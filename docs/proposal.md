@@ -44,7 +44,7 @@ In conclusion, we believe that JSJS's list of features and Javascript's ubiquity
 Features
 ===
 
-* **Strong Type Safety:**<br/>
+* **Strong Type Safety**<br/>
 JavaScript is a dynamically typed language, with no real notion of type safety. A variable in JavaScript can be assigned to data of any type and this assignment can be changed through the course of the program.
 JSJS is be a strongly typed language with static type checking, like OCaml. Types will not be inferred, so the types must be explicitly stated while declaring values and defining functions.  
 A **strong type system** is described as one in which there is no possibility of an unchecked runtime type error and does not permit any implicit type conversion for operations at runtime.   

@@ -1,0 +1,421 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <meta name="author" content="A general purpose, strongly typed programming language for the web" />
+  <title>JSJS - Project Proposal</title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+  </style>
+  <link rel="stylesheet" href="pandoc.css" type="text/css" />
+  
+  
+  
+</head>
+<body>
+<div id="header">
+<h1 class="title">JSJS - Project Proposal</h1>
+<h2 class="author">A general purpose, strongly typed programming language for the web</h2>
+</div>
+
+<hr />
+<h1 id="description">Description</h1>
+<p>JSJS is a strongly typed language for the web. Taking inspiration from languages such Scala, TypeScript and OCaml, the goal of JSJS is to enable programmers to write type-safe, correct and robust code that compiles down to Javascript. Our target users are programmers who like functional nature of Javascript but want the safety and guarantees that come with a statically typed language without sacrificing its ubiquity.</p>
+<h1 id="motivation">Motivation</h1>
+<blockquote>
+<p><em>Any application that can be written in JavaScript, will eventually be written in JavaScript</em> - <strong>Jeff Atwood</strong></p>
+</blockquote>
+<p>Javascript is the <em>lingua franca</em> of the web. With its humble beginnings in engine of the browser, Javascript has slowly and steadily has gained wide adoption across the developer community at large. Famed to have gone from conception to a working implementation in just 10 days, Javascript now runs on everything - from massive servers to even the smallest Raspberry Pi. However, Javascript's massive success has often been met with wide bewilderment (even disdain in some cases) from developers.</p>
+<p>The members of this group, however, believe that Javascript is an incredibly powerful language. Having spent most of our time programming for the web - both frontend and backend, building apps ranging from trivial browser plugins to standalone cross-platform native ones, we marvel that at the fact that a language could have such a widespread use and applicability. The good news that we are not alone in this assessment. The biggest tech giants of today are spending numerous resources in making the language even better. This includes but is not limited to the monumental advances done by the Google folks on V8, the recent Chakra engine by Microsoft and the numerous tools open-sourced by Facebook.</p>
+<p>As a language Javascript is quite interesting. With features such as closures, functions as first class objects, asynchronous programming via callbacks and a prototype based system, Javascript can definitely be touted as a modern language. On the other hand, JS is infamous for weird object rules, global name definitions and hard-to-grok prototype chain. The fact that one of the most popular books on JS is titled &quot;Javascript: The Good Parts&quot; indicates the warts in the language.</p>
+<p>Our goal with <strong>JSJS</strong> is to create a functional language that has features such as type safety and immutability but at the same time can be used where Javascript runs. Despite Javascript treating functions as first class objects, Javascript is typically used as an imperative programming language. Its lack of structure has encouraged programmers to think of Javascript objects in terms of state, instead of attempting to transform data. Javascript is a product of rapid evolution, and thus for many people from the functional programming school of thought, it seems broken. Although its core library is small, Javascript’s weak typing and object construction system create a broken mix, where functions are first class, yet objects are used imperatively. These are some of the issues that we plan to address with JSJS.</p>
+<p>In conclusion, we believe that JSJS's list of features and Javascript's ubiquity is a deadly combination that make it compelling tool for programmers.</p>
+<h1 id="features">Features</h1>
+<ul>
+<li><p><strong>Strong Type Safety</strong><br/> JavaScript is a dynamically typed language, with no real notion of type safety. A variable in JavaScript can be assigned to data of any type and this assignment can be changed through the course of the program. JSJS is be a strongly typed language with static type checking, like OCaml. Types will not be inferred, so the types must be explicitly stated while declaring values and defining functions.<br />
+A <strong>strong type system</strong> is described as one in which there is no possibility of an unchecked runtime type error and does not permit any implicit type conversion for operations at runtime.<br />
+Since JSJS compiles down to JavaScript, which is a dynamically typed language, types in JSJS merely act as annotations for type safety and will be erased during generation of the JavaScript code.</p></li>
+<li><p><strong>Immutable Values</strong><br/> One of the hallmarks of functional programming is immutability of all values used in a program. Javascript is an imperative language, where state can be changed and variables can be reassigned with new values. JSJS will have no concept of variables and all assignments will be treated as values, and hence cannot be changed or reassigned during the running of the program. We have chosen the keyword <code>val</code> for assigning values to identifiers to express the concept of all values being immutable more emphatically.</p></li>
+<li><p><strong>Everything is an Expression</strong><br/> Every statement in JSJS is an expression that evaluates to a result of some type, exactly like in OCaml. We will also provide a Unit type, to allow for side-effects such as printing and logging which don't evaluate to an explicit return type.</p></li>
+<li><p><strong>Immutable Data Structures</strong><br/> An immutable or persistent data structure is one in which previous versions of the data structure are preserved when it is modified. Immutable data structures make programs more robust and easy to reason about. Data structures in JavaScript are completely mutable.<br />
+JSJS will provide immutable implementations for Lists and Maps in the language, with a standard library for functions like <code>List.hd</code> and <code>List.tl</code>, and <code>Map.get</code> and <code>Map.set</code>.</p></li>
+<li><p><strong>Polymorphic Types</strong> <br/> Support for polymorphic types is another fundamental feature of functional programming. This allows functions to take arguments of generic types and perform some operation on them, without the function being required to explicitly know the underlying types of the argument. For eg., we can have a function that takes as an argument a list of any type, and performs some operation on it. This function can work with both lists of numbers and lists of strings. JSJS supports polymorphism for the built-in data types.</p></li>
+<li><p><strong>Functions as First-Class Objects</strong><br/> Functions in JSJS are first-class objects. Functions can be passed as arguments to other functions, returned by other functions, and can be assigned to variables. JSJS also supports anonymous functions. JavaScript has support for functions as first-class objects, so JSJS provides some syntactic sugar to make their usage sweeter.</p></li>
+</ul>
+<h1 id="lexical-conventions">Lexical Conventions</h1>
+<table>
+<thead>
+<tr class="header">
+<th align="left">Name</th>
+<th align="left">Function</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">Keywords</td>
+<td align="left"><code>if</code>, <code>then</code>, <code>else</code>, <code>num</code>, <code>string</code>, <code>bool</code>, <code>val</code>, <code>def</code>, <code>list</code>, <code>true</code>, <code>false</code></td>
+</tr>
+<tr class="even">
+<td align="left">Comments</td>
+<td align="left"><code>// this is a comment</code></td>
+</tr>
+<tr class="odd">
+<td align="left">Multi-line Blocks</td>
+<td align="left"><code>{ ... ; }</code></td>
+</tr>
+<tr class="even">
+<td align="left">Conditionals</td>
+<td align="left"><code>if (x == 10) then { 10 * 10; } else { 100; }</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="primitive-data-types">Primitive Data Types</h3>
+<table>
+<thead>
+<tr class="header">
+<th align="left">Data Types</th>
+<th align="left">Example</th>
+<th align="left">Declaration</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">num</td>
+<td align="left">42, -42, 4.2, -0.00042</td>
+<td align="left"><code>val a : num = 42;</code></td>
+</tr>
+<tr class="even">
+<td align="left">bool</td>
+<td align="left">true, false</td>
+<td align="left"><code>val isAwesome? : bool = true;</code></td>
+</tr>
+<tr class="odd">
+<td align="left">string</td>
+<td align="left">&quot;jsjs&quot;, &quot;is&quot;, &quot;the&quot;, &quot;best&quot;, &quot;!!!&quot;</td>
+<td align="left"><code>val name : string = &quot;jsjs&quot;;</code></td>
+</tr>
+<tr class="even">
+<td align="left">unit</td>
+<td align="left"><code>unit</code></td>
+<td align="left"><code>val _ : unit = println(&quot;Hello&quot;);</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="type-declaration">Type Declaration</h3>
+<table>
+<colgroup>
+<col width="10%" />
+<col width="24%" />
+<col width="65%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">Values</th>
+<th align="left">Type Declaration</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">Any</td>
+<td align="left"><code>a: T</code>, <code>a : U</code></td>
+<td align="left">where T and U can be any of the types given below</td>
+</tr>
+<tr class="even">
+<td align="left">Number</td>
+<td align="left"><code>a: num</code></td>
+<td align="left">where num represents the type for Numbers</td>
+</tr>
+<tr class="odd">
+<td align="left">Boolean</td>
+<td align="left"><code>a: bool</code></td>
+<td align="left">where bool represents the type for Logical values like true and false</td>
+</tr>
+<tr class="even">
+<td align="left">String</td>
+<td align="left"><code>a: string</code></td>
+<td align="left">where string represents the type for string literals</td>
+</tr>
+<tr class="odd">
+<td align="left">Unit</td>
+<td align="left"><code>a: unit</code></td>
+<td align="left">used for dealing with side-effects</td>
+</tr>
+<tr class="even">
+<td align="left">List</td>
+<td align="left"><code>a: list T</code></td>
+<td align="left">where T is type of elements of the list</td>
+</tr>
+<tr class="odd">
+<td align="left">Map</td>
+<td align="left"><code>a: &lt;T : U&gt;</code></td>
+<td align="left">where T is type of the key and U is type of the value</td>
+</tr>
+<tr class="even">
+<td align="left">Function</td>
+<td align="left"><code>a: (T1, T2, ..) -&gt; U</code></td>
+<td align="left">where T1, T2,... are the types of the arguments taken by the function and U is the return type of the function</td>
+</tr>
+</tbody>
+</table>
+<h3 id="operators">Operators</h3>
+<table>
+<thead>
+<tr class="header">
+<th align="left">Operator Name</th>
+<th align="left">Syntax</th>
+<th align="left">Applicable Data Types</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">Assignment</td>
+<td align="left"><code>a = b</code></td>
+<td align="left">num, bool, string</td>
+</tr>
+<tr class="even">
+<td align="left">Integer Arithmetic</td>
+<td align="left"><code>a + b, a - b, a * b, a / b</code></td>
+<td align="left">num</td>
+</tr>
+<tr class="odd">
+<td align="left">Modulo</td>
+<td align="left"><code>a % b</code></td>
+<td align="left">num</td>
+</tr>
+<tr class="even">
+<td align="left">Equal to</td>
+<td align="left"><code>a == b</code></td>
+<td align="left">num, bool, string</td>
+</tr>
+<tr class="odd">
+<td align="left">Not Equal to</td>
+<td align="left"><code>a != b</code></td>
+<td align="left">num, bool, string</td>
+</tr>
+<tr class="even">
+<td align="left">Comparison</td>
+<td align="left"><code>a &lt;= b, a &lt; b, a &gt;= b, a &gt; b</code></td>
+<td align="left">num, bool, string</td>
+</tr>
+<tr class="odd">
+<td align="left">Logical AND</td>
+<td align="left"><code>a &amp;&amp; b</code></td>
+<td align="left">bool</td>
+</tr>
+<tr class="even">
+<td align="left">Logical OR</td>
+<td align="left"><code>a || b</code></td>
+<td align="left">bool</td>
+</tr>
+<tr class="odd">
+<td align="left">Logical NOT</td>
+<td align="left"><code>!a</code></td>
+<td align="left">bool</td>
+</tr>
+<tr class="even">
+<td align="left">Concat</td>
+<td align="left"><code>a ^ b</code></td>
+<td align="left">string</td>
+</tr>
+</tbody>
+</table>
+<h1 id="composite-data-types">Composite Data Types</h1>
+<h2 id="list">List</h2>
+<h3 id="list-type-declaration">List Type Declaration</h3>
+<ul>
+<li>The <strong>list</strong> keyword is used to declare the type of a list</li>
+<li>Type declaration for a list: <code>a : list T</code></li>
+</ul>
+<h3 id="list-declaration">List Declaration</h3>
+<div class="sourceCode"><pre class="sourceCode scala"><code class="sourceCode scala"><span class="co">// List of strings</span>
+<span class="kw">val</span> names : list string = [<span class="st">&quot;foo&quot;</span>, <span class="st">&quot;bar&quot;</span>, <span class="st">&quot;baz&quot;</span>];
+
+<span class="co">// List of nums</span>
+<span class="kw">val</span> nums : list num = [<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>];
+
+<span class="co">// List of lists of string</span>
+<span class="kw">val</span> friends_list : list list string = [[<span class="st">&quot;foo&quot;</span>], [<span class="st">&quot;bar&quot;</span>], [<span class="st">&quot;baz&quot;</span>]];</code></pre></div>
+<h4 id="list-functions">List Functions</h4>
+<div class="sourceCode"><pre class="sourceCode scala"><code class="sourceCode scala"><span class="co">// Returns the first element of the list</span>
+<span class="kw">val</span> head : num = List.<span class="fu">hd</span>([<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">5</span>, <span class="dv">6</span>])
+
+<span class="co">// Returns the list without the head of the list</span>
+<span class="kw">val</span> tail : list num = List.<span class="fu">tl</span>([<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">5</span>, <span class="dv">6</span>])
+
+<span class="co">// Returns the length of the list</span>
+<span class="kw">val</span> length : num = List.<span class="fu">length</span>([<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">5</span>, <span class="dv">6</span>])</code></pre></div>
+<h2 id="map">Map</h2>
+<h4 id="map-type-declaration">Map Type Declaration</h4>
+<ul>
+<li>The <strong>&lt;&gt;</strong> construct is used to declare a map</li>
+<li>Map Type Declaration: <code>a : &lt;T, U&gt;</code> where T is type of the key and U is the type of the value.</li>
+</ul>
+<h4 id="map-declaration">Map Declaration</h4>
+<div class="sourceCode"><pre class="sourceCode scala"><code class="sourceCode scala"><span class="co">// creates a map with key of string type and value of num type.</span>
+<span class="kw">val</span> passwords : &lt;string: num&gt; = {
+ <span class="st">&quot;foo&quot;</span> : <span class="dv">1245</span>,
+ <span class="st">&quot;bar&quot;</span> : <span class="dv">5567</span>,
+ <span class="st">&quot;baz&quot;</span> : <span class="dv">5533</span>
+};
+
+<span class="co">// creates a map of key string type and value being another map </span>
+<span class="co">// that has key of string type and value of num type.</span>
+<span class="kw">val</span> students : &lt;string: &lt;string: num&gt;&gt; = {
+  <span class="st">&quot;foo&quot;</span>: { <span class="st">&quot;marks&quot;</span>: <span class="dv">97</span> },
+  <span class="st">&quot;bar&quot;</span>: { <span class="st">&quot;marks&quot;</span>: <span class="dv">23</span> },
+  <span class="st">&quot;baz&quot;</span>: { <span class="st">&quot;marks&quot;</span>: <span class="dv">47</span> },
+};</code></pre></div>
+<h5 id="map-functions">Map Functions</h5>
+<div class="sourceCode"><pre class="sourceCode scala"><code class="sourceCode scala"><span class="co">// Returns value associated with key = &quot;foo&quot; in map named passwords</span>
+<span class="kw">val</span> foo = Map.<span class="fu">get</span>(passwords, <span class="st">&quot;foo&quot;</span>);
+
+<span class="co">// Sets the value of field &quot;foo&quot; as 12345 in map named passwords</span>
+<span class="kw">val</span> foo = Map.<span class="fu">set</span>(passwords, <span class="st">&quot;foo&quot;</span>, <span class="dv">12345</span>); </code></pre></div>
+<h2 id="functions">Functions</h2>
+<h4 id="function-type-declaration">Function Type Declaration</h4>
+<ul>
+<li>JSJS has a unique way of declaring the type or signature of a function.</li>
+<li>This is particularly needed when declaring anonymous functions.</li>
+<li>Function type is declared as: <code>f : (T, T, ...) -&gt; U</code> where T are types of the arguments and U is the return type of the function</li>
+</ul>
+<h5 id="function-expressions">Function Expressions</h5>
+<div class="sourceCode"><pre class="sourceCode scala"><code class="sourceCode scala"><span class="co">// defines a function square that takes</span>
+<span class="co">// a `num` argument and returns a `num`</span>
+<span class="kw">def</span> <span class="fu">square</span> (x: num) : num = x * x;</code></pre></div>
+<h5 id="multi-line-functions">Multi-line functions</h5>
+<div class="sourceCode"><pre class="sourceCode scala"><code class="sourceCode scala"><span class="co">// multi-line statements (i.e blocks) are separated by </span>
+<span class="co">// a semicolon. The last line in a block is returned automatically.</span>
+<span class="co">// Hence, there is no explicit `return` keyword</span>
+<span class="kw">def</span> <span class="fu">cube</span> (x: num): num = {
+  <span class="kw">val</span> sq = <span class="fu">square</span>(x);
+  x * sq;
+}</code></pre></div>
+<h5 id="functions-as-values">Functions as values</h5>
+<div class="sourceCode"><pre class="sourceCode scala"><code class="sourceCode scala"><span class="co">// Assigns the name `sq` to an anonymous function.</span>
+<span class="co">// Functionally equivalent to def sq (x: num) : num = x * x;</span>
+<span class="kw">val</span> sq : (num) -&gt; num = (x: num) : num =&gt; x * x;</code></pre></div>
+<h5 id="anonymous-functions">Anonymous Functions</h5>
+<div class="sourceCode"><pre class="sourceCode scala"><code class="sourceCode scala"><span class="co">// passing an anonymous function using the arrow syntax</span>
+<span class="kw">val</span> squares : list num = <span class="fu">map</span>((x: num) : num =&gt; x * x, [<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>]);</code></pre></div>
+<h5 id="polymorphic-functions">Polymorphic Functions</h5>
+<div class="sourceCode"><pre class="sourceCode scala"><code class="sourceCode scala"><span class="co">// defining a polymorphic function that takes two arguments</span>
+<span class="co">// The first argument is a function, the second is a list. </span>
+<span class="co">// Finally, the return type of this function is another list</span>
+<span class="co">// of (possibly) a different type than the input list.</span>
+<span class="kw">def</span> <span class="fu">map</span> (f: (T) -&gt; U, l: list T): list U {
+   <span class="kw">if</span> (List.<span class="fu">empty</span>?(l)) 
+   then { []; }
+   <span class="kw">else</span> {
+     <span class="kw">val</span> res = <span class="fu">f</span>(List.<span class="fu">hd</span>(l));
+     List.<span class="fu">cons</span>(res, <span class="fu">map</span>(f, List.<span class="fu">tl</span>(l)));
+   }
+} </code></pre></div>
+
+<h1 id="example-programs">Example Programs</h1>
+<h3 id="bottles-of-beer">99 bottles of beer</h3>
+<div class="sourceCode"><pre class="sourceCode scala"><code class="sourceCode scala"><span class="kw">def</span> <span class="fu">ninetyNineBottles</span> (): <span class="dt">unit</span> = {
+   <span class="kw">def</span> <span class="fu">toStr</span>(x:num) : string = {
+      <span class="kw">if</span> (num == <span class="dv">0</span>)
+      then { <span class="st">&quot;no more&quot;</span>; }
+      <span class="kw">else</span> { String.<span class="fu">toString</span>(num); }
+   }
+
+   <span class="kw">def</span> <span class="fu">ninetyNine</span> (x:num) : <span class="dt">unit</span> = {
+      <span class="kw">if</span>(x==<span class="dv">0</span>)
+      then {
+         <span class="fu">println</span>(<span class="st">&quot;No more bottles of beer on the wall, no more bottles of beer.&quot;</span>);
+         <span class="fu">println</span>(<span class="st">&quot;Go to the store and buy some more, 99 bottles of beer on the wall.&quot;</span>);   
+      } 
+      <span class="kw">else</span> {
+         <span class="fu">println</span>(<span class="fu">toStr</span>(num) ^ <span class="st">&quot;bottle of beer on the wall, &quot;</span> ^
+                 <span class="fu">toStr</span>(num) ^  <span class="st">&quot; bottle of beer.&quot;</span>);
+
+         <span class="kw">if</span>(x==<span class="dv">2</span>)
+         then {
+            <span class="fu">println</span>(<span class="st">&quot;Take one down and pass it around, &quot;</span> ^ 
+                    <span class="fu">toStr</span>(num - <span class="dv">1</span>) ^ <span class="st">&quot; bottle of beer on the wall.&quot;</span>);
+            <span class="fu">nintetyNine</span>(x<span class="dv">-1</span>);
+         }
+         <span class="kw">else</span>{
+            <span class="fu">println</span>(<span class="st">&quot;Take one down and pass it around, &quot;</span> ^ 
+                    <span class="fu">toStr</span>(num - <span class="dv">1</span>) ^ <span class="st">&quot; bottles of beer on the wall.&quot;</span>);
+            <span class="fu">nintetyNine</span>(x<span class="dv">-1</span>);
+         }
+      }
+   }
+   <span class="fu">ninetyNine</span>(<span class="dv">99</span>);
+}</code></pre></div>
+<h3 id="euclids-algorithm-for-gcd">Euclid's algorithm for GCD</h3>
+<div class="sourceCode"><pre class="sourceCode scala"><code class="sourceCode scala"><span class="kw">def</span> <span class="fu">gcd</span> (a : num, b : num) : bool = {
+   <span class="kw">if</span> (a == b) 
+   then { a; } 
+   <span class="kw">else</span> {
+      <span class="kw">if</span> (a &gt; b)
+      then { <span class="fu">gcd</span>((a - b), b); }
+      <span class="kw">else</span> { <span class="fu">gcd</span>((b - a), a); }
+   }
+}</code></pre></div>
+<h3 id="merge-sort">Merge Sort</h3>
+<div class="sourceCode"><pre class="sourceCode scala"><code class="sourceCode scala">
+<span class="kw">def</span> <span class="fu">merge</span> (a : list num, b : list num) : list num = {
+   <span class="kw">if</span>(List.<span class="fu">hd</span>(a) &lt; List.<span class="fu">hd</span>(b))
+   then { List.<span class="fu">cons</span>(List.<span class="fu">hd</span>(a), <span class="fu">merge</span>(List.<span class="fu">tl</span>(a), b); }
+   <span class="kw">else</span> { List.<span class="fu">cons</span>(List.<span class="fu">hd</span>(b), <span class="fu">merge</span>(a, List.<span class="fu">tl</span>(b)); }
+}
+
+<span class="kw">def</span> <span class="fu">split</span> (a : list num, start : num, end : num) : list num = {
+   <span class="kw">if</span> (start != <span class="dv">0</span>)
+   then { <span class="fu">split</span>(List.<span class="fu">tl</span>(num), start - <span class="dv">1</span>, num); }
+   <span class="kw">else</span> {
+      <span class="kw">if</span> (end == -<span class="dv">1</span>)
+      then { a; }
+      <span class="kw">else</span> { List.<span class="fu">cons</span>(List.<span class="fu">hd</span>(a), <span class="fu">split</span>(List.<span class="fu">tl</span>(a), start, end - <span class="dv">1</span>)); }
+   }
+}
+
+<span class="kw">def</span> <span class="fu">mergeSort</span> (a : list num) : list num = {
+   <span class="kw">val</span> size = List.<span class="fu">length</span>(a);
+   <span class="kw">if</span> (size == <span class="dv">0</span> || size == <span class="dv">1</span>) 
+   then { a; }
+   <span class="kw">else</span> { <span class="fu">merge</span>(<span class="fu">split</span>(a, <span class="dv">0</span>, size/<span class="dv">2</span>), <span class="fu">split</span>(a, size/<span class="dv">2</span> + <span class="dv">1</span>, size - <span class="dv">1</span>)); }
+}</code></pre></div>
+</body>
+</html>
