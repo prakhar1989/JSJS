@@ -1,7 +1,6 @@
 DOCS = docs/proposal.md
 
-all:
-	echo "Hello from JSJS"
+all: buildocs
 
 buildocs: $(DOCS)
 	pandoc $(DOCS) -o docs/proposal.pdf
