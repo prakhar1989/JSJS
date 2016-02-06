@@ -325,6 +325,7 @@ def mergeSort (a : list num) : list num = {
    val size = List.length(a);
    if (size == 0 || size == 1) 
    then { a; }
-   else { merge(split(a, 0, size/2), split(a, size/2 + 1, size - 1)); }
+   else { merge(mergeSort(split(a, 0, size/2)), 
+                mergeSort(split(a, size/2 + 1, size - 1))); }
 }
 ```

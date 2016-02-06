@@ -415,7 +415,8 @@ JSJS will provide immutable implementations for Lists and Maps in the language, 
    <span class="kw">val</span> size = List.<span class="fu">length</span>(a);
    <span class="kw">if</span> (size == <span class="dv">0</span> || size == <span class="dv">1</span>) 
    then { a; }
-   <span class="kw">else</span> { <span class="fu">merge</span>(<span class="fu">split</span>(a, <span class="dv">0</span>, size/<span class="dv">2</span>), <span class="fu">split</span>(a, size/<span class="dv">2</span> + <span class="dv">1</span>, size - <span class="dv">1</span>)); }
+   <span class="kw">else</span> { <span class="fu">merge</span>(<span class="fu">mergeSort</span>(<span class="fu">split</span>(a, <span class="dv">0</span>, size/<span class="dv">2</span>)), 
+                <span class="fu">mergeSort</span>(<span class="fu">split</span>(a, size/<span class="dv">2</span> + <span class="dv">1</span>, size - <span class="dv">1</span>))); }
 }</code></pre></div>
 </body>
 </html>
