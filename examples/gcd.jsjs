@@ -1,0 +1,9 @@
+def gcd (a : num, b : num) : bool = {
+   if (a == b) 
+   then { a; } 
+   else {
+      if (a > b)
+      then { gcd((a - b), b); }
+      else { gcd((b - a), a); }
+   }
+}
