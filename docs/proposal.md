@@ -70,6 +70,20 @@ Functions in JSJS are first-class objects. Functions can be passed as arguments 
 JavaScript has support for functions as first-class objects, so JSJS provides some syntactic sugar to make their usage sweeter.
 
 
+Comparison with Javascript
+===
+
+Feature|Exists in JS?|In scope| Out of scope
+---|---|--- | --- | ---- | ----
+Type Safety | No | Strong types | Type inference
+Immutable values | Yes - ES6 only | No variables | NA
+Immutable Data Structures | No | Lists and Maps | Arrays and Sets
+Polymorphic Types | No | For built-ins | User-defined types
+First-class Functions | Yes | Syntactic sugar | NA
+Compiles down to JS | NA | Node & browser | NA
+
+
+
 Lexical Conventions
 ===
 
