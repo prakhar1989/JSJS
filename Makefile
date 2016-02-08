@@ -1,6 +1,6 @@
 DOCS = docs/proposal.md
 
-all: buildocs
+all: scanner
 
 buildocs: $(DOCS)
 	pandoc $(DOCS) -o docs/proposal.pdf
