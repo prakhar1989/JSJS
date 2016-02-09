@@ -21,6 +21,7 @@ open Ast
 %token <string> ID
 
 /* associativity rules */
+%left SEMICOLON
 %left ASSIGN
 %left PLUS MINUS
 %left MULTIPLY DIVIDE MODULUS
@@ -33,15 +34,16 @@ open Ast
 
 /* grammar follows */
 expr: 
-    | expr PLUS expr { Binop($1, Add, $3) }
-    | expr MINUS expr { Binop($1, Sub, $3) }
-    | expr MULTIPLY expr { Binop($1, Mul, $3) }
-    | expr DIVIDE expr { Binop($1, Div, $3) }
-    | expr MODULUS expr { Binop($1, Mod, $3) }
-    | NUM_LIT { NumLit($1) }
-    | ID { Val($1) }
-    | VAL ID COLON NUM ASSIGN expr { Assign($2, Num, $6) }
-    | VAL ID COLON BOOL ASSIGN expr { Assign($2, Bool, $6) }
-    | VAL ID COLON STRING ASSIGN expr { Assign($2, String, $6) }
-    | VAL ID COLON UNIT ASSIGN expr { Assign($2, Unit, $6) }
+    | expr PLUS expr                  { Binop($1, Add, $3) }
+    | expr MINUS expr                 { Binop($1, Sub, $3) }
+    | expr MULTIPLY expr              { Binop($1, Mul, $3) }
+    | expr DIVIDE expr                { Binop($1, Div, $3) }
+    | expr MODULUS expr               { Binop($1, Mod, $3) }
+    | NUM_LIT                         { NumLit($1) }
+    | ID                              { Val($1) }
+    | VAL ID COLON NUM ASSIGN expr    { Assign($2, TNum, $6) }
+    | VAL ID COLON BOOL ASSIGN expr   { Assign($2, TBool, $6) }
+    | VAL ID COLON STRING ASSIGN expr { Assign($2, TString, $6) }
+    | VAL ID COLON UNIT ASSIGN expr   { Assign($2, TUnit, $6) }
+    | expr SEMICOLON expr             { Seq($1, $3) }
 
