@@ -1,5 +1,9 @@
 open Ast
 
+
+(* map for storing value assignments *)
+module ValMap = Map.Make(String);;
+
 let rec eval sym_table = function
   | NumLit(x) -> x 
   | Val(s) -> 
@@ -24,7 +28,11 @@ let rec eval sym_table = function
 
 let _ =                                                              
   let sym_table = Hashtbl.create 100 in
-  let lexbuf = Lexing.from_channel stdin in
+  let cin = if Array.length Sys.argv > 1
+    then open_in Sys.argv.(1)
+    else stdin
+  in
+  let lexbuf = Lexing.from_channel cin in
   let expr = Parser.expr Scanner.token lexbuf in
   let result = eval sym_table expr in 
   print_endline (string_of_float result)

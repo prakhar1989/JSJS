@@ -1,0 +1,4 @@
+val x : num = 10; 
+val y : num = 100; 
+val z : num = 20;
+x + y * z

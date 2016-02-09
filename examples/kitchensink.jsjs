@@ -4,5 +4,3 @@ val total : bool = 4 + 5 / 2 == 10;
 val float_total : num = 3.14159;
 
 val myname : string = "this is soo 4 + 5 //";
-
-val String1.10toString
