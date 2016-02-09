@@ -5,9 +5,9 @@ all: parser
 buildocs: $(DOCS)
 	pandoc $(DOCS) -o docs/proposal.pdf
 
-parser: src/parser.mly
-	ocamlyacc src/parser.mly
-	ocamlc -c src/parser.mli
-	ocamllex src/scanner.mll
-	ocamlc -o out src/scanner.ml
-	ocamlc -c src/parser.ml
+parser: 
+	cd src;	ocamlyacc parser.mly;\
+	ocamlc -c parser.mli;\
+	ocamllex scanner.mll;\
+	ocamlc -c scanner.ml;\
+	ocamlc -c parser.ml;
