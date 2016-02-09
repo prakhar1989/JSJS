@@ -79,6 +79,55 @@ JSJS will provide immutable implementations for Lists and Maps in the language, 
 <li><p><strong>Polymorphic Types</strong> <br/> Support for polymorphic types is another fundamental feature of functional programming. This allows functions to take arguments of generic types and perform some operation on them, without the function being required to explicitly know the underlying types of the argument. For eg., we can have a function that takes as an argument a list of any type, and performs some operation on it. This function can work with both lists of numbers and lists of strings. JSJS supports polymorphism for the built-in data types.</p></li>
 <li><p><strong>Functions as First-Class Objects</strong><br/> Functions in JSJS are first-class objects. Functions can be passed as arguments to other functions, returned by other functions, and can be assigned to variables. JSJS also supports anonymous functions. JavaScript has support for functions as first-class objects, so JSJS provides some syntactic sugar to make their usage sweeter.</p></li>
 </ul>
+<h1 id="comparison-with-javascript">Comparison with Javascript</h1>
+<table>
+<thead>
+<tr class="header">
+<th align="left">Feature</th>
+<th align="left">Exists in JS?</th>
+<th align="left">In scope</th>
+<th align="left">Out of scope</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">Type Safety</td>
+<td align="left">No</td>
+<td align="left">Strong types</td>
+<td align="left">Type inference</td>
+</tr>
+<tr class="even">
+<td align="left">Immutable values</td>
+<td align="left">Yes - ES6 only</td>
+<td align="left">No variables</td>
+<td align="left">NA</td>
+</tr>
+<tr class="odd">
+<td align="left">Immutable Data Structures</td>
+<td align="left">No</td>
+<td align="left">Lists and Maps</td>
+<td align="left">Arrays and Sets</td>
+</tr>
+<tr class="even">
+<td align="left">Polymorphic Types</td>
+<td align="left">No</td>
+<td align="left">For built-ins</td>
+<td align="left">User-defined types</td>
+</tr>
+<tr class="odd">
+<td align="left">First-class Functions</td>
+<td align="left">Yes</td>
+<td align="left">Syntactic sugar</td>
+<td align="left">NA</td>
+</tr>
+<tr class="even">
+<td align="left">Compiles down to JS</td>
+<td align="left">NA</td>
+<td align="left">Node &amp; browser</td>
+<td align="left">NA</td>
+</tr>
+</tbody>
+</table>
 <h1 id="lexical-conventions">Lexical Conventions</h1>
 <table>
 <thead>
