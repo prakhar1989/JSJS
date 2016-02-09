@@ -1320,14 +1320,19 @@ let
 # 1321 "scanner.ml"
 
   | 46 ->
+let
 # 58 "scanner.mll"
-                                ( failwith "Syntax error" )
-# 1326 "scanner.ml"
+           c
+# 1327 "scanner.ml"
+= Lexing.sub_lexeme_char lexbuf lexbuf.Lexing.lex_start_pos in
+# 58 "scanner.mll"
+                                ( raise (Failure("illegal character: " ^ Char.escaped c)) )
+# 1331 "scanner.ml"
 
   | 47 ->
 # 59 "scanner.mll"
-                                ( raise End_of_file )
-# 1331 "scanner.ml"
+                                ( EOF )
+# 1336 "scanner.ml"
 
   | __ocaml_lex_state -> lexbuf.Lexing.refill_buff lexbuf; 
       __ocaml_lex_token_rec lexbuf __ocaml_lex_state
@@ -1339,37 +1344,15 @@ and __ocaml_lex_comment_rec lexbuf __ocaml_lex_state =
       | 0 ->
 # 63 "scanner.mll"
            ( token lexbuf )
-# 1343 "scanner.ml"
+# 1348 "scanner.ml"
 
   | 1 ->
 # 64 "scanner.mll"
          ( comment lexbuf )
-# 1348 "scanner.ml"
+# 1353 "scanner.ml"
 
   | __ocaml_lex_state -> lexbuf.Lexing.refill_buff lexbuf; 
       __ocaml_lex_comment_rec lexbuf __ocaml_lex_state
 
 ;;
 
-# 66 "scanner.mll"
- 
-    let rec parse lexbuf = 
-        let _ = token lexbuf in parse lexbuf
-    ;;
-
-    let main () = 
-        (* checks for a file as the first argument
-         * else defaults to stdin *)
-        let cin = 
-            if Array.length Sys.argv > 1
-            then open_in Sys.argv.(1)
-            else stdin
-        in
-        let lexbuf = Lexing.from_channel cin in
-        try parse lexbuf with
-        | End_of_file -> ()
-    ;;
-
-    main ();;
-
-# 1376 "scanner.ml"

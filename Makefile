@@ -7,7 +7,10 @@ buildocs: $(DOCS)
 
 parser: 
 	cd src;	ocamlyacc parser.mly;\
+	ocamlc -c ast.mli;\
 	ocamlc -c parser.mli;\
 	ocamllex scanner.mll;\
 	ocamlc -c scanner.ml;\
-	ocamlc -c parser.ml;
+	ocamlc -c parser.ml; \
+	ocamlc -c main.ml;\
+	ocamlc -o ../jsjs.out parser.cmo scanner.cmo main.cmo

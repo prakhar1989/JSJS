@@ -55,31 +55,10 @@ rule token =
     | '"' (string_lit as s) '"' { STR_LIT(s); }
     | id     as ident           { ID(ident); }
     | module_lit  as m_lit      { MOD_LIT(m_lit); }
-    | _                         { failwith "Syntax error" }
-    | eof                       { raise End_of_file }
+    | _ as c                    { raise (Failure("illegal character: " ^ Char.escaped c)) }
+    | eof                       { EOF }
 
 and comment = 
     parse
     | '\n' { token lexbuf }
     | _  { comment lexbuf }
-
-{
-    let rec parse lexbuf = 
-        let _ = token lexbuf in parse lexbuf
-    ;;
-
-    let main () = 
-        (* checks for a file as the first argument
-         * else defaults to stdin *)
-        let cin = 
-            if Array.length Sys.argv > 1
-            then open_in Sys.argv.(1)
-            else stdin
-        in
-        let lexbuf = Lexing.from_channel cin in
-        try parse lexbuf with
-        | End_of_file -> ()
-    ;;
-
-    main ();;
-}

@@ -1,4 +1,5 @@
 type token =
+  | EOF
   | PLUS
   | MINUS
   | MULTIPLY
@@ -44,5 +45,5 @@ type token =
   | MOD_LIT of (string)
   | ID of (string)
 
-val input :
-  (Lexing.lexbuf  -> token) -> Lexing.lexbuf -> unit
+val expr :
+  (Lexing.lexbuf  -> token) -> Lexing.lexbuf -> Ast.expr
