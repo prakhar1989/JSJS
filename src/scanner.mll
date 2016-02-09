@@ -18,7 +18,7 @@ rule token =
     | '<'                       { LT }
     | '>'                       { GT }
     | '='                       { ASSIGN }
-    | '!'                       { NEGATE }
+    | '!'                       { NOT }
     | '^'                       { CARET }
     | "<="                      { LTE }
     | ">="                      { GTE }
@@ -39,7 +39,6 @@ rule token =
     | "unit"                    { UNIT }
     | "string"                  { STRING }
     | "list"                    { LIST }
-    | '"'                       { string_lit lexbuf; }
     | ':'                       { COLON }
     | '('                       { LPAREN }
     | ')'                       { RPAREN }
