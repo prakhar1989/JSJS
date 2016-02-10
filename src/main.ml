@@ -1,8 +1,5 @@
 open Ast
-
-
-(* map for storing value assignments *)
-module ValMap = Map.Make(String);;
+open Lexing
 
 let rec eval sym_table = function
   | NumLit(x) -> x 
@@ -32,12 +29,14 @@ let _ =
     then open_in Sys.argv.(1)
     else stdin
   in
+  let lexbuf = Lexing.from_channel cin in
   try 
-    let lexbuf = Lexing.from_channel cin in
     let expr = Parser.expr Scanner.token lexbuf in
     let result = eval sym_table expr in 
     print_endline (string_of_float result)
   with
-  | Exceptions.IllegalCharacter(s) -> print_endline ("Syntax Error: Illegal Character " ^ s ^ " found.")
+  | Exceptions.IllegalCharacter(c, line_no, char_no) -> 
+    print_endline ("Syntax Error: Illegal Character " ^ c ^ " found at line: " 
+                 ^ (string_of_int line_no) ^ ", position: " ^ (string_of_int char_no) )
 ;;
 

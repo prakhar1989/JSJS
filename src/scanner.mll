@@ -1,8 +1,20 @@
-{ open Parser }
+{ 
+    open Parser 
+    open Lexing
+
+    (* increments the line number *)
+    let incr_lineno lexbuf = 
+        let curr_pos = lexbuf.lex_curr_p in
+        lexbuf.lex_curr_p <- { curr_pos with
+            pos_lnum = curr_pos.pos_lnum + 1;
+            pos_bol = curr_pos.pos_cnum;
+        }
+    ;;
+}
 
 let digit = ['0'-'9']
 let id = ['a'-'z'] ['a'-'z' 'A'-'Z' '0'-'9' '_']* ['?']?
-let ws = [' ' '\r' '\n' '\t']
+let ws = [' ' '\r' '\t']
 let number = digit+ '.'? digit*
 let module_lit = ['A'-'Z'] ['a'-'z' 'A'-'Z']*
 let string_lit = (([' '-'!' '#'-'[' ']'-'~'] | '\\' ['\\' '"' 'n' 'r' 't'])* as s)
@@ -10,6 +22,7 @@ let string_lit = (([' '-'!' '#'-'[' ']'-'~'] | '\\' ['\\' '"' 'n' 'r' 't'])* as 
 rule token = 
     parse
     | ws                        { token lexbuf; }
+    | '\n'                      { incr_lineno lexbuf; token lexbuf; }
     | '+'                       { PLUS }
     | '-'                       { MINUS }
     | '*'                       { MULTIPLY }
@@ -55,7 +68,9 @@ rule token =
     | '"' (string_lit as s) '"' { STR_LIT(s); }
     | id     as ident           { ID(ident); }
     | module_lit  as m_lit      { MOD_LIT(m_lit); }
-    | _ as c                    { raise (Exceptions.IllegalCharacter(Char.escaped c)) }
+    | _ as c                    { let line_no = lexbuf.lex_curr_p.pos_lnum in
+                                  let char_no = lexbuf.lex_curr_p.pos_cnum - lexbuf.lex_curr_p.pos_bol in
+                                  raise (Exceptions.IllegalCharacter(Char.escaped c, line_no, char_no)) }
     | eof                       { EOF }
 
 and comment = 
