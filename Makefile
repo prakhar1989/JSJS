@@ -1,16 +1,17 @@
-DOCS = docs/proposal.md
+DOCS=docs/proposal.md
+FLAGS= -I src -c
 
-all: parser
+all: compiler
 
 buildocs: $(DOCS)
 	pandoc $(DOCS) -o docs/proposal.pdf
 
-parser: 
-	cd src;	ocamlyacc parser.mly;\
-	ocamlc -c ast.mli;\
-	ocamlc -c parser.mli;\
-	ocamllex scanner.mll;\
-	ocamlc -c scanner.ml;\
-	ocamlc -c parser.ml; \
-	ocamlc -c main.ml;\
-	ocamlc -o ../jsjs.out parser.cmo scanner.cmo main.cmo
+compiler: src/parser.mly src/scanner.mll src/main.ml
+	ocamlyacc src/parser.mly
+	ocamlc -c src/ast.mli
+	ocamlc $(FLAGS) src/parser.mli
+	ocamllex src/scanner.mll
+	ocamlc $(FLAGS) src/scanner.ml
+	ocamlc $(FLAGS) src/parser.ml
+	ocamlc $(FLAGS) src/main.ml
+	ocamlc -I src -o ../jsjs.out src/parser.cmo src/scanner.cmo src/main.cmo
