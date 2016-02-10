@@ -32,9 +32,12 @@ let _ =
     then open_in Sys.argv.(1)
     else stdin
   in
-  let lexbuf = Lexing.from_channel cin in
-  let expr = Parser.expr Scanner.token lexbuf in
-  let result = eval sym_table expr in 
-  print_endline (string_of_float result)
+  try 
+    let lexbuf = Lexing.from_channel cin in
+    let expr = Parser.expr Scanner.token lexbuf in
+    let result = eval sym_table expr in 
+    print_endline (string_of_float result)
+  with
+  | Exceptions.IllegalCharacter(s) -> print_endline ("Syntax Error: Illegal Character " ^ s ^ " found.")
 ;;
 

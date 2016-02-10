@@ -55,7 +55,7 @@ rule token =
     | '"' (string_lit as s) '"' { STR_LIT(s); }
     | id     as ident           { ID(ident); }
     | module_lit  as m_lit      { MOD_LIT(m_lit); }
-    | _ as c                    { raise (Failure("illegal character: " ^ Char.escaped c)) }
+    | _ as c                    { raise (Exceptions.IllegalCharacter(Char.escaped c)) }
     | eof                       { EOF }
 
 and comment = 

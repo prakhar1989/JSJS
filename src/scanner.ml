@@ -1326,7 +1326,7 @@ let
 # 1327 "src/scanner.ml"
 = Lexing.sub_lexeme_char lexbuf lexbuf.Lexing.lex_start_pos in
 # 58 "src/scanner.mll"
-                                ( raise (Failure("illegal character: " ^ Char.escaped c)) )
+                                ( raise (Exceptions.IllegalCharacter(Char.escaped c)) )
 # 1331 "src/scanner.ml"
 
   | 47 ->
