@@ -1,6 +1,11 @@
 val x : num = 10; 
+
 val y : num = 100; 
+
 val z : num = 20;
-val t : ~ = 20;
+
+// err - val z : ~  = 20;
+
 val x : num = x + y * z;
+
 x + 1

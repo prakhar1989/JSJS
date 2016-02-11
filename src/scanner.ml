@@ -1362,12 +1362,12 @@ and __ocaml_lex_comment_rec lexbuf __ocaml_lex_state =
   match Lexing.engine __ocaml_lex_tables __ocaml_lex_state lexbuf with
       | 0 ->
 # 78 "src/scanner.mll"
-           ( token lexbuf )
+                                ( token lexbuf )
 # 1367 "src/scanner.ml"
 
   | 1 ->
 # 79 "src/scanner.mll"
-         ( comment lexbuf )
+                                ( comment lexbuf )
 # 1372 "src/scanner.ml"
 
   | __ocaml_lex_state -> lexbuf.Lexing.refill_buff lexbuf; 
