@@ -23,10 +23,11 @@ open Ast
 /* associativity rules */
 %left SEMICOLON
 %left ASSIGN
+%left CARET
 %left PLUS MINUS
 %left MULTIPLY DIVIDE MODULUS
 
-
+/* entry point */
 %start expr
 %type <Ast.expr> expr
 
