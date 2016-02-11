@@ -13,11 +13,23 @@ let op_to_string = function
   | Not   -> "!"
 ;;
 
+let type_to_string = function
+  | Num(_) -> "Number"
+  | String(_) -> "String"
+  | Bool(_) -> "Bool"
+  | Unit(_) -> "Unit"
+;;
+
 let rec eval sym_table = function
   | NumLit(x) -> Num(x)
   | StrLit(s) -> String(s)
   | BoolLit(b) -> Bool(b)
-  | Unop(op, _) -> Bool(false) (* TODO: Broken *)
+  | Unop(op, e) -> 
+    let res = eval sym_table e in
+    (match res, op with
+    | Bool(b), Not -> let x = not b in Bool(x)
+    | t, Not -> raise (Exceptions.InvalidOperation((type_to_string t), (op_to_string op))) 
+    | _, _ -> raise (failwith "invalid type and operation"))
   | Binop (e1, op, e2) -> 
     let x1 = eval sym_table e1 and x2 = eval sym_table e2  in
     begin
@@ -45,7 +57,8 @@ let rec eval sym_table = function
           | Or  -> Bool(b1 || b2)
           | _     -> raise (Exceptions.InvalidOperation("Bool", (op_to_string op)))
         end
-      | _, _ -> Unit(())
+      | Unit(_), Unit(_) -> raise (Exceptions.InvalidOperation("Unit", (op_to_string op)))
+      | _, _ -> raise Exceptions.MismatchedTypes
     end
   | Val(s) -> 
     (try Hashtbl.find sym_table s
@@ -83,5 +96,7 @@ let _ =
     print_endline ("Error: value " ^ s ^ " was used before it was defined")
   | Exceptions.InvalidOperation(t, op) ->
     print_endline ("Error: Invalid operation '" ^ op ^ "' on type: " ^ t)
+  | Exceptions.MismatchedTypes ->
+    print_endline ("Type error: Mismatched types")
 ;;
 
