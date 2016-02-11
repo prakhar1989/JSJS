@@ -40,6 +40,7 @@ expr:
     | expr DIVIDE expr                { Binop($1, Div, $3) }
     | expr MODULUS expr               { Binop($1, Mod, $3) }
     | NUM_LIT                         { NumLit($1) }
+    | STR_LIT                         { StrLit($1) }
     | ID                              { Val($1) }
     | VAL ID COLON NUM ASSIGN expr    { Assign($2, TNum, $6) }
     | VAL ID COLON BOOL ASSIGN expr   { Assign($2, TBool, $6) }

@@ -6,6 +6,8 @@ val z : num = 20;
 
 // err - val z : ~  = 20;
 
+val name : string = "foobar";
+
 val x : num = x + y * z;
 
-x + 1
+name

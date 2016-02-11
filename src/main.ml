@@ -3,6 +3,7 @@ open Lexing
 
 let rec eval sym_table = function
   | NumLit(x) -> Num(x)
+  | StrLit(s) -> String(s)
   | Binop (e1, op, e2) -> 
     let x1 = eval sym_table e1 and x2 = eval sym_table e2 in
     begin
@@ -39,8 +40,10 @@ let _ =
     let expr = Parser.expr Scanner.token lexbuf in
     let result = eval sym_table expr in 
     match result with 
-    | Num(x) -> print_endline (string_of_float x)
-    | _ -> print_endline "don't know how to print"
+    | Num(x)    -> print_endline (string_of_float x)
+    | String(s) -> print_endline s
+    | Bool(b)   -> print_endline (string_of_bool b)
+    | Unit(_)   -> print_endline "got back unit"
   with
   | Exceptions.IllegalCharacter(c, line_no, char_no) -> 
     print_endline ("Syntax Error: Illegal Character " ^ c ^ " found at line: " 

@@ -12,6 +12,7 @@ type primitiveValue =
 type expr = 
   | Binop of expr * op * expr
   | NumLit of float
+  | StrLit of string
   | Assign of string * primitiveType * expr 
   | Val of string
   | Seq of expr * expr
