@@ -1,11 +1,11 @@
+// lets create three variables
 val x : num = 10; 
 
 val y : num = 100; 
 
 val z : num = 20;
 
-// err - val z : ~  = 20;
-
+// two strings
 val firstName : string = "foo";
 val secondName : string = "bar";
 

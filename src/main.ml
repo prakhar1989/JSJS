@@ -1,11 +1,20 @@
 open Ast
 open Lexing
 
+let op_to_string = function
+  | Add   -> "+"
+  | Mul   -> "*"
+  | Sub   -> "-"
+  | Div   -> "/"
+  | Mod   -> "%"
+  | Caret -> "^"
+;;
+
 let rec eval sym_table = function
   | NumLit(x) -> Num(x)
   | StrLit(s) -> String(s)
   | Binop (e1, op, e2) -> 
-    let x1 = eval sym_table e1 and x2 = eval sym_table e2 in
+    let x1 = eval sym_table e1 and x2 = eval sym_table e2  in
     begin
       match (x1, x2) with
       | Num(v1), Num(v2) ->
@@ -16,19 +25,19 @@ let rec eval sym_table = function
           | Sub -> Num(v1 -. v2)
           | Div -> Num(v1 /. v2)
           | Mod -> Num(mod_float v1 v2)
-          | _   -> raise (failwith "invalid operation")
+          | _ -> raise (Exceptions.InvalidOperation("Number", (op_to_string op)))
         end
       | String(s1), String(s2) ->
         begin
           match op with
           | Caret -> String(s1 ^ s2)
-          | _ -> raise (failwith "invalid operation")
+          | _  -> raise (Exceptions.InvalidOperation("String", (op_to_string op)))
         end
       | _, _ -> Unit(())
     end
   | Val(s) -> 
     (try Hashtbl.find sym_table s
-    with Not_found -> failwith "NULL POINTER EXCEPTION. BOOYA! =)")
+     with Not_found -> raise (Exceptions.Undefined s))
   | Assign(s, t, e) ->
     let v = eval sym_table e in 
     Hashtbl.add sym_table s v; 
@@ -56,6 +65,10 @@ let _ =
   with
   | Exceptions.IllegalCharacter(c, line_no, char_no) -> 
     print_endline ("Syntax Error: Illegal Character " ^ c ^ " found at line: " 
-                 ^ (string_of_int line_no) ^ ", position: " ^ (string_of_int char_no) )
+                   ^ (string_of_int line_no) ^ ", position: " ^ (string_of_int char_no) )
+  | Exceptions.Undefined(s) ->
+    print_endline ("Error: value " ^ s ^ " was used before it was defined")
+  | Exceptions.InvalidOperation(t, op) ->
+    print_endline ("Error: Invalid operation '" ^ op ^ "' on type: " ^ t)
 ;;
 
