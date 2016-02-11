@@ -15,7 +15,7 @@ open Ast
 %token NUM LIST BOOL STRING UNIT
 %token COLON SEMICOLON DOT FATARROW COMMA THINARROW
 
-%token <float> NUM_LIT
+%token <float>  NUM_LIT
 %token <string> STR_LIT
 %token <string> MOD_LIT
 %token <string> ID
@@ -42,6 +42,8 @@ expr:
     | expr MODULUS expr               { Binop($1, Mod, $3) }
     | expr CARET expr                 { Binop($1, Caret, $3) }
     | NUM_LIT                         { NumLit($1) }
+    | TRUE                            { BoolLit(true) }
+    | FALSE                           { BoolLit(false) }
     | STR_LIT                         { StrLit($1) }
     | ID                              { Val($1) }
     | VAL ID COLON NUM ASSIGN expr    { Assign($2, TNum, $6) }

@@ -13,6 +13,7 @@ let op_to_string = function
 let rec eval sym_table = function
   | NumLit(x) -> Num(x)
   | StrLit(s) -> String(s)
+  | BoolLit(b) -> Bool(b)
   | Binop (e1, op, e2) -> 
     let x1 = eval sym_table e1 and x2 = eval sym_table e2  in
     begin
@@ -25,13 +26,13 @@ let rec eval sym_table = function
           | Sub -> Num(v1 -. v2)
           | Div -> Num(v1 /. v2)
           | Mod -> Num(mod_float v1 v2)
-          | _ -> raise (Exceptions.InvalidOperation("Number", (op_to_string op)))
+          | _   -> raise (Exceptions.InvalidOperation("Number", (op_to_string op)))
         end
       | String(s1), String(s2) ->
         begin
           match op with
           | Caret -> String(s1 ^ s2)
-          | _  -> raise (Exceptions.InvalidOperation("String", (op_to_string op)))
+          | _     -> raise (Exceptions.InvalidOperation("String", (op_to_string op)))
         end
       | _, _ -> Unit(())
     end
@@ -47,6 +48,7 @@ let rec eval sym_table = function
     eval sym_table e2 
 ;;
 
+(* the "main" function *)
 let _ =                                                              
   let sym_table = Hashtbl.create 100 in
   let cin = if Array.length Sys.argv > 1
