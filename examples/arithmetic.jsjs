@@ -6,8 +6,10 @@ val z : num = 20;
 
 // err - val z : ~  = 20;
 
-val name : string = "foobar";
+val firstName : string = "foo";
+val secondName : string = "bar";
 
 val x : num = x + y * z;
 
-name
+"my first name is: " ^ firstName ^
+", my second name is: " ^ secondName

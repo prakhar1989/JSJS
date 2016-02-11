@@ -39,6 +39,7 @@ expr:
     | expr MULTIPLY expr              { Binop($1, Mul, $3) }
     | expr DIVIDE expr                { Binop($1, Div, $3) }
     | expr MODULUS expr               { Binop($1, Mod, $3) }
+    | expr CARET expr                 { Binop($1, Caret, $3) }
     | NUM_LIT                         { NumLit($1) }
     | STR_LIT                         { StrLit($1) }
     | ID                              { Val($1) }

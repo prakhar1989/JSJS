@@ -9,13 +9,22 @@ let rec eval sym_table = function
     begin
       match (x1, x2) with
       | Num(v1), Num(v2) ->
-        (match op with
-         | Add -> Num(v1 +. v2)
-         | Mul -> Num(v1 *. v2)
-         | Sub -> Num(v1 -. v2)
-         | Div -> Num(v1 /. v2)
-         | Mod -> Num(mod_float v1 v2))
-      | _, _ -> Num(10.)
+        begin
+          match op with
+          | Add -> Num(v1 +. v2)
+          | Mul -> Num(v1 *. v2)
+          | Sub -> Num(v1 -. v2)
+          | Div -> Num(v1 /. v2)
+          | Mod -> Num(mod_float v1 v2)
+          | _   -> raise (failwith "invalid operation")
+        end
+      | String(s1), String(s2) ->
+        begin
+          match op with
+          | Caret -> String(s1 ^ s2)
+          | _ -> raise (failwith "invalid operation")
+        end
+      | _, _ -> Unit(())
     end
   | Val(s) -> 
     (try Hashtbl.find sym_table s

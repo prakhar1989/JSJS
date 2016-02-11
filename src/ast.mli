@@ -1,4 +1,4 @@
-type op = Add | Sub | Mul | Div | Mod
+type op = Add | Sub | Mul | Div | Mod | Caret
 
 type primitiveType = TNum | TString | TBool | TUnit
 
