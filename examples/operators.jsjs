@@ -9,8 +9,9 @@ val firstName : string = "foo";
 val secondName : string = "bar";
 val bio : string = "my first name is: " ^ firstName ^ ", my second name is: " ^ secondName;
 
-
-val hungry? : bool = false;
+// booleans
+val hungry? : bool = !true; // false
 val sleepy? : bool = true;
+val happy? : bool = hungry? || sleepy?; 
 
-sleepy?
+happy?

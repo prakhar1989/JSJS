@@ -8,12 +8,16 @@ let op_to_string = function
   | Div   -> "/"
   | Mod   -> "%"
   | Caret -> "^"
+  | And   -> "&&"
+  | Or    -> "||"
+  | Not   -> "!"
 ;;
 
 let rec eval sym_table = function
   | NumLit(x) -> Num(x)
   | StrLit(s) -> String(s)
   | BoolLit(b) -> Bool(b)
+  | Unop(op, _) -> Bool(false) (* TODO: Broken *)
   | Binop (e1, op, e2) -> 
     let x1 = eval sym_table e1 and x2 = eval sym_table e2  in
     begin
@@ -33,6 +37,13 @@ let rec eval sym_table = function
           match op with
           | Caret -> String(s1 ^ s2)
           | _     -> raise (Exceptions.InvalidOperation("String", (op_to_string op)))
+        end
+      | Bool(b1), Bool(b2) ->
+        begin
+          match op with
+          | And -> Bool(b1 && b2)
+          | Or  -> Bool(b1 || b2)
+          | _     -> raise (Exceptions.InvalidOperation("Bool", (op_to_string op)))
         end
       | _, _ -> Unit(())
     end

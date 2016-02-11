@@ -1,4 +1,4 @@
-type op = Add | Sub | Mul | Div | Mod | Caret
+type op = Add | Sub | Mul | Div | Mod | Caret | And | Or | Not
 
 type primitiveType = TNum | TString | TBool | TUnit
 
@@ -11,6 +11,7 @@ type primitiveValue =
 
 type expr = 
   | Binop of expr * op * expr
+  | Unop of op * expr
   | NumLit of float
   | BoolLit of bool
   | StrLit of string

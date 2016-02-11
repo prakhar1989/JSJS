@@ -23,7 +23,8 @@ open Ast
 /* associativity rules */
 %left SEMICOLON
 %left ASSIGN
-%left CARET
+%left CARET AND OR
+%left NOT
 %left PLUS MINUS
 %left MULTIPLY DIVIDE MODULUS
 
@@ -41,6 +42,9 @@ expr:
     | expr DIVIDE expr                { Binop($1, Div, $3) }
     | expr MODULUS expr               { Binop($1, Mod, $3) }
     | expr CARET expr                 { Binop($1, Caret, $3) }
+    | expr AND expr                   { Binop($1, And, $3) }
+    | expr OR expr                    { Binop($1, Or, $3) }
+    | NOT expr                        { Unop(Not, $2) }
     | NUM_LIT                         { NumLit($1) }
     | TRUE                            { BoolLit(true) }
     | FALSE                           { BoolLit(false) }
