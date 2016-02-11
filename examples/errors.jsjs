@@ -1,0 +1,21 @@
+// illegal character
+//val ~ : num  = asd;
+
+// type declaration errors 
+//val x : bool = 10;
+//val y : num = true;
+
+// other type errors
+val x : num = 10;
+val y : bool = true;
+val z : string = "hello";
+//z + 10; y ^ "false"; 
+//z && true
+
+
+// undefined error
+//w + 10;
+
+// invalid operations
+!10
+

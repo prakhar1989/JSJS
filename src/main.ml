@@ -14,22 +14,22 @@ let op_to_string = function
 ;;
 
 let type_to_string = function
-  | Num(_) -> "Number"
+  | Num(_)    -> "Number"
   | String(_) -> "String"
-  | Bool(_) -> "Bool"
-  | Unit(_) -> "Unit"
+  | Bool(_)   -> "Bool"
+  | Unit(_)   -> "Unit"
 ;;
 
 let rec eval sym_table = function
-  | NumLit(x) -> Num(x)
-  | StrLit(s) -> String(s)
-  | BoolLit(b) -> Bool(b)
-  | Unop(op, e) -> 
+  | NumLit(x)   -> Num(x)
+  | StrLit(s)   -> String(s)
+  | BoolLit(b)  -> Bool(b)
+  | Unop(op, e) ->
     let res = eval sym_table e in
     (match res, op with
     | Bool(b), Not -> let x = not b in Bool(x)
-    | t, Not -> raise (Exceptions.InvalidOperation((type_to_string t), (op_to_string op))) 
-    | _, _ -> raise (failwith "invalid type and operation"))
+    | t, Not       -> raise (Exceptions.InvalidOperation((type_to_string t), (op_to_string op)))
+    | _, _         -> raise (failwith "invalid type and operation"))
   | Binop (e1, op, e2) -> 
     let x1 = eval sym_table e1 and x2 = eval sym_table e2  in
     begin
@@ -55,18 +55,22 @@ let rec eval sym_table = function
           match op with
           | And -> Bool(b1 && b2)
           | Or  -> Bool(b1 || b2)
-          | _     -> raise (Exceptions.InvalidOperation("Bool", (op_to_string op)))
+          | _   -> raise (Exceptions.InvalidOperation("Bool", (op_to_string op)))
         end
       | Unit(_), Unit(_) -> raise (Exceptions.InvalidOperation("Unit", (op_to_string op)))
-      | _, _ -> raise Exceptions.MismatchedTypes
+      | _, _             -> raise Exceptions.MismatchedTypes
     end
   | Val(s) -> 
     (try Hashtbl.find sym_table s
      with Not_found -> raise (Exceptions.Undefined s))
   | Assign(s, t, e) ->
     let v = eval sym_table e in 
-    Hashtbl.add sym_table s v; 
-    v
+    (match t, v with
+     | TNum, Num(_) 
+     | TString, String(_) 
+     | TBool, Bool(_)
+     | TUnit, Unit(_) -> Hashtbl.add sym_table s v; v
+     | _, _           -> raise Exceptions.MismatchedTypes)
   | Seq(e1, e2) ->
     let _ = eval sym_table e1 in 
     eval sym_table e2 
@@ -99,4 +103,3 @@ let _ =
   | Exceptions.MismatchedTypes ->
     print_endline ("Type error: Mismatched types")
 ;;
-
