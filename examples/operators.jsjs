@@ -3,6 +3,7 @@ val x : num = 10;
 val y : num = 100; 
 val z : num = 20;
 val t : num = x + y * z;
+val u : bool = t == 2010;
 
 // strings
 val firstName : string = "foo";
@@ -15,4 +16,4 @@ val sleepy? : bool = !true; // false
 // i'm happy if i'm neither hungry nor sleepy
 val happy? : bool = !hungry? && !sleepy?; 
 
-happy?
+u

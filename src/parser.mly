@@ -23,6 +23,7 @@ open Ast
 /* associativity rules */
 %left SEMICOLON
 %left ASSIGN
+%left LTE GTE LT GT EQUALS NEQ
 %left CARET AND OR
 %left NOT
 %left PLUS MINUS
@@ -44,6 +45,12 @@ expr:
     | expr CARET expr                 { Binop($1, Caret, $3) }
     | expr AND expr                   { Binop($1, And, $3) }
     | expr OR expr                    { Binop($1, Or, $3) }
+    | expr LTE expr                   { Binop($1, Lte, $3) }
+    | expr LT expr                    { Binop($1, Lt, $3) }
+    | expr GTE expr                   { Binop($1, Gte, $3) }
+    | expr GT expr                    { Binop($1, Gt, $3) }
+    | expr EQUALS expr                { Binop($1, Equals, $3) }
+    | expr NEQ expr                   { Binop($1, Neq, $3) }
     | NOT expr                        { Unop(Not, $2) }
     | NUM_LIT                         { NumLit($1) }
     | TRUE                            { BoolLit(true) }

@@ -8,8 +8,13 @@ JSJS
 $ make buildocs
 ```
 
-### Run
+### Build
 ```shell
+$ make clean
 $ make
-$ ./jsjs.out examples/arithmetic.jsjs
+```
+
+### Run
+```
+$ ./jsjs.out examples/operators.jsjs
 ```

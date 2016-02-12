@@ -2,15 +2,21 @@ open Ast
 open Lexing
 
 let op_to_string = function
-  | Add   -> "+"
-  | Mul   -> "*"
-  | Sub   -> "-"
-  | Div   -> "/"
-  | Mod   -> "%"
-  | Caret -> "^"
-  | And   -> "&&"
-  | Or    -> "||"
-  | Not   -> "!"
+  | Add    -> "+"
+  | Mul    -> "*"
+  | Sub    -> "-"
+  | Div    -> "/"
+  | Mod    -> "%"
+  | Caret  -> "^"
+  | And    -> "&&"
+  | Or     -> "||"
+  | Not    -> "!"
+  | Lte    -> "<="
+  | Gte    -> ">="
+  | Neq    -> "!="
+  | Equals -> "=="
+  | Lt     -> "<"
+  | Gt     -> ">"
 ;;
 
 let type_to_string = function
@@ -42,12 +48,24 @@ let rec eval sym_table = function
           | Sub -> Num(v1 -. v2)
           | Div -> Num(v1 /. v2)
           | Mod -> Num(mod_float v1 v2)
+          | Lte -> Bool(v1 <= v2)
+          | Gte -> Bool(v1 >= v2)
+          | Equals -> Bool(v1 = v2)
+          | Lt  -> Bool(v1 < v2)
+          | Gt  -> Bool(v1 > v2)
+          | Neq -> Bool(v1 != v2)
           | _   -> raise (Exceptions.InvalidOperation("Number", (op_to_string op)))
         end
       | String(s1), String(s2) ->
         begin
           match op with
           | Caret -> String(s1 ^ s2)
+          | Lte -> Bool(s1 <= s2)
+          | Gte -> Bool(s1 >= s2)
+          | Equals -> Bool(s1 = s2)
+          | Lt  -> Bool(s1 < s2)
+          | Gt  -> Bool(s1 > s2)
+          | Neq -> Bool(s1 != s2)
           | _     -> raise (Exceptions.InvalidOperation("String", (op_to_string op)))
         end
       | Bool(b1), Bool(b2) ->
@@ -55,9 +73,25 @@ let rec eval sym_table = function
           match op with
           | And -> Bool(b1 && b2)
           | Or  -> Bool(b1 || b2)
+          | Lte -> Bool(b1 <= b2)
+          | Gte -> Bool(b1 >= b2)
+          | Equals -> Bool(b1 = b2)
+          | Lt  -> Bool(b1 < b2)
+          | Gt  -> Bool(b1 > b2)
+          | Neq -> Bool(b1 != b2)
           | _   -> raise (Exceptions.InvalidOperation("Bool", (op_to_string op)))
         end
-      | Unit(_), Unit(_) -> raise (Exceptions.InvalidOperation("Unit", (op_to_string op)))
+      | Unit(u1), Unit(u2) -> 
+        begin
+          match op with
+          | Lte -> Bool(u1 <= u2)
+          | Gte -> Bool(u1 >= u2)
+          | Equals -> Bool(u1 = u2)
+          | Lt  -> Bool(u1 < u2)
+          | Gt  -> Bool(u1 > u2)
+          | Neq -> Bool(u1 != u2)
+          | _ -> raise (Exceptions.InvalidOperation("Unit", (op_to_string op)))
+        end
       | _, _             -> raise Exceptions.MismatchedTypes
     end
   | Val(s) -> 
