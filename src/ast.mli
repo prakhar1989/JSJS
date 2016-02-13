@@ -1,5 +1,5 @@
 type op =
-  | Add | Sub | Mul | Div | Mod             (* num operators *)
+  | Add | Sub | Mul | Div | Mod | Neg       (* num operators *)
   | Caret                                   (* string operators *)
   | And | Or | Not                          (* boolean operators *)
   | Lte | Gte | Neq | Equals | Lt | Gt      (* relational operators *)

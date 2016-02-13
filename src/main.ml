@@ -4,6 +4,7 @@ open Lexing
 let op_to_string = function
   | Add    -> "+"
   | Mul    -> "*"
+  | Neg
   | Sub    -> "-"
   | Div    -> "/"
   | Mod    -> "%"
@@ -33,9 +34,10 @@ let rec eval sym_table = function
   | Unop(op, e) ->
     let res = eval sym_table e in
     (match res, op with
-    | Bool(b), Not -> let x = not b in Bool(x)
-    | t, Not       -> raise (Exceptions.InvalidOperation((type_to_string t), (op_to_string op)))
-    | _, _         -> raise (failwith "invalid type and operation"))
+    | Bool(b), Not    -> let x = not b in Bool(x)
+    | Num(f), Neg     -> let x = -.f in Num(x)
+    | t, Neg | t, Not -> raise (Exceptions.InvalidOperation((type_to_string t), (op_to_string op)))
+    | _, _            -> raise (failwith "invalid type and operation"))
   | Binop (e1, op, e2) -> 
     let x1 = eval sym_table e1 and x2 = eval sym_table e2  in
     begin

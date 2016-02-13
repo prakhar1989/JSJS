@@ -28,6 +28,7 @@ open Ast
 %left NOT
 %left PLUS MINUS
 %left MULTIPLY DIVIDE MODULUS
+%left NEG
 
 /* entry point */
 %start expr
@@ -52,6 +53,7 @@ expr:
     | expr EQUALS expr                { Binop($1, Equals, $3) }
     | expr NEQ expr                   { Binop($1, Neq, $3) }
     | NOT expr                        { Unop(Not, $2) }
+    | MINUS expr %prec NEG            { Unop(Neg, $2) }
     | NUM_LIT                         { NumLit($1) }
     | TRUE                            { BoolLit(true) }
     | FALSE                           { BoolLit(false) }
