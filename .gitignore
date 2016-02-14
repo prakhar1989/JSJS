@@ -3,3 +3,5 @@
 *.out
 *.cm*
 _build
+*.log
+*.cache

@@ -1,10 +1,11 @@
 DOCS=docs/proposal.md
 FLAGS= -I src -c
 EXECUTABLE=jsjs.out
-OBJS=src/parser.cmo src/exceptions.cmo src/scanner.cmo src/main.cmo
+OBJS=src/parser.cmo src/exceptions.cmo src/scanner.cmo
+TESTDEPS=oUnit -linkpkg -g
 
-jsjs: $(OBJS)
-	ocamlc -I src -o $(EXECUTABLE) $(OBJS)
+jsjs: $(OBJS) src/main.cmo
+	ocamlc -I src -o $(EXECUTABLE) $(OBJS) src/main.cmo
 	@echo ---------------------------
 	@echo JSJS is ready to be served!
 	@echo ---------------------------
@@ -25,6 +26,13 @@ src/scanner.cmo: src/scanner.mll src/scanner.ml
 src/%.cmo: src/%.ml
 	ocamlc $(FLAGS) $<
 
+.PHONY: test
+test:
+	ocamlfind ocamlc $(FLAGS) test/test_parser.ml -package $(TESTDEPS)
+	ocamlfind ocamlc -o test/run -I src -package $(TESTDEPS) $(OBJS) test/test_parser.ml
+
 .PHONY : clean
 clean:
-	rm -f src/*.cmo src/*.cmi
+	rm -f src/*.cmo src/*.cmi *.log *.cache
+	rm -f test/*.cmo test/*.cmi test/*.log test/*.cache
+

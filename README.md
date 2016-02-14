@@ -18,3 +18,10 @@ $ make
 ```
 $ ./jsjs.out examples/operators.jsjs
 ```
+
+### Tests
+```
+$ make
+$ make test
+$ ./test/run
+```
