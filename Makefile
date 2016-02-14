@@ -29,7 +29,7 @@ src/%.cmo: src/%.ml
 .PHONY: test
 test:
 	ocamlfind ocamlc $(FLAGS) test/test_parser.ml -package $(TESTDEPS)
-	ocamlfind ocamlc -o test/run -I src -package $(TESTDEPS) $(OBJS) test/test_parser.ml
+	ocamlfind ocamlc -o test/run.out -I src -package $(TESTDEPS) $(OBJS) test/test_parser.ml
 
 .PHONY : clean
 clean:
