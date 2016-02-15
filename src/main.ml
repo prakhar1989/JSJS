@@ -1,23 +1,23 @@
 open Ast
 open Lexing
+open Parsing
 
 let op_to_string = function
-  | Add    -> "+"
-  | Mul    -> "*"
-  | Neg
-  | Sub    -> "-"
-  | Div    -> "/"
-  | Mod    -> "%"
-  | Caret  -> "^"
-  | And    -> "&&"
-  | Or     -> "||"
-  | Not    -> "!"
-  | Lte    -> "<="
-  | Gte    -> ">="
-  | Neq    -> "!="
-  | Equals -> "=="
-  | Lt     -> "<"
-  | Gt     -> ">"
+  | Add       -> "+"
+  | Mul       -> "*"
+  | Neg | Sub -> "-"
+  | Div       -> "/"
+  | Mod       -> "%"
+  | Caret     -> "^"
+  | And       -> "&&"
+  | Or        -> "||"
+  | Not       -> "!"
+  | Lte       -> "<="
+  | Gte       -> ">="
+  | Neq       -> "!="
+  | Equals    -> "=="
+  | Lt        -> "<"
+  | Gt        -> ">"
 ;;
 
 let type_to_string = function
@@ -129,6 +129,10 @@ let _ =
     | Bool(b)   -> print_endline (string_of_bool b)
     | Unit(_)   -> print_endline "got back unit"
   with
+  | Parsing.Parse_error -> 
+    let line_no = lexbuf.lex_curr_p.pos_lnum + 1 in
+    let char_no = lexbuf.lex_curr_p.pos_cnum - lexbuf.lex_curr_p.pos_bol in
+    print_endline ("Syntax Error: Unable to parse line: " ^ (string_of_int line_no) ^ ", at: " ^ (string_of_int char_no))
   | Exceptions.IllegalCharacter(c, line_no, char_no) -> 
     print_endline ("Syntax Error: Illegal Character " ^ c ^ " found at line: " 
                    ^ (string_of_int line_no) ^ ", position: " ^ (string_of_int char_no) )

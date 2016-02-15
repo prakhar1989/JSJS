@@ -1343,7 +1343,7 @@ let
 # 1344 "src/scanner.ml"
 = Lexing.sub_lexeme_char lexbuf lexbuf.Lexing.lex_start_pos in
 # 71 "src/scanner.mll"
-                                ( let line_no = lexbuf.lex_curr_p.pos_lnum in
+                                ( let line_no = lexbuf.lex_curr_p.pos_lnum + 1 in
                                   let char_no = lexbuf.lex_curr_p.pos_cnum - lexbuf.lex_curr_p.pos_bol in
                                   raise (Exceptions.IllegalCharacter(Char.escaped c, line_no, char_no)) )
 # 1350 "src/scanner.ml"
