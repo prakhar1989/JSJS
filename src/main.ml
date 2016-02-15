@@ -2,6 +2,27 @@ open Ast
 open Lexing
 open Parsing
 
+(* pretty prints line in file for error reprting *)
+let print_error_line line_no char_no fname etype = 
+  let in_channel = open_in fname in
+  let msg = Printf.sprintf "File: '%s', line %d, character %d:" fname line_no char_no in
+  let print_caret line char_at = 
+    let s = (String.make (char_at-1) ' ') ^ "^" in
+    print_endline ("Error: "  ^ etype);
+    print_endline msg;
+    print_endline line;
+    print_endline s;
+  in
+  let rec aux c =
+    let line = input_line in_channel in 
+    if c != line_no then ()
+    else print_caret line char_no;
+    aux (c + 1)
+  in
+  try aux 1
+  with End_of_file -> close_in in_channel
+;;
+
 let op_to_string = function
   | Add       -> "+"
   | Mul       -> "*"
@@ -115,11 +136,11 @@ let rec eval sym_table = function
 (* the "main" function *)
 let _ =                                                              
   let sym_table = Hashtbl.create 100 in
-  let cin = if Array.length Sys.argv > 1
-    then open_in Sys.argv.(1)
-    else stdin
+  let filename = if Array.length Sys.argv > 1
+    then Sys.argv.(1)
+    else raise (failwith "please provide a filename")
   in
-  let lexbuf = Lexing.from_channel cin in
+  let lexbuf = Lexing.from_channel (open_in filename) in
   try 
     let expr = Parser.expr Scanner.token lexbuf in
     let result = eval sym_table expr in 
@@ -132,10 +153,9 @@ let _ =
   | Parsing.Parse_error -> 
     let line_no = lexbuf.lex_curr_p.pos_lnum + 1 in
     let char_no = lexbuf.lex_curr_p.pos_cnum - lexbuf.lex_curr_p.pos_bol in
-    print_endline ("Syntax Error: Unable to parse line: " ^ (string_of_int line_no) ^ ", at: " ^ (string_of_int char_no))
+    print_error_line line_no char_no filename "Failed to parse";
   | Exceptions.IllegalCharacter(c, line_no, char_no) -> 
-    print_endline ("Syntax Error: Illegal Character " ^ c ^ " found at line: " 
-                   ^ (string_of_int line_no) ^ ", position: " ^ (string_of_int char_no) )
+    print_error_line line_no char_no filename "Illegal character";
   | Exceptions.Undefined(s) ->
     print_endline ("Error: value " ^ s ^ " was used before it was defined")
   | Exceptions.InvalidOperation(t, op) ->
