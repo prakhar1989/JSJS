@@ -2,8 +2,7 @@
 open Ast
 %}
 
-/* OCamlyacc Declarations */
-
+/* Tokens */
 %token EOF
 %token PLUS MINUS MULTIPLY DIVIDE MODULUS
 %token LT LTE GT GTE EQUALS NEQ
@@ -38,6 +37,8 @@ open Ast
 
 /* grammar follows */
 expr: 
+    | literals                        { $1 }
+    | assigns                         { $1 }
     | expr PLUS expr                  { Binop($1, Add, $3) }
     | expr MINUS expr                 { Binop($1, Sub, $3) }
     | expr MULTIPLY expr              { Binop($1, Mul, $3) }
@@ -55,14 +56,18 @@ expr:
     | LPAREN expr RPAREN              { $2 }
     | NOT expr                        { Unop(Not, $2) }
     | MINUS expr %prec NEG            { Unop(Neg, $2) }
+    | expr SEMICOLON expr             { Seq($1, $3) }
+
+literals:
     | NUM_LIT                         { NumLit($1) }
     | TRUE                            { BoolLit(true) }
     | FALSE                           { BoolLit(false) }
     | STR_LIT                         { StrLit($1) }
     | ID                              { Val($1) }
+
+/* val x : num = 10 */
+assigns:
     | VAL ID COLON NUM ASSIGN expr    { Assign($2, TNum, $6) }
     | VAL ID COLON BOOL ASSIGN expr   { Assign($2, TBool, $6) }
     | VAL ID COLON STRING ASSIGN expr { Assign($2, TString, $6) }
     | VAL ID COLON UNIT ASSIGN expr   { Assign($2, TUnit, $6) }
-    | expr SEMICOLON expr             { Seq($1, $3) }
-
