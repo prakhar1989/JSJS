@@ -23,38 +23,6 @@ let print_error_line line_no char_no fname etype =
   with End_of_file -> close_in in_channel
 ;;
 
-let op_to_string = function
-  | Add       -> "+"
-  | Mul       -> "*"
-  | Neg | Sub -> "-"
-  | Div       -> "/"
-  | Mod       -> "%"
-  | Caret     -> "^"
-  | And       -> "&&"
-  | Or        -> "||"
-  | Not       -> "!"
-  | Lte       -> "<="
-  | Gte       -> ">="
-  | Neq       -> "!="
-  | Equals    -> "=="
-  | Lt        -> "<"
-  | Gt        -> ">"
-;;
-
-let type_to_string = function
-  | Num(_)    -> "num"
-  | String(_) -> "string"
-  | Bool(_)   -> "bool"
-  | Unit(_)   -> "unit"
-;;
-
-let primitive_type_to_string = function
-  | TNum    -> "num"
-  | TString -> "string"
-  | TBool   -> "bool"
-  | TUnit   -> "unit"
-;;
-
 let rec eval sym_table = function
   | NumLit(x)   -> Num(x)
   | StrLit(s)   -> String(s)
@@ -64,15 +32,13 @@ let rec eval sym_table = function
     (match res, op with
     | Bool(b), Not    -> let x = not b in Bool(x)
     | Num(f), Neg     -> let x = -.f in Num(x)
-    | t, Neg | t, Not -> raise (Exceptions.InvalidOperation((type_to_string t), (op_to_string op)))
+    | t, Neg | t, Not -> raise (Exceptions.InvalidOperation(Stringify.pValue t, Stringify.op op))
     | _, _            -> raise (failwith "invalid type and operation"))
   | Binop (e1, op, e2) -> 
     let x1 = eval sym_table e1 and x2 = eval sym_table e2  in
     begin
       match (x1, x2) with
-      | Num(v1), Num(v2) ->
-        begin
-          match op with
+      | Num(v1), Num(v2) -> (match op with
           | Add -> Num(v1 +. v2)
           | Mul -> Num(v1 *. v2)
           | Sub -> Num(v1 -. v2)
@@ -84,11 +50,8 @@ let rec eval sym_table = function
           | Lt  -> Bool(v1 < v2)
           | Gt  -> Bool(v1 > v2)
           | Neq -> Bool(v1 != v2)
-          | _   -> raise (Exceptions.InvalidOperation("Number", (op_to_string op)))
-        end
-      | String(s1), String(s2) ->
-        begin
-          match op with
+          | _   -> raise (Exceptions.InvalidOperation("num", (Stringify.op op))))
+      | String(s1), String(s2) -> (match op with
           | Caret -> String(s1 ^ s2)
           | Lte -> Bool(s1 <= s2)
           | Gte -> Bool(s1 >= s2)
@@ -96,11 +59,8 @@ let rec eval sym_table = function
           | Lt  -> Bool(s1 < s2)
           | Gt  -> Bool(s1 > s2)
           | Neq -> Bool(s1 != s2)
-          | _     -> raise (Exceptions.InvalidOperation("String", (op_to_string op)))
-        end
-      | Bool(b1), Bool(b2) ->
-        begin
-          match op with
+          | _     -> raise (Exceptions.InvalidOperation("string", (Stringify.op op))))
+      | Bool(b1), Bool(b2) -> (match op with
           | And -> Bool(b1 && b2)
           | Or  -> Bool(b1 || b2)
           | Lte -> Bool(b1 <= b2)
@@ -109,20 +69,16 @@ let rec eval sym_table = function
           | Lt  -> Bool(b1 < b2)
           | Gt  -> Bool(b1 > b2)
           | Neq -> Bool(b1 != b2)
-          | _   -> raise (Exceptions.InvalidOperation("Bool", (op_to_string op)))
-        end
-      | Unit(u1), Unit(u2) -> 
-        begin
-          match op with
+          | _   -> raise (Exceptions.InvalidOperation("bool", (Stringify.op op))))
+      | Unit(u1), Unit(u2) -> (match op with
           | Lte -> Bool(u1 <= u2)
           | Gte -> Bool(u1 >= u2)
           | Equals -> Bool(u1 = u2)
           | Lt  -> Bool(u1 < u2)
           | Gt  -> Bool(u1 > u2)
           | Neq -> Bool(u1 != u2)
-          | _ -> raise (Exceptions.InvalidOperation("Unit", (op_to_string op)))
-        end
-      | t1, t2 -> raise (Exceptions.MismatchedTypes(type_to_string t1, type_to_string t2))
+          | _ -> raise (Exceptions.InvalidOperation("unit", (Stringify.op op))))
+      | t1, t2 -> raise (Exceptions.MismatchedTypes(Stringify.pValue t1, Stringify.pValue t2))
     end
   | Val(s) -> 
     (try Hashtbl.find sym_table s
@@ -136,7 +92,7 @@ let rec eval sym_table = function
        | TString, String(_) 
        | TBool, Bool(_)
        | TUnit, Unit(_) -> Hashtbl.add sym_table s v; v
-       | t1, t2         -> raise (Exceptions.MismatchedTypes(primitive_type_to_string t1, type_to_string t2)))
+       | t1, t2         -> raise (Exceptions.MismatchedTypes(Stringify.pType t1, Stringify.pValue t2)))
   | Seq(e1, e2) ->
     let _ = eval sym_table e1 in 
     eval sym_table e2 

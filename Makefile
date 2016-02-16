@@ -1,7 +1,7 @@
 DOCS=docs/proposal.md
 FLAGS= -I src -c
 EXECUTABLE=jsjs.out
-OBJS=src/parser.cmo src/exceptions.cmo src/scanner.cmo
+OBJS=src/parser.cmo src/exceptions.cmo src/scanner.cmo src/stringify.cmo
 TESTDEPS=oUnit -linkpkg -g
 
 jsjs: $(OBJS) src/main.cmo
