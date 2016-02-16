@@ -4,7 +4,7 @@ val y : num = 100;
 val z : num = 20;
 val t : num = x + (y * z);
 val u? : bool = t == 2010;
-val negs : num = -t;
+val negs : bool = -t;
 
 // strings
 val firstName : string = "foo";

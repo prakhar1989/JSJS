@@ -42,17 +42,17 @@ let op_to_string = function
 ;;
 
 let type_to_string = function
-  | Num(_)    -> "Number"
-  | String(_) -> "String"
-  | Bool(_)   -> "Bool"
-  | Unit(_)   -> "Unit"
+  | Num(_)    -> "num"
+  | String(_) -> "string"
+  | Bool(_)   -> "bool"
+  | Unit(_)   -> "unit"
 ;;
 
 let primitive_type_to_string = function
-  | TNum    -> "Number"
-  | TString -> "String"
-  | TBool   -> "Boolean"
-  | TUnit   -> "Unit"
+  | TNum    -> "num"
+  | TString -> "string"
+  | TBool   -> "bool"
+  | TUnit   -> "unit"
 ;;
 
 let rec eval sym_table = function
@@ -168,9 +168,9 @@ let _ =
   | Exceptions.Undefined(s) ->
     print_endline ("Error: value " ^ s ^ " was used before it was defined")
   | Exceptions.InvalidOperation(t, op) ->
-    print_endline ("Error: Invalid operation '" ^ op ^ "' on type: " ^ t)
+    print_endline (Printf.sprintf "Type error: Invalid operation %s on type '%s'" op t)
   | Exceptions.MismatchedTypes(t1, t2) ->
-    print_endline (Printf.sprintf "Type error: expected %s, got %s" t1 t2)
+    print_endline (Printf.sprintf "Type error: expected value of type '%s', got a value of type '%s' instead" t1 t2)
   | Exceptions.AlreadyDefined(s) ->
     print_endline ("Error: value '" ^ s ^ "' was already defined.")
 ;;
