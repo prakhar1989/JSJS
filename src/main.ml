@@ -48,6 +48,13 @@ let type_to_string = function
   | Unit(_)   -> "Unit"
 ;;
 
+let primitive_type_to_string = function
+  | TNum    -> "Number"
+  | TString -> "String"
+  | TBool   -> "Boolean"
+  | TUnit   -> "Unit"
+;;
+
 let rec eval sym_table = function
   | NumLit(x)   -> Num(x)
   | StrLit(s)   -> String(s)
@@ -115,7 +122,7 @@ let rec eval sym_table = function
           | Neq -> Bool(u1 != u2)
           | _ -> raise (Exceptions.InvalidOperation("Unit", (op_to_string op)))
         end
-      | _, _             -> raise Exceptions.MismatchedTypes
+      | t1, t2 -> raise (Exceptions.MismatchedTypes(type_to_string t1, type_to_string t2))
     end
   | Val(s) -> 
     (try Hashtbl.find sym_table s
@@ -129,7 +136,7 @@ let rec eval sym_table = function
        | TString, String(_) 
        | TBool, Bool(_)
        | TUnit, Unit(_) -> Hashtbl.add sym_table s v; v
-       | _, _           -> raise Exceptions.MismatchedTypes)
+       | t1, t2         -> raise (Exceptions.MismatchedTypes(primitive_type_to_string t1, type_to_string t2)))
   | Seq(e1, e2) ->
     let _ = eval sym_table e1 in 
     eval sym_table e2 
@@ -162,8 +169,8 @@ let _ =
     print_endline ("Error: value " ^ s ^ " was used before it was defined")
   | Exceptions.InvalidOperation(t, op) ->
     print_endline ("Error: Invalid operation '" ^ op ^ "' on type: " ^ t)
-  | Exceptions.MismatchedTypes ->
-    print_endline ("Type error: Mismatched types")
+  | Exceptions.MismatchedTypes(t1, t2) ->
+    print_endline (Printf.sprintf "Type error: expected %s, got %s" t1 t2)
   | Exceptions.AlreadyDefined(s) ->
     print_endline ("Error: value '" ^ s ^ "' was already defined.")
 ;;

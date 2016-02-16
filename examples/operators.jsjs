@@ -5,7 +5,6 @@ val z : num = 20;
 val t : num = x + (y * z);
 val u? : bool = t == 2010;
 val negs : num = -t;
-val x : num = 10;
 
 // strings
 val firstName : string = "foo";

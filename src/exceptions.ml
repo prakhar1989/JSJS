@@ -6,5 +6,5 @@ exception IllegalCharacter of string * int * int
 (* SAST *)
 exception Undefined of string
 exception InvalidOperation of string * string
-exception MismatchedTypes
+exception MismatchedTypes of string * string
 exception AlreadyDefined of string
