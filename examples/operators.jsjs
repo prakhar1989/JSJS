@@ -2,9 +2,10 @@
 val x : num = 10; 
 val y : num = 100; 
 val z : num = 20;
-val t : num = x ~ y * z;
+val t : num = x + (y * z);
 val u? : bool = t == 2010;
 val negs : num = -t;
+val x : num = 10;
 
 // strings
 val firstName : string = "foo";
@@ -14,7 +15,6 @@ val bio : string = "my first name is: " ^ firstName ^ ", my second name is: " ^ 
 // booleans
 val hungry? : bool = false;
 val sleepy? : bool = !true; // false
-// i'm happy if i'm neither hungry nor sleepy
 val happy? : bool = !hungry? && !sleepy?; 
 
-negs
+happy?

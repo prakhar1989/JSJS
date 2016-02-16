@@ -7,3 +7,4 @@ exception IllegalCharacter of string * int * int
 exception Undefined of string
 exception InvalidOperation of string * string
 exception MismatchedTypes
+exception AlreadyDefined of string

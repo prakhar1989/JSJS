@@ -121,13 +121,15 @@ let rec eval sym_table = function
     (try Hashtbl.find sym_table s
      with Not_found -> raise (Exceptions.Undefined s))
   | Assign(s, t, e) ->
-    let v = eval sym_table e in 
-    (match t, v with
-     | TNum, Num(_) 
-     | TString, String(_) 
-     | TBool, Bool(_)
-     | TUnit, Unit(_) -> Hashtbl.add sym_table s v; v
-     | _, _           -> raise Exceptions.MismatchedTypes)
+    if Hashtbl.mem sym_table s 
+    then raise (Exceptions.AlreadyDefined(s))
+    else let v = eval sym_table e in 
+      (match t, v with
+       | TNum, Num(_) 
+       | TString, String(_) 
+       | TBool, Bool(_)
+       | TUnit, Unit(_) -> Hashtbl.add sym_table s v; v
+       | _, _           -> raise Exceptions.MismatchedTypes)
   | Seq(e1, e2) ->
     let _ = eval sym_table e1 in 
     eval sym_table e2 
@@ -138,7 +140,7 @@ let _ =
   let sym_table = Hashtbl.create 100 in
   let filename = if Array.length Sys.argv > 1
     then Sys.argv.(1)
-    else raise (failwith "please provide a filename")
+    else raise (failwith "Error: please provide a filename. Usage: ./jsjs.out filename")
   in
   let lexbuf = Lexing.from_channel (open_in filename) in
   try 
@@ -148,7 +150,7 @@ let _ =
     | Num(x)    -> print_endline (string_of_float x)
     | String(s) -> print_endline s
     | Bool(b)   -> print_endline (string_of_bool b)
-    | Unit(_)   -> print_endline "got back unit"
+    | Unit(_)   -> print_endline "unit"
   with
   | Parsing.Parse_error -> 
     let line_no = lexbuf.lex_curr_p.pos_lnum + 1 in
@@ -162,4 +164,6 @@ let _ =
     print_endline ("Error: Invalid operation '" ^ op ^ "' on type: " ^ t)
   | Exceptions.MismatchedTypes ->
     print_endline ("Type error: Mismatched types")
+  | Exceptions.AlreadyDefined(s) ->
+    print_endline ("Error: value '" ^ s ^ "' was already defined.")
 ;;

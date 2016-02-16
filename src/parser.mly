@@ -42,6 +42,13 @@ primitive:
     | STRING                             { TString }
     | UNIT                               { TUnit }
 
+literals:
+    | NUM_LIT                            { NumLit($1) }
+    | TRUE                               { BoolLit(true) }
+    | FALSE                              { BoolLit(false) }
+    | STR_LIT                            { StrLit($1) }
+    | ID                                 { Val($1) }
+
 expr: 
     | literals                           { $1 }
     | assigns                            { $1 }
@@ -63,13 +70,6 @@ expr:
     | NOT expr                           { Unop(Not, $2) }
     | MINUS expr %prec NEG               { Unop(Neg, $2) }
     | expr SEMICOLON expr                { Seq($1, $3) }
-
-literals:
-    | NUM_LIT                            { NumLit($1) }
-    | TRUE                               { BoolLit(true) }
-    | FALSE                              { BoolLit(false) }
-    | STR_LIT                            { StrLit($1) }
-    | ID                                 { Val($1) }
 
 assigns:
     | VAL ID COLON primitive ASSIGN expr { Assign($2, $4, $6) }
