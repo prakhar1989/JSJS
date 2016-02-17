@@ -107,7 +107,7 @@ let _ =
   in
   let lexbuf = Lexing.from_channel (open_in filename) in
   try 
-    let expr = Parser.expr Scanner.token lexbuf in
+    let expr = Parser.main Scanner.token lexbuf in
     let result = eval sym_table expr in 
     match result with 
     | Num(x)    -> print_endline (string_of_float x)

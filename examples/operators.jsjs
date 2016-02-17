@@ -4,7 +4,7 @@ val y : num = 100;
 val z : num = 20;
 val t : num = x + (y * z);
 val u? : bool = t == 2010;
-val negs : bool = -t;
+val negs : num = -t;
 
 // strings
 val firstName : string = "foo";
@@ -16,4 +16,4 @@ val hungry? : bool = false;
 val sleepy? : bool = !true; // false
 val happy? : bool = !hungry? && !sleepy?; 
 
-happy?
+happy?;

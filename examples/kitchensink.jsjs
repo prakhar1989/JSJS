@@ -3,4 +3,4 @@ val isHappy? : bool = true;
 val total : bool = 4 + 5 / 2 == 10;
 val float_total : num = 3.14159;
 
-val myname : string = "this is soo 4 + 5 //";
+val msg : string = "jsjs rawks";

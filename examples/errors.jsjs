@@ -17,5 +17,4 @@ val z : string = "hello";
 //w + 10;
 
 // invalid operations
-!10
-
+!10;

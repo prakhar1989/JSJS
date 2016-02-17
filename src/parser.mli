@@ -45,5 +45,5 @@ type token =
   | MOD_LIT of (string)
   | ID of (string)
 
-val expr :
+val main :
   (Lexing.lexbuf  -> token) -> Lexing.lexbuf -> Ast.expr

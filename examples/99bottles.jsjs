@@ -1,9 +1,9 @@
 def ninetyNineBottles (): unit = {
    def toStr(x:num) : string = {
       if (num == 0)
-      then { "no more"; }
-      else { String.toString(num); }
-   }
+      then { "no more" }
+      else { String.toString(num) }
+   };
 
    def ninetyNine (x:num) : unit = {
       if(x==0)
@@ -28,5 +28,5 @@ def ninetyNineBottles (): unit = {
          }
       }
    }
-   ninetyNine(99);
-}
+   ninetyNine(99)
+};

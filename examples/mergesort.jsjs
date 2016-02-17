@@ -1,23 +1,23 @@
 def merge (a : list num, b : list num) : list num = {
-   if(List.hd(a) < List.hd(b))
-   then { List.cons(List.hd(a), merge(List.tl(a), b); }
-   else { List.cons(List.hd(b), merge(a, List.tl(b)); }
-}
+   if (List.hd(a) < List.hd(b))
+   then { List.cons(List.hd(a), merge(List.tl(a), b) }
+   else { List.cons(List.hd(b), merge(a, List.tl(b)) }
+};
 
 def split (a : list num, start : num, end : num) : list num = {
    if (start != 0)
-   then { split(List.tl(num), start - 1, num); }
+   then { split(List.tl(num), start - 1, num) }
    else {
       if (end == -1)
-      then { a; }
-      else { List.cons(List.hd(a), split(List.tl(a), start, end - 1)); }
+      then { a }
+      else { List.cons(List.hd(a), split(List.tl(a), start, end - 1)) }
    }
-}
+};
 
 def mergeSort (a : list num) : list num = {
    val size = List.length(a);
    if (size == 0 || size == 1) 
-   then { a; }
+   then { a }
    else { merge(mergeSort(split(a, 0, size/2)), 
-                mergeSort(split(a, size/2 + 1, size - 1))); }
-}
+                mergeSort(split(a, size/2 + 1, size - 1))) }
+};

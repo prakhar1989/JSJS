@@ -21,19 +21,22 @@ open Ast
 
 /* associativity rules */
 %left SEMICOLON
-%left ASSIGN
-%left LTE GTE LT GT EQUALS NEQ
+%right ASSIGN
 %left CARET AND OR
 %left NOT
+%left LTE GTE LT GT EQUALS NEQ
 %left PLUS MINUS
 %left MULTIPLY DIVIDE MODULUS
 %left NEG
 
 /* entry point */
-%start expr
-%type <Ast.expr> expr
+%start main
+%type <Ast.expr> main
 
 %%
+
+main:
+    expr SEMICOLON EOF                   { $1 }
 
 /* grammar follows */
 primitive:
