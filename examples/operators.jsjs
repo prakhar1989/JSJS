@@ -22,7 +22,11 @@ val single: string =
   if (resp == "yes") then { 
     "Y"
   } else {
-    "N"
+    if (10 == 10) then {
+      "Y"
+    } else {
+      "N"
+    }
   };
 
-"Am I happy?: " ^ resp;
+"Am I happy?: " ^ single;
