@@ -22,5 +22,6 @@ type expr =
   | Assign of string * primitiveType * expr 
   | Val of string
   | Seq of expr * expr
+  | If of expr * expr * expr
 ;;
 

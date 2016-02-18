@@ -16,4 +16,13 @@ val hungry? : bool = false;
 val sleepy? : bool = !true; // false
 val happy? : bool = !hungry? && !sleepy?; 
 
-happy?;
+// if else 
+val resp: string = if (happy?) then { "yes" } else { "no" };
+val single: string = 
+  if (resp == "yes") then { 
+    "Y"
+  } else {
+    "N"
+  };
+
+"Am I happy?: " ^ resp;

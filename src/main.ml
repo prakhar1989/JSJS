@@ -109,6 +109,11 @@ let rec eval (env: nametable) (exp: Ast.expr) : (Ast.primitiveValue * nametable)
   | Seq(e1, e2) ->
     let _, env = eval env e1 in 
     let v, env = eval env e2 in (v, env)
+  | If(pred, e2, e3) -> 
+    let v, env = eval env pred in
+    (match v with
+     | Bool(b) -> if b then eval env e2 else eval env e3
+     | t -> raise (Exceptions.MismatchedTypes(Stringify.pType TBool, Stringify.pValue t)))
 ;;
 
 (* the "main" function *)
