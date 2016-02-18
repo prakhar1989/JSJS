@@ -94,26 +94,25 @@ let rec eval (env: nametable) (exp: Ast.expr) : (Ast.primitiveValue * nametable)
       | t1, t2 -> raise (Exceptions.MismatchedTypes(Stringify.pValue t1, Stringify.pValue t2))
     end
   | Val(s) -> 
-    (try Hashtbl.find sym_table s
+    (try NameMap.find s env, env
      with Not_found -> raise (Exceptions.Undefined s))
   | Assign(s, t, e) ->
-    if Hashtbl.mem sym_table s 
+    if NameMap.mem s env
     then raise (Exceptions.AlreadyDefined(s))
-    else let v = eval sym_table e in 
+    else let v, env = eval env e in 
       (match t, v with
        | TNum, Num(_) 
        | TString, String(_) 
        | TBool, Bool(_)
-       | TUnit, Unit(_) -> Hashtbl.add sym_table s v; v
+       | TUnit, Unit(_) -> let m = NameMap.add s v env in (v, m)
        | t1, t2         -> raise (Exceptions.MismatchedTypes(Stringify.pType t1, Stringify.pValue t2)))
   | Seq(e1, e2) ->
-    let _ = eval sym_table e1 in 
-    eval sym_table e2 
+    let _, env = eval env e1 in 
+    let v, env = eval env e2 in (v, env)
 ;;
 
 (* the "main" function *)
 let _ =                                                              
-  let sym_table = Hashtbl.create 100 in
   let filename = if Array.length Sys.argv > 1
     then Sys.argv.(1)
     else raise (failwith "Error: please provide a filename. Usage: ./jsjs.out filename")
@@ -121,7 +120,7 @@ let _ =
   let lexbuf = Lexing.from_channel (open_in filename) in
   try 
     let expr = Parser.main Scanner.token lexbuf in
-    let result = eval sym_table expr in 
+    let result, _ = eval NameMap.empty expr in 
     match result with 
     | Num(x)    -> print_endline (string_of_float x)
     | String(s) -> print_endline s
