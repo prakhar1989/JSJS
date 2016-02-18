@@ -4,8 +4,8 @@ EXECUTABLE=jsjs.out
 OBJS=src/parser.cmo src/exceptions.cmo src/scanner.cmo src/stringify.cmo
 TESTDEPS=oUnit -linkpkg -g
 
-jsjs: $(OBJS) src/main.cmo
-	ocamlc -I src -o $(EXECUTABLE) $(OBJS) src/main.cmo
+jsjs: $(OBJS) src/interpret.cmo
+	ocamlc -I src -o $(EXECUTABLE) $(OBJS) src/interpret.cmo
 	@echo ---------------------------
 	@echo JSJS is ready to be served!
 	@echo ---------------------------
