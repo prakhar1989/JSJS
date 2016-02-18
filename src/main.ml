@@ -2,6 +2,9 @@ open Ast
 open Lexing
 open Parsing
 
+module NameMap = Map.Make(String);;
+type nametable = Ast.primitiveValue NameMap.t;;
+
 (* pretty prints line in file for error reprting *)
 let print_error_line line_no char_no fname etype = 
   let in_channel = open_in fname in
@@ -23,22 +26,25 @@ let print_error_line line_no char_no fname etype =
   with End_of_file -> close_in in_channel
 ;;
 
-let rec eval sym_table = function
-  | NumLit(x)   -> Num(x)
-  | StrLit(s)   -> String(s)
-  | BoolLit(b)  -> Bool(b)
+let rec eval (env: nametable) (exp: Ast.expr) : (Ast.primitiveValue * nametable) = 
+  match exp with
+  | NumLit(x)   -> Num(x), env
+  | StrLit(s)   -> String(s), env
+  | BoolLit(b)  -> Bool(b), env
   | Unop(op, e) ->
-    let res = eval sym_table e in
+    let res, env = eval env e in
     (match res, op with
-    | Bool(b), Not    -> let x = not b in Bool(x)
-    | Num(f), Neg     -> let x = -.f in Num(x)
+    | Bool(b), Not    -> let x = not b in Bool(x), env
+    | Num(f), Neg     -> let x = -.f in Num(x), env
     | t, Neg | t, Not -> raise (Exceptions.InvalidOperation(Stringify.pValue t, Stringify.op op))
     | _, _            -> raise (failwith "invalid type and operation"))
   | Binop (e1, op, e2) -> 
-    let x1 = eval sym_table e1 and x2 = eval sym_table e2  in
+    let x1, env = eval env e1 in
+    let x2, env = eval env e2 in
     begin
       match (x1, x2) with
-      | Num(v1), Num(v2) -> (match op with
+      | Num(v1), Num(v2) -> 
+        let res = (match op with
           | Add -> Num(v1 +. v2)
           | Mul -> Num(v1 *. v2)
           | Sub -> Num(v1 -. v2)
@@ -50,17 +56,21 @@ let rec eval sym_table = function
           | Lt  -> Bool(v1 < v2)
           | Gt  -> Bool(v1 > v2)
           | Neq -> Bool(v1 != v2)
-          | _   -> raise (Exceptions.InvalidOperation("num", (Stringify.op op))))
-      | String(s1), String(s2) -> (match op with
-          | Caret -> String(s1 ^ s2)
-          | Lte -> Bool(s1 <= s2)
-          | Gte -> Bool(s1 >= s2)
+          | _   -> raise (Exceptions.InvalidOperation("num", (Stringify.op op)))) 
+        in res, env
+      | String(s1), String(s2) -> 
+        let res = (match op with
+          | Caret  -> String(s1 ^ s2)
+          | Lte    -> Bool(s1 <= s2)
+          | Gte    -> Bool(s1 >= s2)
           | Equals -> Bool(s1 = s2)
-          | Lt  -> Bool(s1 < s2)
-          | Gt  -> Bool(s1 > s2)
-          | Neq -> Bool(s1 != s2)
+          | Lt     -> Bool(s1 < s2)
+          | Gt     -> Bool(s1 > s2)
+          | Neq    -> Bool(s1 != s2)
           | _     -> raise (Exceptions.InvalidOperation("string", (Stringify.op op))))
-      | Bool(b1), Bool(b2) -> (match op with
+        in res, env
+      | Bool(b1), Bool(b2) -> 
+        let res = (match op with
           | And -> Bool(b1 && b2)
           | Or  -> Bool(b1 || b2)
           | Lte -> Bool(b1 <= b2)
@@ -70,7 +80,9 @@ let rec eval sym_table = function
           | Gt  -> Bool(b1 > b2)
           | Neq -> Bool(b1 != b2)
           | _   -> raise (Exceptions.InvalidOperation("bool", (Stringify.op op))))
-      | Unit(u1), Unit(u2) -> (match op with
+        in res, env
+      | Unit(u1), Unit(u2) -> 
+        let res = (match op with
           | Lte -> Bool(u1 <= u2)
           | Gte -> Bool(u1 >= u2)
           | Equals -> Bool(u1 = u2)
@@ -78,6 +90,7 @@ let rec eval sym_table = function
           | Gt  -> Bool(u1 > u2)
           | Neq -> Bool(u1 != u2)
           | _ -> raise (Exceptions.InvalidOperation("unit", (Stringify.op op))))
+        in res, env
       | t1, t2 -> raise (Exceptions.MismatchedTypes(Stringify.pValue t1, Stringify.pValue t2))
     end
   | Val(s) -> 
