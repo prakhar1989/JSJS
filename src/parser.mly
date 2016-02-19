@@ -29,6 +29,8 @@ open Ast
 %left MULTIPLY DIVIDE MODULUS
 %left NEG
 
+
+
 /* entry point */
 %start main
 %type <Ast.expr> main
@@ -76,7 +78,7 @@ expr:
     | NOT expr                                    { Unop(Not, $2) }
     | MINUS expr %prec NEG                        { Unop(Neg, $2) }
     | expr SEMICOLON expr                         { Seq($1, $3) }
-    | IF LPAREN expr RPAREN THEN block ELSE block { If($3, $6, $8) }
+    | IF expr THEN block ELSE block               { If($2, $4, $6) }
 
 assigns:
     | VAL ID COLON primitive ASSIGN expr { Assign($2, $4, $6) }
