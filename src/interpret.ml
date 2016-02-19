@@ -124,8 +124,8 @@ let _ =
   in
   let lexbuf = Lexing.from_channel (open_in filename) in
   try 
-    let expr = Parser.main Scanner.token lexbuf in
-    let result, _ = eval NameMap.empty expr in 
+    let program = Parser.main Scanner.token lexbuf in
+    let result, _ = eval NameMap.empty program in 
     match result with 
     | Num(x)    -> print_endline (string_of_float x)
     | String(s) -> print_endline s
