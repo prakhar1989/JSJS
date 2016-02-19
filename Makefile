@@ -14,7 +14,7 @@ buildocs: $(DOCS)
 	pandoc $(DOCS) -o docs/proposal.pdf
 
 src/parser.cmo: src/ast.mli
-	ocamlyacc src/parser.mly
+	menhir src/parser.mly
 	ocamlc $(FLAGS) src/ast.mli
 	ocamlc $(FLAGS) src/parser.mli
 	ocamlc $(FLAGS) src/parser.ml

@@ -21,7 +21,13 @@ type expr =
   | StrLit of string
   | Assign of string * primitiveType * expr 
   | Val of string
-  | Seq of expr * expr
-  | If of expr * expr * expr
+  | If of expr * expr list * expr list
 ;;
 
+type func_decl = {
+  fname : string;
+  formals : string list;
+  body : expr;
+};;
+
+type program = expr list * func_decl list;;
