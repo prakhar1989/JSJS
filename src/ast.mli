@@ -31,3 +31,9 @@ type func_decl = {
 };;
 
 type program = expr list * func_decl list;;
+
+
+
+(*func_decl:*)
+    (*| /* nothign */  { {fname="as"; formals=[]; body=NumLit(3.)} }    *)
+(*| decls func_decl                    { fst $1, ($2 :: snd $1) }*)

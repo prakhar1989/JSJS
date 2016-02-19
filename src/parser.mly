@@ -35,12 +35,22 @@ open Ast
 %%
 
 program:
-    | expr_list EOF                      { $1 }
+    | decls EOF                          { (List.rev (fst $1), snd $1) }
+
+decls:
+    | /* nothing */                      { [], [] }
+    | decls delimited_expr               { ($2 :: fst $1), snd $1 }
+
+
+delimited_expr:
+    | expr SEMICOLON                     { $1 }
+
+block:
+    | LBRACE expr_list RBRACE            { $2 }
 
 expr_list:
     | exprs = list(delimited_expr)       { exprs }
 
-/* grammar follows */
 primitive:
     | NUM                                { TNum }
     | BOOL                               { TBool }
@@ -53,12 +63,6 @@ literals:
     | FALSE                              { BoolLit(false) }
     | STR_LIT                            { StrLit($1) }
     | ID                                 { Val($1) }
-
-block:
-    | LBRACE expr_list RBRACE            { $2 }
-
-delimited_expr:
-    | expr SEMICOLON                     { $1 }
 
 expr:
     | literals                           { $1 }
