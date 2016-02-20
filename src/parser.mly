@@ -73,6 +73,7 @@ primitive:
     | UNIT                                    { TUnit }
     | LPAREN args RPAREN THINARROW primitive  { TFun($2, $5) }
     | LIST primitive                          { TList($2) }
+    | LT primitive COLON primitive GT         { TMap($2, $4) }
 
 args:
     | args = separated_list(COMMA, primitive) { args }
@@ -90,6 +91,13 @@ literals:
         FunLit($3, $6) 
     }
     | LSQUARE actuals_opt RSQUARE        { ListLit($2) } 
+    | LT LSQUARE kv_pairs RSQUARE GT     { MapLit($3) }
+
+kv_pairs: 
+    | kv = separated_list(COMMA, kv_pair) { kv }
+
+kv_pair:
+    | expr COLON expr                { $1, $3}
 
 expr:
     | literals                           { $1 }

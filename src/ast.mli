@@ -11,6 +11,7 @@ type primitiveType =
   | TUnit 
   | TFun of funcType
   | TList of primitiveType
+  | TMap of primitiveType * primitiveType
 and funcType = primitiveType list * primitiveType
 ;;
 
@@ -27,6 +28,7 @@ type expr =
   | NumLit of float
   | BoolLit of bool
   | StrLit of string
+  | MapLit of (expr * expr) list
   | ListLit of expr list
   | Assign of string * primitiveType * expr 
   | Val of string
