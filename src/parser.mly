@@ -64,24 +64,32 @@ formals_opt:
     | opts = separated_list(COMMA, opt)  { opts }
 
 opt:
-    | ID COLON primitive                 { $1, $3 }
+    | ID COLON primitive                      { $1, $3 }
 
 primitive:
-    | NUM                                { TNum }
-    | BOOL                               { TBool }
-    | STRING                             { TString }
-    | UNIT                               { TUnit }
-    | LPAREN args RPAREN THINARROW primitive { TFun($2, $5) }
+    | NUM                                     { TNum }
+    | BOOL                                    { TBool }
+    | STRING                                  { TString }
+    | UNIT                                    { TUnit }
+    | LPAREN args RPAREN THINARROW primitive  { TFun($2, $5) }
+    | LIST primitive                          { TList($2) }
 
 args:
     | args = separated_list(COMMA, primitive) { args }
 
 literals:
-    | NUM_LIT                            { NumLit($1) }
-    | TRUE                               { BoolLit(true) }
-    | FALSE                              { BoolLit(false) }
-    | STR_LIT                            { StrLit($1) }
-    | ID                                 { Val($1) }
+    | NUM_LIT                                 { NumLit($1) }
+    | TRUE                                    { BoolLit(true) }
+    | FALSE                                   { BoolLit(false) }
+    | STR_LIT                                 { StrLit($1) }
+    | ID                                      { Val($1) }
+    | LAMBDA LPAREN actuals_opt RPAREN FATARROW expr %prec ANON { 
+        FunLit($3, [$6]) 
+    }
+    | LAMBDA LPAREN actuals_opt RPAREN FATARROW block { 
+        FunLit($3, $6) 
+    }
+    | LSQUARE actuals_opt RSQUARE        { ListLit($2) } 
 
 expr:
     | literals                           { $1 }
@@ -105,12 +113,6 @@ expr:
     | MINUS expr %prec NEG               { Unop(Neg, $2) }
     | IF expr THEN block ELSE block      { If($2, $4, $6) }
     | ID LPAREN actuals_opt RPAREN       { Call($1, $3) }
-    | LAMBDA LPAREN actuals_opt RPAREN FATARROW expr %prec ANON { 
-        FunLit($3, [$6]) 
-    }
-    | LAMBDA LPAREN actuals_opt RPAREN FATARROW block { 
-        FunLit($3, $6) 
-    }
 
 actuals_opt:
     | opts = separated_list(COMMA, expr) { opts }

@@ -5,7 +5,12 @@ type op =
   | Lte | Gte | Neq | Equals | Lt | Gt      (* relational operators *)
 
 type primitiveType = 
-  | TNum | TString | TBool | TUnit | TFun of funcType
+  | TNum 
+  | TString 
+  | TBool 
+  | TUnit 
+  | TFun of funcType
+  | TList of primitiveType
 and funcType = primitiveType list * primitiveType
 ;;
 
@@ -22,6 +27,7 @@ type expr =
   | NumLit of float
   | BoolLit of bool
   | StrLit of string
+  | ListLit of expr list
   | Assign of string * primitiveType * expr 
   | Val of string
   | If of expr * expr list * expr list
