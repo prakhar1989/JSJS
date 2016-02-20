@@ -36,3 +36,5 @@ val people : <string: <string: num>> = <[
   "goo" : <[ "b" : 40 ]>,
   "hoo" : <[ "c" : 2 ]>
 ]>;
+
+val x: list T = ["a", "b", "c"];

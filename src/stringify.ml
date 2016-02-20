@@ -40,7 +40,7 @@ let rec pType = function
   | TBool   -> "bool"
   | TUnit   -> "unit"
   | T(c)    -> Printf.sprintf "%c" c
-  | TList(p) -> (pType p) ^ "list"
+  | TList(p) -> "list " ^ (pType p)
   | TFun(f) -> 
     let args, t = f in
     concat " -> " ((List.map pType args) @ [pType t])
