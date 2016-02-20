@@ -21,3 +21,23 @@ $ make
 $ make test
 $ ./test/run.out
 ```
+
+##### Syntax
+
+```scala
+val isHappy? : bool = true;
+val pi : num = 3.14159;
+
+val sq: (num, num) -> num = /\ (x, y) => x * y;
+
+
+def gcd (a: num, b: num) : num = {
+   if a == b then { a; } 
+   else {
+      if a > b
+      then { gcd((a - b), b); }
+      else { gcd((b - a), a); };
+   };
+}
+
+```

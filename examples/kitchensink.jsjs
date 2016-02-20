@@ -4,3 +4,5 @@ val total : bool = 4 + 5 / 2 == 10;
 val float_total : num = 3.14159;
 
 val msg : string = "jsjs rawks";
+
+val sq: (num, num) -> num = /\ (x, y) => x * y;
