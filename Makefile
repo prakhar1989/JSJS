@@ -19,7 +19,7 @@ src/parser.cmo: src/ast.mli
 	ocamlc $(FLAGS) src/parser.mli
 	ocamlc $(FLAGS) src/parser.ml
 
-src/scanner.cmo: src/scanner.mll src/scanner.ml
+src/scanner.cmo: src/scanner.mll
 	ocamllex src/scanner.mll
 	ocamlc $(FLAGS) src/scanner.ml
 

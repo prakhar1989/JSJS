@@ -22,5 +22,17 @@ val single: string =
   if resp == "yes" then { "Y";
   } else {
     if 10 == 10 then { "Y"; } else { "N"; };
-  };
+  }
+;
 
+val sum : (num, num) -> num = /\(x, y) => x + y;
+
+val total : num = sum(a, b);
+
+val myMap : list num = List.map((/\(x) => x * x), [1, 2, 3, 4]);
+
+val people : <string: <string: num>> = <[
+  "foo" : <[ "a" : 10 ]>,
+  "goo" : <[ "b" : 40 ]>,
+  "hoo" : <[ "c" : 2 ]>
+]>;

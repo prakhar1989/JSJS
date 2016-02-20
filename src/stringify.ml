@@ -27,18 +27,27 @@ let pValue = function
   | Unit(_)   -> "unit"
 ;;
 
-let pType = function
+(* concats a list of strings by a separator *)
+let rec concat sep = function
+  | [] -> ""
+  | x :: [] ->  x
+  | x :: xs ->  x ^ sep ^ (concat sep xs)
+;;
+
+let rec pType = function
   | TNum    -> "num"
   | TString -> "string"
   | TBool   -> "bool"
   | TUnit   -> "unit"
+  | T(c)    -> Printf.sprintf "%c" c
+  | TList(p) -> (pType p) ^ "list"
+  | TFun(f) -> 
+    let args, t = f in
+    concat " -> " ((List.map pType args) @ [pType t])
+  | TMap(k, v) -> 
+    "< " ^ pType k ^ " : " ^ pType v ^ " >"
 ;;
 
-(* concats a list of strings by a separator *)
-let rec concat sep = function
-  | [] -> ""
-  | x :: xs ->  x ^ sep ^ (concat sep xs)
-;;
 
 (* returns a stringified version of an expression *)
 let rec string_of_expr = function
@@ -53,8 +62,23 @@ let rec string_of_expr = function
     concat " " ["val"; s; ":"; pType t; "="; string_of_expr e]
   | Val(s) -> s
   | If(e1, e2, e3) ->
+    let fhalf = concat ";\n" (List.map string_of_expr e2) in
+    let shalf = concat ";\n" (List.map string_of_expr e3) in
     concat " " ["if"; string_of_expr e1; "then"; "{";
-                string_of_expr e2; "}"; "else"; string_of_expr e3]
+                fhalf; "}"; "else"; "{"; shalf; "}"]
+  | ListLit(l) -> 
+    let s = concat "," (List.map string_of_expr l) in
+    "[" ^ s ^ "]"
+  | MapLit(l) -> 
+    let pairs = List.map (fun (k, v) -> string_of_expr k ^ ":" ^ string_of_expr v) l in
+    "<[" ^ (concat ",\n" pairs) ^ "]>"
+  | Call(s, es) -> let ss = List.map string_of_expr es in
+    concat " " [s; "("; (concat ", " ss); ")"]
+  | ModuleLit(s, e) -> s ^ "." ^ (string_of_expr e)
+  | FunLit(args, blk) -> 
+    let sargs = concat "," (List.map string_of_expr args) in
+    let sblk = concat ";\n" (List.map string_of_expr blk) in
+    concat " " ["/\\"; "("; sargs; ")"; "=>"; "{"; sblk; ";};"]
 ;;
 
 
