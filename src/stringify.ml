@@ -52,8 +52,6 @@ let rec string_of_expr = function
   | Assign(s, t, e) -> 
     concat " " ["val"; s; ":"; pType t; "="; string_of_expr e]
   | Val(s) -> s
-  | Seq(e1, e2) -> 
-    concat " " [string_of_expr e1; "\n"; string_of_expr e2]
   | If(e1, e2, e3) ->
     concat " " ["if"; string_of_expr e1; "then"; "{";
                 string_of_expr e2; "}"; "else"; string_of_expr e3]

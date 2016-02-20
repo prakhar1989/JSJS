@@ -14,7 +14,7 @@ buildocs: $(DOCS)
 	pandoc $(DOCS) -o docs/proposal.pdf
 
 src/parser.cmo: src/ast.mli
-	ocamlyacc src/parser.mly
+	menhir src/parser.mly
 	ocamlc $(FLAGS) src/ast.mli
 	ocamlc $(FLAGS) src/parser.mli
 	ocamlc $(FLAGS) src/parser.ml
@@ -28,8 +28,9 @@ src/%.cmo: src/%.ml
 
 .PHONY: test
 test:
-	ocamlfind ocamlc $(FLAGS) test/test_parser.ml -package $(TESTDEPS)
-	ocamlfind ocamlc -o test/run.out -I src -package $(TESTDEPS) $(OBJS) test/test_parser.ml
+	#ocamlfind ocamlc $(FLAGS) test/test_parser.ml -package $(TESTDEPS)
+	#ocamlfind ocamlc -o test/run.out -I src -package $(TESTDEPS) $(OBJS) test/test_parser.ml
+	cat test/menhir-test.txt | menhir --interpret --interpret-show-cst src/parser.mly
 
 .PHONY : clean
 clean:
