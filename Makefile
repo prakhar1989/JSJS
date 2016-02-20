@@ -30,7 +30,7 @@ src/%.cmo: src/%.ml
 test:
 	#ocamlfind ocamlc $(FLAGS) test/test_parser.ml -package $(TESTDEPS)
 	#ocamlfind ocamlc -o test/run.out -I src -package $(TESTDEPS) $(OBJS) test/test_parser.ml
-	cat test/menhir-test.txt | menhir --interpret --interpret-show-cst src/parser.mly
+	@python test/menhir.py
 
 .PHONY : clean
 clean:
