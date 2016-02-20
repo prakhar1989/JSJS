@@ -52,7 +52,7 @@ expr_list:
     | exprs = list(delimited_expr)       { exprs }
 
 func_decl:
-    | DEF ID LPAREN formals_opt RPAREN COLON primitive EQUALS block { 
+    | DEF ID LPAREN formals_opt RPAREN COLON primitive ASSIGN block { 
         { fname = $2;
           formals = $4;
           return_type = $7;
@@ -99,6 +99,10 @@ expr:
     | NOT expr                           { Unop(Not, $2) }
     | MINUS expr %prec NEG               { Unop(Neg, $2) }
     | IF expr THEN block ELSE block      { If($2, $4, $6) }
+    | ID LPAREN actuals_opt RPAREN       { Call($1, $3) }
+
+actuals_opt:
+    | opts = separated_list(COMMA, expr) { opts }
 
 assigns:
     | VAL ID COLON primitive ASSIGN expr { Assign($2, $4, $6) }

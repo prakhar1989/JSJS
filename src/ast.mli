@@ -22,6 +22,7 @@ type expr =
   | Assign of string * primitiveType * expr 
   | Val of string
   | If of expr * expr list * expr list
+  | Call of string * expr list
 ;;
 
 type func_decl = {
