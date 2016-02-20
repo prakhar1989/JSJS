@@ -25,9 +25,10 @@ type expr =
 ;;
 
 type func_decl = {
-  fname : string;
-  formals : string list;
-  body : expr;
+  fname       : string;
+  formals     : (string * primitiveType) list;
+  return_type : primitiveType;
+  body        : expr list;
 };;
 
 type program = expr list * func_decl list;;

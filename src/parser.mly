@@ -40,7 +40,7 @@ program:
 decls:
     | /* nothing */                      { [], [] }
     | decls delimited_expr               { ($2 :: fst $1), snd $1 }
-
+    | decls func_decl                    { fst $1, ($2 :: snd $1) }
 
 delimited_expr:
     | expr SEMICOLON                     { $1 }
@@ -50,6 +50,20 @@ block:
 
 expr_list:
     | exprs = list(delimited_expr)       { exprs }
+
+func_decl:
+    | DEF ID LPAREN formals_opt RPAREN COLON primitive EQUALS block { 
+        { fname = $2;
+          formals = $4;
+          return_type = $7;
+          body = $9; }
+    }
+
+formals_opt:
+    | opts = separated_list(COMMA, opt)  { opts }
+
+opt:
+    | ID COLON primitive                 { $1, $3 }
 
 primitive:
     | NUM                                { TNum }
