@@ -28,8 +28,7 @@ $ ./test/run.out
 val isHappy? : bool = true;
 val pi : num = 3.14159;
 
-val sq: (num, num) -> num = /\ (x, y) => x * y;
-
+val sq: (num, num) -> num = /\(x, y) => x * y;
 
 def gcd (a: num, b: num) : num = {
    if a == b then { a; } 
