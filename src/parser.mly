@@ -16,10 +16,11 @@ open Ast
 
 %token <float>  NUM_LIT
 %token <string> STR_LIT
-%token <string> MOD_LIT
+%token <string> MODULE_LIT
 %token <string> ID
 
 /* associativity rules */
+%nonassoc EXPR
 %right ASSIGN
 %left CARET AND OR
 %left NOT
@@ -71,6 +72,12 @@ primitive:
     | STRING                             { TString }
     | UNIT                               { TUnit }
 
+func_type:
+    | LPAREN args RPAREN THINARROW primitive { $2, $5 }
+
+args:
+    | args = separated_list(COMMA, primitive) { args }
+
 literals:
     | NUM_LIT                            { NumLit($1) }
     | TRUE                               { BoolLit(true) }
@@ -104,5 +111,14 @@ expr:
 actuals_opt:
     | opts = separated_list(COMMA, expr) { opts }
 
+anon_formals:
+    | args = separated_list(COMMA, ID)   { args }
+
 assigns:
     | VAL ID COLON primitive ASSIGN expr { Assign($2, $4, $6) }
+    | VAL ID COLON func_type ASSIGN LPAREN anon_formals RPAREN FATARROW expr %prec EXPR {
+        FuncAssign($2, $4, $7, [$10])
+    } 
+    | VAL ID COLON func_type ASSIGN LPAREN anon_formals RPAREN FATARROW block {
+        FuncAssign($2, $4, $7, $10)
+    } 

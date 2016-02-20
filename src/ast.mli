@@ -4,7 +4,10 @@ type op =
   | And | Or | Not                          (* boolean operators *)
   | Lte | Gte | Neq | Equals | Lt | Gt      (* relational operators *)
 
-type primitiveType = TNum | TString | TBool | TUnit
+type primitiveType = 
+  | TNum | TString | TBool | TUnit | Fun of funcType
+and funcType = primitiveType list * primitiveType
+;;
 
 type primitiveValue = 
   | Num of float 
@@ -20,6 +23,7 @@ type expr =
   | BoolLit of bool
   | StrLit of string
   | Assign of string * primitiveType * expr 
+  | FuncAssign of string * funcType * string list * expr list
   | Val of string
   | If of expr * expr list * expr list
   | Call of string * expr list
@@ -33,9 +37,3 @@ type func_decl = {
 };;
 
 type program = expr list * func_decl list;;
-
-
-
-(*func_decl:*)
-    (*| /* nothign */  { {fname="as"; formals=[]; body=NumLit(3.)} }    *)
-(*| decls func_decl                    { fst $1, ($2 :: snd $1) }*)

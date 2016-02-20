@@ -20,8 +20,8 @@ type token =
   | NOT
   | NEQ
   | MULTIPLY
-  | MOD_LIT of (string)
   | MODULUS
+  | MODULE_LIT of (string)
   | MINUS
   | LTE
   | LT

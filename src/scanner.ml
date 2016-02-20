@@ -1333,7 +1333,7 @@ let
 # 1334 "src/scanner.ml"
 = Lexing.sub_lexeme lexbuf lexbuf.Lexing.lex_start_pos lexbuf.Lexing.lex_curr_pos in
 # 70 "src/scanner.mll"
-                                ( MOD_LIT(m_lit); )
+                                ( MODULE_LIT(m_lit); )
 # 1338 "src/scanner.ml"
 
   | 47 ->

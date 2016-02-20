@@ -67,7 +67,7 @@ rule token =
     | number as num             { NUM_LIT(float_of_string num); }
     | '"' (string_lit as s) '"' { STR_LIT(s); }
     | id     as ident           { ID(ident); }
-    | module_lit  as m_lit      { MOD_LIT(m_lit); }
+    | module_lit  as m_lit      { MODULE_LIT(m_lit); }
     | _ as c                    { let line_no = lexbuf.lex_curr_p.pos_lnum + 1 in
                                   let char_no = lexbuf.lex_curr_p.pos_cnum - lexbuf.lex_curr_p.pos_bol in
                                   raise (Exceptions.IllegalCharacter(Char.escaped c, line_no, char_no)) }
