@@ -18,8 +18,10 @@ open Ast
 %token <string> STR_LIT
 %token <string> MODULE_LIT
 %token <string> ID
+%token <char>   GENERIC
 
 /* associativity rules */
+%nonassoc DOT
 %nonassoc ANON
 %right ASSIGN
 %left CARET AND OR
@@ -74,6 +76,7 @@ primitive:
     | LPAREN args RPAREN THINARROW primitive  { TFun($2, $5) }
     | LIST primitive                          { TList($2) }
     | LT primitive COLON primitive GT         { TMap($2, $4) }
+    | GENERIC                                 { T($1) }
 
 args:
     | args = separated_list(COMMA, primitive) { args }
@@ -121,6 +124,7 @@ expr:
     | MINUS expr %prec NEG               { Unop(Neg, $2) }
     | IF expr THEN block ELSE block      { If($2, $4, $6) }
     | ID LPAREN actuals_opt RPAREN       { Call($1, $3) }
+    | MODULE_LIT DOT expr                { ModuleLit($1, $3)}
 
 actuals_opt:
     | opts = separated_list(COMMA, expr) { opts }

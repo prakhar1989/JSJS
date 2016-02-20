@@ -34,6 +34,7 @@ type token =
   | ID of (string)
   | GTE
   | GT
+  | GENERIC of (char)
   | FATARROW
   | FALSE
   | EQUALS

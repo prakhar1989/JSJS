@@ -16,7 +16,7 @@ let digit = ['0'-'9']
 let id = ['a'-'z'] ['a'-'z' 'A'-'Z' '0'-'9' '_']* ['?']?
 let ws = [' ' '\r' '\t']
 let number = digit+ '.'? digit*
-let module_lit = ['A'-'Z'] ['a'-'z' 'A'-'Z']*
+let module_lit = ['A'-'Z'] ['a'-'z' 'A'-'Z']+
 let string_lit = (([' '-'!' '#'-'[' ']'-'~'] | '\\' ['\\' '"' 'n' 'r' 't'])* as s)
 
 rule token = 
@@ -65,6 +65,7 @@ rule token =
     | ','                       { COMMA }
     | "=>"                      { FATARROW }
     | "->"                      { THINARROW }
+    | ['A'-'Z'] as c            { GENERIC(c) }
     | number as num             { NUM_LIT(float_of_string num); }
     | '"' (string_lit as s) '"' { STR_LIT(s); }
     | id     as ident           { ID(ident); }

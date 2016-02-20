@@ -5,6 +5,7 @@ type op =
   | Lte | Gte | Neq | Equals | Lt | Gt      (* relational operators *)
 
 type primitiveType = 
+  | T of char
   | TNum 
   | TString 
   | TBool 
@@ -35,6 +36,7 @@ type expr =
   | If of expr * expr list * expr list
   | Call of string * expr list
   | FunLit of expr list * expr list
+  | ModuleLit of string * expr
 ;;
 
 type func_decl = {
