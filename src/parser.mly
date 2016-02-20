@@ -8,7 +8,7 @@ open Ast
 %token LT LTE GT GTE EQUALS NEQ
 %token AND OR NOT
 %token LPAREN RPAREN LBRACE RBRACE RSQUARE LSQUARE
-%token ASSIGN
+%token ASSIGN LAMBDA
 %token CARET
 %token VAL IF THEN ELSE DEF TRUE FALSE
 %token NUM LIST BOOL STRING UNIT
@@ -20,7 +20,7 @@ open Ast
 %token <string> ID
 
 /* associativity rules */
-%nonassoc EXPR
+%nonassoc ANON
 %right ASSIGN
 %left CARET AND OR
 %left NOT
@@ -71,9 +71,7 @@ primitive:
     | BOOL                               { TBool }
     | STRING                             { TString }
     | UNIT                               { TUnit }
-
-func_type:
-    | LPAREN args RPAREN THINARROW primitive { $2, $5 }
+    | LPAREN args RPAREN THINARROW primitive { TFun($2, $5) }
 
 args:
     | args = separated_list(COMMA, primitive) { args }
@@ -107,18 +105,15 @@ expr:
     | MINUS expr %prec NEG               { Unop(Neg, $2) }
     | IF expr THEN block ELSE block      { If($2, $4, $6) }
     | ID LPAREN actuals_opt RPAREN       { Call($1, $3) }
+    | LAMBDA LPAREN actuals_opt RPAREN FATARROW expr %prec ANON { 
+        FunLit($3, [$6]) 
+    }
+    | LAMBDA LPAREN actuals_opt RPAREN FATARROW block { 
+        FunLit($3, $6) 
+    }
 
 actuals_opt:
     | opts = separated_list(COMMA, expr) { opts }
 
-anon_formals:
-    | args = separated_list(COMMA, ID)   { args }
-
 assigns:
     | VAL ID COLON primitive ASSIGN expr { Assign($2, $4, $6) }
-    | VAL ID COLON func_type ASSIGN LPAREN anon_formals RPAREN FATARROW expr %prec EXPR {
-        FuncAssign($2, $4, $7, [$10])
-    } 
-    | VAL ID COLON func_type ASSIGN LPAREN anon_formals RPAREN FATARROW block {
-        FuncAssign($2, $4, $7, $10)
-    } 

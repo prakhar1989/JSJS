@@ -33,6 +33,7 @@ rule token =
     | '='                       { ASSIGN }
     | '!'                       { NOT }
     | '^'                       { CARET }
+    | "/\\"                     { LAMBDA }
     | "<="                      { LTE }
     | ">="                      { GTE }
     | "=="                      { EQUALS }

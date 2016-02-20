@@ -5,7 +5,7 @@ type op =
   | Lte | Gte | Neq | Equals | Lt | Gt      (* relational operators *)
 
 type primitiveType = 
-  | TNum | TString | TBool | TUnit | Fun of funcType
+  | TNum | TString | TBool | TUnit | TFun of funcType
 and funcType = primitiveType list * primitiveType
 ;;
 
@@ -23,10 +23,10 @@ type expr =
   | BoolLit of bool
   | StrLit of string
   | Assign of string * primitiveType * expr 
-  | FuncAssign of string * funcType * string list * expr list
   | Val of string
   | If of expr * expr list * expr list
   | Call of string * expr list
+  | FunLit of expr list * expr list
 ;;
 
 type func_decl = {
@@ -37,3 +37,11 @@ type func_decl = {
 };;
 
 type program = expr list * func_decl list;;
+(*
+    | VAL ID COLON func_type ASSIGN LPAREN anon_formals RPAREN FATARROW expr %prec EXPR {
+        FuncAssign($2, $4, $7, [$10])
+    } 
+    | VAL ID COLON func_type ASSIGN LPAREN anon_formals RPAREN FATARROW block {
+        FuncAssign($2, $4, $7, $10)
+    } 
+   *)

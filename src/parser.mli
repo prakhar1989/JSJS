@@ -29,6 +29,7 @@ type token =
   | LPAREN
   | LIST
   | LBRACE
+  | LAMBDA
   | IF
   | ID of (string)
   | GTE
