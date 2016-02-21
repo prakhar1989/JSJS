@@ -1,9 +1,9 @@
-{ 
-    open Parser 
+{
+    open Parser
     open Lexing
 
     (* increments the line number *)
-    let incr_lineno lexbuf = 
+    let incr_lineno lexbuf =
         let curr_pos = lexbuf.lex_curr_p in
         lexbuf.lex_curr_p <- { curr_pos with
             pos_lnum = curr_pos.pos_lnum + 1;
@@ -19,7 +19,7 @@ let number = digit+ '.'? digit*
 let module_lit = ['A'-'Z'] ['a'-'z' 'A'-'Z']+
 let string_lit = (([' '-'!' '#'-'[' ']'-'~'] | '\\' ['\\' '"' 'n' 'r' 't'])* as s)
 
-rule token = 
+rule token =
     parse
     | ws                        { token lexbuf; }
     | '\n'                      { incr_lineno lexbuf; token lexbuf; }
@@ -53,6 +53,7 @@ rule token =
     | "unit"                    { UNIT }
     | "string"                  { STRING }
     | "list"                    { LIST }
+    | "Map"                     { MAP }
     | ':'                       { COLON }
     | '('                       { LPAREN }
     | ')'                       { RPAREN }
@@ -75,7 +76,7 @@ rule token =
                                   raise (Exceptions.IllegalCharacter(Char.escaped c, line_no, char_no)) }
     | eof                       { EOF }
 
-and comment = 
+and comment =
     parse
     | '\n'                      { token lexbuf }
     | _                         { comment lexbuf }

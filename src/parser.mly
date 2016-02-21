@@ -1,4 +1,4 @@
-%{ 
+%{
 open Ast
 %}
 
@@ -13,6 +13,7 @@ open Ast
 %token VAL IF THEN ELSE DEF TRUE FALSE
 %token NUM LIST BOOL STRING UNIT
 %token COLON SEMICOLON DOT FATARROW COMMA THINARROW
+%token MAP
 
 %token <float>  NUM_LIT
 %token <string> STR_LIT
@@ -38,24 +39,24 @@ open Ast
 %%
 
 program:
-    | decls EOF                          { (List.rev (fst $1), snd $1) }
+    | decls EOF                               { (List.rev (fst $1), snd $1) }
 
 decls:
-    | /* nothing */                      { [], [] }
-    | decls delimited_expr               { ($2 :: fst $1), snd $1 }
-    | decls func_decl                    { fst $1, ($2 :: snd $1) }
+    | /* nothing */                           { [], [] }
+    | decls delimited_expr                    { ($2 :: fst $1), snd $1 }
+    | decls func_decl                         { fst $1, ($2 :: snd $1) }
 
 delimited_expr:
-    | expr SEMICOLON                     { $1 }
+    | expr SEMICOLON                          { $1 }
 
 block:
-    | LBRACE expr_list RBRACE            { $2 }
+    | LBRACE expr_list RBRACE                 { $2 }
 
 expr_list:
-    | exprs = list(delimited_expr)       { exprs }
+    | exprs = list(delimited_expr)            { exprs }
 
 func_decl:
-    | DEF ID LPAREN formals_opt RPAREN COLON primitive ASSIGN block { 
+    | DEF ID LPAREN formals_opt RPAREN COLON primitive ASSIGN block {
         { fname = $2;
           formals = $4;
           return_type = $7;
@@ -63,7 +64,7 @@ func_decl:
     }
 
 formals_opt:
-    | opts = separated_list(COMMA, opt)  { opts }
+    | opts = separated_list(COMMA, opt)       { opts }
 
 opt:
     | ID COLON primitive                      { $1, $3 }
@@ -87,20 +88,20 @@ literals:
     | FALSE                                   { BoolLit(false) }
     | STR_LIT                                 { StrLit($1) }
     | ID                                      { Val($1) }
-    | LAMBDA LPAREN actuals_opt RPAREN FATARROW expr %prec ANON { 
-        FunLit($3, [$6]) 
+    | LAMBDA LPAREN actuals_opt RPAREN FATARROW expr %prec ANON {
+        FunLit($3, [$6])
     }
-    | LAMBDA LPAREN actuals_opt RPAREN FATARROW block { 
-        FunLit($3, $6) 
+    | LAMBDA LPAREN actuals_opt RPAREN FATARROW block {
+        FunLit($3, $6)
     }
-    | LSQUARE actuals_opt RSQUARE        { ListLit($2) } 
-    | LT LSQUARE kv_pairs RSQUARE GT     { MapLit($3) }
+    | LSQUARE actuals_opt RSQUARE             { ListLit($2) }
+    | MAP LPAREN kv_pairs RPAREN              { MapLit($3) }
 
-kv_pairs: 
-    | kv = separated_list(COMMA, kv_pair) { kv }
+kv_pairs:
+    | kv = separated_list(COMMA, kv_pair)     { kv }
 
 kv_pair:
-    | expr COLON expr                { $1, $3}
+    | expr COLON expr                         { $1, $3}
 
 expr:
     | literals                           { $1 }
