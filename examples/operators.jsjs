@@ -25,11 +25,11 @@ val single: string =
   }
 ;
 
-val sum : (num, num) -> num = /\(x, y) => x + y;
+val sum: (num, num) -> num = /\(x, y) => x + y;
 
-val total : num = sum(a, b);
+val myMap: list num = List.map((/\(x) => x * x), [1, 2, 3, 4]);
 
-val myMap : list num = List.map((/\(x) => x * x), [1, 2, 3, 4]);
+val total: num = sum(a, b);
 
 val people : <string: <string: num>> = <[
   "foo" : <[ "a" : 10 ]>,
@@ -38,3 +38,8 @@ val people : <string: <string: num>> = <[
 ]>;
 
 val x: list T = ["a", "b", "c"];
+
+// function decs
+def add(a: num, b: num): num = {
+  a + b;
+}

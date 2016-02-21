@@ -47,11 +47,3 @@ type func_decl = {
 };;
 
 type program = expr list * func_decl list;;
-(*
-    | VAL ID COLON func_type ASSIGN LPAREN anon_formals RPAREN FATARROW expr %prec EXPR {
-        FuncAssign($2, $4, $7, [$10])
-    } 
-    | VAL ID COLON func_type ASSIGN LPAREN anon_formals RPAREN FATARROW block {
-        FuncAssign($2, $4, $7, $10)
-    } 
-   *)

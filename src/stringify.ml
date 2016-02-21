@@ -48,7 +48,6 @@ let rec pType = function
     "< " ^ pType k ^ " : " ^ pType v ^ " >"
 ;;
 
-
 (* returns a stringified version of an expression *)
 let rec string_of_expr = function
   | Binop(e1, o, e2) ->
@@ -80,5 +79,3 @@ let rec string_of_expr = function
     let sblk = concat ";\n" (List.map string_of_expr blk) in
     concat " " ["/\\"; "("; sargs; ")"; "=>"; "{"; sblk; ";};"]
 ;;
-
-

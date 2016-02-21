@@ -118,15 +118,14 @@ let print_error_line line_no char_no fname etype =
 (*;;*)
 
 (* the "main" function *)
-let _ =                                                              
+let run () =                                                              
   let filename = if Array.length Sys.argv > 1
     then Sys.argv.(1)
     else raise (failwith "Error: please provide a filename. Usage: ./jsjs.out filename")
   in
   let lexbuf = Lexing.from_channel (open_in filename) in
-  let es, _ = Parser.program Scanner.token lexbuf in
-  let s = List.map Stringify.string_of_expr es in
-  List.iter (fun x -> print_endline (x ^ ";")) s
+  let _, _ = Parser.program Scanner.token lexbuf in
+  print_endline "todo"
 ;;
     (*let result, _ = eval NameMap.empty program in *)
     (*match result with *)

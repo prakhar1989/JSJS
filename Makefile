@@ -4,8 +4,8 @@ EXECUTABLE=jsjs.out
 OBJS=src/parser.cmo src/exceptions.cmo src/scanner.cmo src/stringify.cmo
 TESTDEPS=oUnit -linkpkg -g
 
-jsjs: $(OBJS) src/interpret.cmo
-	ocamlc -I src -o $(EXECUTABLE) $(OBJS) src/interpret.cmo
+jsjs: $(OBJS) src/driver.cmo
+	ocamlc -I src -o $(EXECUTABLE) $(OBJS) src/driver.cmo
 	@echo ---------------------------
 	@echo JSJS is ready to be served!
 	@echo ---------------------------
@@ -28,8 +28,8 @@ src/%.cmo: src/%.ml
 
 .PHONY: test
 test:
-	#ocamlfind ocamlc $(FLAGS) test/test_parser.ml -package $(TESTDEPS)
-	#ocamlfind ocamlc -o test/run.out -I src -package $(TESTDEPS) $(OBJS) test/test_parser.ml
+	@#ocamlfind ocamlc $(FLAGS) test/test_parser.ml -package $(TESTDEPS)
+	@#ocamlfind ocamlc -o test/run.out -I src -package $(TESTDEPS) $(OBJS) test/test_parser.ml
 	@python test/menhir.py
 
 .PHONY : clean
