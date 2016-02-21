@@ -13,6 +13,7 @@ open Ast
 %token VAL IF THEN ELSE DEF TRUE FALSE
 %token NUM LIST BOOL STRING UNIT
 %token COLON SEMICOLON DOT FATARROW COMMA THINARROW
+%token MAP
 
 %token <float>  NUM_LIT
 %token <string> STR_LIT
@@ -94,7 +95,7 @@ literals:
         FunLit($3, $6)
     }
     | LSQUARE actuals_opt RSQUARE             { ListLit($2) }
-    | LT LSQUARE kv_pairs RSQUARE GT          { MapLit($3) }
+    | MAP LPAREN kv_pairs RPAREN              { MapLit($3) }
 
 kv_pairs:
     | kv = separated_list(COMMA, kv_pair)     { kv }

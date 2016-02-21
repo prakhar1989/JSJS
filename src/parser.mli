@@ -23,6 +23,7 @@ type token =
   | MODULUS
   | MODULE_LIT of (string)
   | MINUS
+  | MAP
   | LTE
   | LT
   | LSQUARE
