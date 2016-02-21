@@ -31,7 +31,7 @@ val pi : num = 3.14159;
 val sq: (num, num) -> num = /\(x, y) => x * y;
 
 def gcd (a: num, b: num) : num = {
-   if a == b then { a; } 
+   if a == b then { a; }
    else {
       if a > b
       then { gcd((a - b), b); }
@@ -39,4 +39,9 @@ def gcd (a: num, b: num) : num = {
    };
 }
 
+val people : <string: <string: num>> = Map(
+  "foo" : Map("a" : 10),
+  "goo" : Map("b" : 40),
+  "hoo" : Map("c" : 2)
+);
 ```
