@@ -28,5 +28,5 @@ def ninetyNineBottles (): unit = {
          }
       }
    }
-   ninetyNine(99)
+   ninetyNine(99);
 };
