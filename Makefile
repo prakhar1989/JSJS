@@ -34,6 +34,6 @@ test:
 
 .PHONY : clean
 clean:
-	rm -f src/*.cmo src/*.cmi *.log *.cache
+	rm -f src/*.cmo src/*.cmi *.log *.cache parser.ml parser.mli scanner.ml
 	rm -f test/*.cmo test/*.cmi test/*.log test/*.cache
 

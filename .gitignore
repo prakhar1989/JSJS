@@ -5,3 +5,6 @@
 _build
 *.log
 *.cache
+src/parser.ml
+src/parser.mli
+src/scanner.ml
