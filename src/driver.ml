@@ -14,10 +14,10 @@ let print_program () =
   let lexbuf = Lexing.from_channel (open_in filename) in
   let exprs, fdecls = Parser.program Scanner.token lexbuf in
 
-  (* print functions
+(*  print functions *)
   let fs = List.map Stringify.string_of_func_decl fdecls in
   List.iter (fun x -> print_endline x) fs;
-  *)
+
   print_endline "";
 
   (* print exprs *)

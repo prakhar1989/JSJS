@@ -79,3 +79,11 @@ let rec string_of_expr = function
     let sblk = concat ";\n" (List.map string_of_expr blk) in
     concat " " ["/\\"; "("; sargs; ")"; "=>"; "{"; sblk; ";};"]
 ;;
+
+let string_of_func_decl decl = 
+    let fname = decl.fname in 
+    let fargs = concat ", " (List.map (fun (id, typ) -> id ^ " : " ^ pType typ) decl.formals) in
+    let fsig = "(" ^ fargs ^ ")" ^ " : " ^ (pType decl.return_type) in 
+    let fbody = concat ";\n" (List.map string_of_expr decl.body) in
+    concat " " ["def"; fname; fsig; "="; "{"; fbody; "}"]
+;;
