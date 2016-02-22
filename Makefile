@@ -27,21 +27,26 @@ src/scanner.cmo: src/scanner.mll
 src/%.cmo: src/%.ml
 	ocamlc $(FLAGS) $<
 
-js: codegen/out.js
+
+js: codegen/out.js node_modules
 	@mkdir -p outputs
 	@node codegen/out.js > outputs/$(filename).js
 	@echo --------------------------------------------
 	@echo "Hot off the grill! 🍗 🍗 🍗  - outputs/$(filename).js"
 	@echo --------------------------------------------
 
+node_modules:
+	npm install
+
 codegen/out.js:
 	@echo "Please provide a file name.\nUsage: ./jsjs.out filename.jsjs"; false
 
 .PHONY: test
-test:
+test: node_modules
 	@#ocamlfind ocamlc $(FLAGS) test/test_parser.ml -package $(TESTDEPS)
 	@#ocamlfind ocamlc -o test/run.out -I src -package $(TESTDEPS) $(OBJS) test/test_parser.ml
-	@python test/menhir.py
+	python test/menhir.py
+	npm test
 
 .PHONY : clean
 clean:
