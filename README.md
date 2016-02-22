@@ -19,7 +19,7 @@ To run tests, you need the [OUnit](http://ounit.forge.ocamlcore.org/) library. R
 ```
 $ make
 $ make test
-$ ./test/run.out
+$ npm test
 ```
 
 ##### Syntax
