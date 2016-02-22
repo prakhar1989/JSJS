@@ -7,6 +7,10 @@ val t : num = x + (y * z);
 // strings
 val firstName : string = "foo";
 val secondName : string = "bar";
-val bio : string = "my first name is: " ^ firstName ^ ", my second name is: " ^ secondName;
+val bio : string = "My first name is " ^ firstName ^ ", my second name is " ^ secondName;
 
-print(10, "hello world", t);
+print("Hello World");
+print("Value of 10 + (100 * 20) = ", t);
+print("Bio:", bio);
+print("Boolean:", !true && false);
+
