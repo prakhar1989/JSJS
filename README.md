@@ -24,11 +24,11 @@ def gcd (a: num, b: num) : num = {
    };
 }
 
-val people : <string: <string: num>> = Map(
-  "foo" : Map("a" : 10),
-  "goo" : Map("b" : 40),
-  "hoo" : Map("c" : 2)
-);
+val people : <string: <string: num>> = {
+  "foo" : {"a" : 10},
+  "goo" : {"b" : 40},
+  "hoo" : {"c" : 2}
+};
 ```
 
 ----

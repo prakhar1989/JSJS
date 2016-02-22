@@ -53,7 +53,7 @@ block:
     | LBRACE expr_list RBRACE                 { $2 }
 
 expr_list:
-    | exprs = list(delimited_expr)            { exprs }
+    | exprs = nonempty_list(delimited_expr)            { exprs }
 
 func_decl:
     | DEF ID LPAREN formals_opt RPAREN COLON primitive ASSIGN block {
@@ -95,7 +95,7 @@ literals:
         FunLit($3, $6)
     }
     | LSQUARE actuals_opt RSQUARE             { ListLit($2) }
-    | MAP LPAREN kv_pairs RPAREN              { MapLit($3) }
+    | LBRACE kv_pairs RBRACE                  { MapLit($2) }
 
 kv_pairs:
     | kv = separated_list(COMMA, kv_pair)     { kv }
