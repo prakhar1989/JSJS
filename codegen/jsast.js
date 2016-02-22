@@ -32,10 +32,34 @@ function binop(op, expr1, expr2) {
     }
 }
 
+function assign(id, expr) {
+    return {
+      "type": "VariableDeclaration",
+      "declarations": [
+        {
+          "type": "VariableDeclarator",
+          "id": id,
+          "init": expr 
+        }
+      ],
+      "kind": "let"
+    }
+}
+
+function call(id, exprs) {
+    return {
+        type: "CallExpression",
+        callee: id,
+        arguments: exprs
+    }
+}
+
 module.exports = {
     literal: literal,
     unop: unop,
     id: id,
-    binop: binop
+    binop: binop,
+    assign: assign,
+    call: call
 }
 
