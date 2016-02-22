@@ -26,6 +26,11 @@ src/scanner.cmo: src/scanner.mll
 src/%.cmo: src/%.ml
 	ocamlc $(FLAGS) $<
 
+.PHONY : gen
+gen:
+	@node codegen/out.js > outputs/jsjs.js
+	@echo "outputs/jsjs.js is ready to be served!"
+
 .PHONY: test
 test:
 	@#ocamlfind ocamlc $(FLAGS) test/test_parser.ml -package $(TESTDEPS)
@@ -35,5 +40,5 @@ test:
 .PHONY : clean
 clean:
 	rm -f src/*.cmo src/*.cmi *.log *.cache parser.ml parser.mli scanner.ml
-	rm -f test/*.cmo test/*.cmi test/*.log test/*.cache
+	rm -f test/*.cmo test/*.cmi test/*.log test/*.cache codegen/out.js
 

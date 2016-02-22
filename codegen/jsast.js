@@ -42,7 +42,7 @@ function assign(id, expr) {
           "init": expr 
         }
       ],
-      "kind": "let"
+      "kind": "var"
     }
 }
 

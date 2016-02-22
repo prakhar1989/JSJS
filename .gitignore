@@ -9,4 +9,5 @@ src/parser.ml
 src/parser.mli
 src/scanner.ml
 node_modules
-jsjs.js
+codegen/out.js
+outputs

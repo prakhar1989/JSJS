@@ -60,7 +60,7 @@ describe('Assigns', function() {
 
     it('assignment for ids', function () {
       var expr = ast.binop("+", ast.id('x'), ast.id('y'));
-      assert.equal('let z = x + y;', gen(ast.assign(ast.id('z'), expr)));
+      assert.equal('var z = x + y;', gen(ast.assign(ast.id('z'), expr)));
     });
 });
 

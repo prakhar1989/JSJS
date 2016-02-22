@@ -1,0 +1,12 @@
+// numbers
+val x : num = 10;
+val y : num = 100;
+val z : num = 20;
+val t : num = x + (y * z);
+
+// strings
+val firstName : string = "foo";
+val secondName : string = "bar";
+val bio : string = "my first name is: " ^ firstName ^ ", my second name is: " ^ secondName;
+
+print(10, "hello world", t);
