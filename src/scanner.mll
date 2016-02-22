@@ -53,7 +53,6 @@ rule token =
     | "unit"                    { UNIT }
     | "string"                  { STRING }
     | "list"                    { LIST }
-    | "Map"                     { MAP }
     | ':'                       { COLON }
     | '('                       { LPAREN }
     | ')'                       { RPAREN }

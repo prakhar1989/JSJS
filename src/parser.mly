@@ -13,7 +13,6 @@ open Ast
 %token VAL IF THEN ELSE DEF TRUE FALSE
 %token NUM LIST BOOL STRING UNIT
 %token COLON SEMICOLON DOT FATARROW COMMA THINARROW
-%token MAP
 
 %token <float>  NUM_LIT
 %token <string> STR_LIT
@@ -23,6 +22,7 @@ open Ast
 
 /* associativity rules */
 %nonassoc DOT
+%nonassoc SINGLE
 %nonassoc ANON
 %right ASSIGN
 %left CARET AND OR
@@ -123,6 +123,7 @@ expr:
     | LPAREN expr RPAREN                 { $2 }
     | NOT expr                           { Unop(Not, $2) }
     | MINUS expr %prec NEG               { Unop(Neg, $2) }
+    | IF expr THEN expr ELSE expr %prec SINGLE      { If($2, [$4], [$6]) }
     | IF expr THEN block ELSE block      { If($2, $4, $6) }
     | ID LPAREN actuals_opt RPAREN       { Call($1, $3) }
     | MODULE_LIT DOT expr                { ModuleLit($1, $3)}
