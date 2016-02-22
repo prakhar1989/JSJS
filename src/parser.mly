@@ -56,11 +56,11 @@ expr_list:
     | exprs = nonempty_list(delimited_expr)            { exprs }
 
 func_decl:
-    | DEF ID LPAREN formals_opt RPAREN COLON primitive ASSIGN block {
+    | DEF ID LPAREN formals_opt RPAREN COLON primitive block {
         { fname = $2;
           formals = $4;
           return_type = $7;
-          body = $9; }
+          body = $8; }
     }
 
 formals_opt:
