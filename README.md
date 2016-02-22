@@ -7,21 +7,6 @@ Read the [proposal](http://prakhar.me/JSJS/) or track the status of the project 
 
 ----
 
-##### Build
-```shell
-$ make clean
-$ make
-$ ./jsjs.out examples/operators.jsjs
-```
-
-##### Tests
-To run tests, you need the [OUnit](http://ounit.forge.ocamlcore.org/) library. Run `opam install ounit` to get it.
-```
-$ make
-$ make test
-$ npm test
-```
-
 ##### Syntax
 
 ```scala
@@ -45,3 +30,28 @@ val people : <string: <string: num>> = Map(
   "hoo" : Map("c" : 2)
 );
 ```
+
+----
+
+##### Build
+```shell
+$ make clean
+$ make
+$ ./jsjs.out examples/operators.jsjs
+```
+
+#### Generate JS
+```shell
+$ make 
+$ ./jsjs.out helloworld.jsjs
+$ make js filename=awesome.js
+```
+
+##### Tests
+To run tests, you need the [OUnit](http://ounit.forge.ocamlcore.org/) library. Run `opam install ounit` to get it.
+```
+$ make
+$ make test
+$ npm test
+```
+

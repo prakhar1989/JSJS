@@ -3,12 +3,13 @@ FLAGS= -I src -c
 EXECUTABLE=jsjs.out
 OBJS=src/parser.cmo src/exceptions.cmo src/scanner.cmo src/stringify.cmo src/codegen.cmo
 TESTDEPS=oUnit -linkpkg -g
+filename=jsjs
 
 jsjs: $(OBJS) src/driver.cmo
 	ocamlc -I src -o $(EXECUTABLE) $(OBJS) src/driver.cmo
-	@echo ---------------------------
-	@echo JSJS is ready to be served!
-	@echo ---------------------------
+	@echo ----------------------------------
+	@echo JSJS is ready to be served! 🍕 🍕 🍕
+	@echo ----------------------------------
 
 buildocs: $(DOCS)
 	pandoc $(DOCS) -o docs/proposal.pdf
@@ -26,10 +27,15 @@ src/scanner.cmo: src/scanner.mll
 src/%.cmo: src/%.ml
 	ocamlc $(FLAGS) $<
 
-.PHONY : gen
-gen:
-	@node codegen/out.js > outputs/jsjs.js
-	@echo "outputs/jsjs.js is ready to be served!"
+js: codegen/out.js
+	@mkdir -p outputs
+	@node codegen/out.js > outputs/$(filename).js
+	@echo --------------------------------------------
+	@echo "Hot off the grill! 🍗 🍗 🍗  - outputs/$(filename).js"
+	@echo --------------------------------------------
+
+codegen/out.js:
+	@echo "Please provide a file name.\nUsage: ./jsjs.out filename.jsjs"; false
 
 .PHONY: test
 test:
