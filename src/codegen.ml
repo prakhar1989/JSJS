@@ -7,11 +7,14 @@ let rec js_of_expr = function
   | StrLit(s) -> Printf.sprintf "ast.literal('%s')" s
   | BoolLit(b) -> Printf.sprintf "ast.literal(%s)" (string_of_bool b)
   | Val(s) -> Printf.sprintf "ast.id('%s')" s 
-  | Unop(o, e) -> let s1 = Stringify.op o in
-    let s2 = js_of_expr e in
+  | Unop(o, e) -> 
+    let s1 = Stringify.op o and s2 = js_of_expr e in
     Printf.sprintf "ast.unop('%s', %s)" s1 s2
   | Binop(e1, o, e2) -> 
-    let s1 = Stringify.op o and
+    let s1 = match o with
+      | Caret -> "+"
+      | _ -> Stringify.op o
+    and
     s2 = js_of_expr e1 and s3 = js_of_expr e2 in
     Printf.sprintf "ast.binop('%s', %s, %s)" s1 s2 s3
   | Assign(s, _, e) ->
