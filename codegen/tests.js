@@ -73,3 +73,4 @@ describe('Function Call', function() {
       assert.equal('print(4 + 3, 10, b)', gen(ast.call(fn, [a1,a2,a3])))
     });
 });
+

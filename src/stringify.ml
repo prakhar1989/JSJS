@@ -71,7 +71,7 @@ let rec string_of_expr = function
   | MapLit(l) -> 
     let pairs = List.map (fun (k, v) -> string_of_expr k ^ ":" ^ string_of_expr v) l in
     "Map(" ^ (concat ",\n" pairs) ^ ")"
-  | Call(s, es) -> let ss = List.map string_of_expr es in
+  | Call(s, args) -> let ss = List.map string_of_expr args in
     concat " " [s; "("; (concat ", " ss); ")"]
   | ModuleLit(s, e) -> s ^ "." ^ (string_of_expr e)
   | FunLit(args, blk) -> 
