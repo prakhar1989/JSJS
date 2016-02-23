@@ -37,3 +37,4 @@ test: node_modules
 .PHONY : clean
 clean:
 	ocamlbuild -clean
+	rm codegen/out.js
