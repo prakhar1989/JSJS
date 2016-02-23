@@ -1,3 +1,6 @@
 S src
+S _build/src
 B src
+B _build/src
 PKG ounit
+PKG core
