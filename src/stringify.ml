@@ -2,7 +2,7 @@
 
 open Ast
 
-let op = function
+let string_of_op = function
   | Add       -> "+"
   | Mul       -> "*"
   | Neg | Sub -> "-"
@@ -20,13 +20,6 @@ let op = function
   | Gt        -> ">"
 ;;
 
-let pValue = function
-  | Num(_)    -> "num"
-  | String(_) -> "string"
-  | Bool(_)   -> "bool"
-  | Unit(_)   -> "unit"
-;;
-
 (* concats a list of strings by a separator *)
 let rec concat sep = function
   | [] -> ""
@@ -34,31 +27,31 @@ let rec concat sep = function
   | x :: xs ->  x ^ sep ^ (concat sep xs)
 ;;
 
-let rec pType = function
+let rec string_of_type = function
   | TNum    -> "num"
   | TString -> "string"
   | TBool   -> "bool"
   | TUnit   -> "unit"
   | T(c)    -> Printf.sprintf "%c" c
-  | TList(p) -> "list " ^ (pType p)
+  | TList(p) -> "list " ^ (string_of_type p)
   | TFun(f) -> 
     let args, t = f in
-    concat " -> " ((List.map pType args) @ [pType t])
+    concat " -> " ((List.map string_of_type args) @ [string_of_type t])
   | TMap(k, v) -> 
-    "< " ^ pType k ^ " : " ^ pType v ^ " >"
+    "< " ^ string_of_type k ^ " : " ^ string_of_type v ^ " >"
 ;;
 
 (* returns a stringified version of an expression *)
 let rec string_of_expr = function
   | Binop(e1, o, e2) ->
-    concat " " [string_of_expr e1; op o; string_of_expr e2]
+    concat " " [string_of_expr e1; string_of_op o; string_of_expr e2]
   | Unop(o, e1) -> 
-    concat " " [op o; string_of_expr e1]
+    concat " " [string_of_op o; string_of_expr e1]
   | NumLit(x) -> string_of_float x
   | StrLit(s) -> Printf.sprintf "'%s'" s
   | BoolLit(b) -> if b then "true" else "false"
   | Assign(s, t, e) -> 
-    concat " " ["val"; s; ":"; pType t; "="; string_of_expr e]
+    concat " " ["val"; s; ":"; string_of_type t; "="; string_of_expr e]
   | Val(s) -> s
   | If(e1, e2, e3) ->
     let fhalf = concat ";\n" (List.map string_of_expr e2) in
@@ -82,8 +75,8 @@ let rec string_of_expr = function
 
 let string_of_func_decl decl = 
     let fname = decl.fname in 
-    let fargs = concat ", " (List.map (fun (id, typ) -> id ^ " : " ^ pType typ) decl.formals) in
-    let fsig = "(" ^ fargs ^ ")" ^ " : " ^ (pType decl.return_type) in 
+    let fargs = concat ", " (List.map (fun (id, typ) -> id ^ " : " ^ string_of_type typ) decl.formals) in
+    let fsig = "(" ^ fargs ^ ")" ^ " : " ^ (string_of_type decl.return_type) in 
     let fbody = concat ";\n" (List.map string_of_expr decl.body) in
     concat " " ["def"; fname; fsig; "="; "{"; fbody; "}"]
 ;;

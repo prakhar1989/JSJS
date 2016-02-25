@@ -16,13 +16,6 @@ type primitiveType =
 and funcType = primitiveType list * primitiveType
 ;;
 
-type primitiveValue = 
-  | Num of float 
-  | String of string 
-  | Bool of bool 
-  | Unit of unit
-;;
-
 type expr = 
   | Binop of expr * op * expr
   | Unop of op * expr

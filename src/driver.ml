@@ -3,9 +3,6 @@ open Lexing
 open Parsing
 open Core.Std
 
-module NameMap = Map.Make(String);;
-type nametable = Ast.primitiveValue NameMap.t;;
-
 type action = Compile | GenAST
 
 (* creates intermediate JS *)
