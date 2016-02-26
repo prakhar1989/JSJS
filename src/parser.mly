@@ -53,7 +53,7 @@ block:
     | LBRACE expr_list RBRACE                 { $2 }
 
 expr_list:
-    | exprs = nonempty_list(delimited_expr)            { exprs }
+    | exprs = nonempty_list(delimited_expr)   { exprs }
 
 func_decl:
     | DEF ID LPAREN formals_opt RPAREN COLON primitive block {
@@ -83,53 +83,53 @@ args:
     | args = separated_list(COMMA, primitive) { args }
 
 literals:
-    | NUM_LIT                                 { NumLit($1) }
-    | TRUE                                    { BoolLit(true) }
-    | FALSE                                   { BoolLit(false) }
-    | STR_LIT                                 { StrLit($1) }
-    | ID                                      { Val($1) }
+    | NUM_LIT                                  { NumLit($1) }
+    | TRUE                                     { BoolLit(true) }
+    | FALSE                                    { BoolLit(false) }
+    | STR_LIT                                  { StrLit($1) }
+    | ID                                       { Val($1) }
     | LAMBDA LPAREN actuals_opt RPAREN FATARROW expr %prec ANON {
-        FunLit($3, [$6])
+        FunLit($3, Block([$6]))
     }
     | LAMBDA LPAREN actuals_opt RPAREN FATARROW block {
-        FunLit($3, $6)
+        FunLit($3, Block($6))
     }
-    | LSQUARE actuals_opt RSQUARE             { ListLit($2) }
-    | LBRACE kv_pairs RBRACE                  { MapLit($2) }
+    | LSQUARE actuals_opt RSQUARE              { ListLit($2) }
+    | LBRACE kv_pairs RBRACE                   { MapLit($2) }
 
 kv_pairs:
-    | kv = separated_list(COMMA, kv_pair)     { kv }
+    | kv = separated_list(COMMA, kv_pair)      { kv }
 
 kv_pair:
-    | expr COLON expr                         { $1, $3}
+    | expr COLON expr                          { $1, $3 }
 
 expr:
-    | literals                           { $1 }
-    | assigns                            { $1 }
-    | expr PLUS expr                     { Binop($1, Add, $3) }
-    | expr MINUS expr                    { Binop($1, Sub, $3) }
-    | expr MULTIPLY expr                 { Binop($1, Mul, $3) }
-    | expr DIVIDE expr                   { Binop($1, Div, $3) }
-    | expr MODULUS expr                  { Binop($1, Mod, $3) }
-    | expr CARET expr                    { Binop($1, Caret, $3) }
-    | expr AND expr                      { Binop($1, And, $3) }
-    | expr OR expr                       { Binop($1, Or, $3) }
-    | expr LTE expr                      { Binop($1, Lte, $3) }
-    | expr LT expr                       { Binop($1, Lt, $3) }
-    | expr GTE expr                      { Binop($1, Gte, $3) }
-    | expr GT expr                       { Binop($1, Gt, $3) }
-    | expr EQUALS expr                   { Binop($1, Equals, $3) }
-    | expr NEQ expr                      { Binop($1, Neq, $3) }
-    | LPAREN expr RPAREN                 { $2 }
-    | NOT expr                           { Unop(Not, $2) }
-    | MINUS expr %prec NEG               { Unop(Neg, $2) }
-    | IF expr THEN expr ELSE expr %prec SINGLE      { If($2, [$4], [$6]) }
-    | IF expr THEN block ELSE block      { If($2, $4, $6) }
-    | ID LPAREN actuals_opt RPAREN       { Call($1, $3) }
-    | MODULE_LIT DOT expr                { ModuleLit($1, $3)}
+    | literals                                 { $1 }
+    | assigns                                  { $1 }
+    | expr PLUS expr                           { Binop($1, Add, $3) }
+    | expr MINUS expr                          { Binop($1, Sub, $3) }
+    | expr MULTIPLY expr                       { Binop($1, Mul, $3) }
+    | expr DIVIDE expr                         { Binop($1, Div, $3) }
+    | expr MODULUS expr                        { Binop($1, Mod, $3) }
+    | expr CARET expr                          { Binop($1, Caret, $3) }
+    | expr AND expr                            { Binop($1, And, $3) }
+    | expr OR expr                             { Binop($1, Or, $3) }
+    | expr LTE expr                            { Binop($1, Lte, $3) }
+    | expr LT expr                             { Binop($1, Lt, $3) }
+    | expr GTE expr                            { Binop($1, Gte, $3) }
+    | expr GT expr                             { Binop($1, Gt, $3) }
+    | expr EQUALS expr                         { Binop($1, Equals, $3) }
+    | expr NEQ expr                            { Binop($1, Neq, $3) }
+    | LPAREN expr RPAREN                       { $2 }
+    | NOT expr                                 { Unop(Not, $2) }
+    | MINUS expr %prec NEG                     { Unop(Neg, $2) }
+    | IF expr THEN expr ELSE expr %prec SINGLE { If($2, Block([$4]), Block([$6])) }
+    | IF expr THEN block ELSE block            { If($2, Block($4), Block($6)) }
+    | ID LPAREN actuals_opt RPAREN             { Call($1, $3) }
+    | MODULE_LIT DOT expr                      { ModuleLit($1, $3)}
 
 actuals_opt:
-    | opts = separated_list(COMMA, expr) { opts }
+    | opts = separated_list(COMMA, expr)       { opts }
 
 assigns:
-    | VAL ID COLON primitive ASSIGN expr { Assign($2, $4, $6) }
+    | VAL ID COLON primitive ASSIGN expr       { Assign($2, $4, $6) }

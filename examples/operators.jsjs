@@ -33,15 +33,16 @@ val myMap: list num = List.map((/\(x) => x * x), [1, 2, 3, 4]);
 
 val total: num = sum(a, b);
 
-val people : <string: <string: num>> = Map(
-  "foo" : Map("a" : 10),
-  "goo" : Map("b" : 40),
-  "hoo" : Map("c" : 2)
-);
-
 val x: list T = ["a", "b", "c"];
 
 // function decs
-def add(a: num, b: num): num = {
+def add(a: num, b: num): num {
   a + b;
 }
+
+val people : <string: <string: num>> = {
+  "foo" : {"a" : 10},
+  "goo" : {"b" : 40},
+  "hoo" : {"c" : 2}
+};
+

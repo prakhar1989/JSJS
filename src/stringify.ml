@@ -41,29 +41,30 @@ let rec string_of_expr = function
   | Unop(o, e1) -> 
     String.concat " " [string_of_op o; string_of_expr e1]
   | NumLit(x) -> string_of_float x
+  | Block(es) -> let ss = String.concat ";\n" (List.map string_of_expr es) in
+    "{" ^ ss ^ "}"
   | StrLit(s) -> Printf.sprintf "'%s'" s
   | BoolLit(b) -> if b then "true" else "false"
   | Assign(s, t, e) -> 
     String.concat " " ["val"; s; ":"; string_of_type t; "="; string_of_expr e]
   | Val(s) -> s
-  | If(e1, e2, e3) ->
-    let fhalf = String.concat ";\n" (List.map string_of_expr e2) in
-    let shalf = String.concat ";\n" (List.map string_of_expr e3) in
-    String.concat " " ["if"; string_of_expr e1; "then"; "{";
-                fhalf; "}"; "else"; "{"; shalf; "}"]
+  | If(e1, b1, b2) ->
+    let fhalf = string_of_expr b1 in
+    let shalf = string_of_expr b2 in
+    String.concat " " ["if"; string_of_expr e1; "then"; fhalf; "else"; shalf;]
   | ListLit(l) -> 
     let s = String.concat "," (List.map string_of_expr l) in
     "[" ^ s ^ "]"
   | MapLit(l) -> 
     let pairs = List.map (fun (k, v) -> string_of_expr k ^ ":" ^ string_of_expr v) l in
-    "Map(" ^ (String.concat ",\n" pairs) ^ ")"
+    "{" ^ (String.concat ",\n" pairs) ^ "}"
   | Call(s, args) -> let ss = List.map string_of_expr args in
     String.concat " " [s; "("; (String.concat ", " ss); ")"]
   | ModuleLit(s, e) -> s ^ "." ^ (string_of_expr e)
   | FunLit(args, blk) -> 
     let sargs = String.concat "," (List.map string_of_expr args) in
-    let sblk = String.concat ";\n" (List.map string_of_expr blk) in
-    String.concat " " ["/\\"; "("; sargs; ")"; "=>"; "{"; sblk; ";};"]
+    let sblk = string_of_expr blk in
+    String.concat " " ["/\\"; "("; sargs; ")"; "=>"; sblk;]
 ;;
 
 let string_of_func_decl decl = 

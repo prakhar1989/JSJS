@@ -26,9 +26,10 @@ type expr =
   | ListLit of expr list
   | Assign of string * primitiveType * expr 
   | Val of string
-  | If of expr * expr list * expr list
+  | Block of expr list
+  | If of expr * expr * expr 
   | Call of string * expr list
-  | FunLit of expr list * expr list
+  | FunLit of expr list * expr
   | ModuleLit of string * expr
 ;;
 
