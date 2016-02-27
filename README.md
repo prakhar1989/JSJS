@@ -25,6 +25,8 @@ val gcd : (num, num) -> num = /\(a,b) => {
    };
 };
 
+val sqrs = List.map( /\(x) => x * x; , [1,2,3,4]);  
+
 val people : <string: <string: num>> = {
   "foo" : {"a" : 10},
   "goo" : {"b" : 40},
