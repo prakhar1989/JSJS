@@ -45,7 +45,6 @@ rule token =
     | "if"                      { IF }
     | "else"                    { ELSE }
     | "then"                    { THEN }
-    | "def"                     { DEF }
     | "true"                    { TRUE }
     | "false"                   { FALSE }
     | "num"                     { NUM }

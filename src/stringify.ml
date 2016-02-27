@@ -24,6 +24,7 @@ let rec string_of_type = function
   | TNum    -> "num"
   | TString -> "string"
   | TBool   -> "bool"
+  | TSome   -> "unknown" (* TODO:  figure this out *)
   | TUnit   -> "unit"
   | T(c)    -> Printf.sprintf "%c" c
   | TList(p) -> "list " ^ (string_of_type p)
@@ -61,16 +62,9 @@ let rec string_of_expr = function
   | Call(s, args) -> let ss = List.map string_of_expr args in
     String.concat " " [s; "("; (String.concat ", " ss); ")"]
   | ModuleLit(s, e) -> s ^ "." ^ (string_of_expr e)
-  | FunLit(args, blk) -> 
-    let sargs = String.concat "," (List.map string_of_expr args) in
-    let sblk = string_of_expr blk in
-    String.concat " " ["/\\"; "("; sargs; ")"; "=>"; sblk;]
-;;
-
-let string_of_func_decl decl = 
-    let fname = decl.fname in 
+  | FunLit(decl) -> 
     let fargs = String.concat ", " (List.map (fun (id, typ) -> id ^ " : " ^ string_of_type typ) decl.formals) in
     let fsig = "(" ^ fargs ^ ")" ^ " : " ^ (string_of_type decl.return_type) in 
-    let fbody = String.concat ";\n" (List.map string_of_expr decl.body) in
-    String.concat " " ["def"; fname; fsig; "="; "{"; fbody; "}"]
+    let fbody = string_of_expr decl.body in
+    String.concat " " ["/\\"; fsig; "="; "{"; fbody; "}"]
 ;;

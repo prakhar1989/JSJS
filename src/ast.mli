@@ -6,6 +6,7 @@ type op =
 
 type primitiveType = 
   | T of char
+  | TSome
   | TNum 
   | TString 
   | TBool 
@@ -29,15 +30,13 @@ type expr =
   | Block of expr list
   | If of expr * expr * expr 
   | Call of string * expr list
-  | FunLit of expr list * expr
+  | FunLit of func_decl
   | ModuleLit of string * expr
-;;
-
-type func_decl = {
-  fname       : string;
+and 
+func_decl = {
   formals     : (string * primitiveType) list;
   return_type : primitiveType;
-  body        : expr list;
+  body        : expr;
 };;
 
-type program = expr list * func_decl list;;
+type program = expr list;;

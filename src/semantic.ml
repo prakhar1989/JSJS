@@ -14,7 +14,6 @@ open Stringify
 
 *)
 
-
 let rec type_of_expr = function
   | NumLit(_) -> TNum
   | BoolLit(_) -> TBool

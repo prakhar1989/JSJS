@@ -19,13 +19,10 @@ console.log(gen.join('\\n'))" in
 
 let driver filename axn =
   let lexbuf = Lexing.from_channel (open_in filename) in
-  let exprs, fdecls = Parser.program Scanner.token lexbuf in
+  let exprs = Parser.program Scanner.token lexbuf in
 
   (* JS -> AST -> JS *)
   let print_ast () = 
-    let fs = List.map fdecls ~f:Stringify.string_of_func_decl in 
-    List.iter fs ~f:(fun x -> print_endline x);
-    print_endline "";
     let exps = List.map exprs ~f:Stringify.string_of_expr in
     List.iter exps ~f:(fun x -> print_endline (x ^ ";"));
   in 

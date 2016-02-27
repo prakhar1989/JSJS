@@ -10,7 +10,7 @@ open Ast
 %token LPAREN RPAREN LBRACE RBRACE RSQUARE LSQUARE
 %token ASSIGN LAMBDA
 %token CARET
-%token VAL IF THEN ELSE DEF TRUE FALSE
+%token VAL IF THEN ELSE TRUE FALSE
 %token NUM LIST BOOL STRING UNIT
 %token COLON SEMICOLON DOT FATARROW COMMA THINARROW
 
@@ -39,12 +39,7 @@ open Ast
 %%
 
 program:
-    | decls EOF                               { (List.rev (fst $1), snd $1) }
-
-decls:
-    | /* nothing */                           { [], [] }
-    | decls delimited_expr                    { ($2 :: fst $1), snd $1 }
-    | decls func_decl                         { fst $1, ($2 :: snd $1) }
+    | expr_list EOF                           { $1 }
 
 delimited_expr:
     | expr SEMICOLON                          { $1 }
@@ -54,14 +49,6 @@ block:
 
 expr_list:
     | exprs = nonempty_list(delimited_expr)   { exprs }
-
-func_decl:
-    | DEF ID LPAREN formals_opt RPAREN COLON primitive block {
-        { fname = $2;
-          formals = $4;
-          return_type = $7;
-          body = $8; }
-    }
 
 formals_opt:
     | opts = separated_list(COMMA, opt)       { opts }
@@ -88,11 +75,15 @@ literals:
     | FALSE                                    { BoolLit(false) }
     | STR_LIT                                  { StrLit($1) }
     | ID                                       { Val($1) }
-    | LAMBDA LPAREN actuals_opt RPAREN FATARROW expr %prec ANON {
-        FunLit($3, Block([$6]))
+    | LAMBDA LPAREN formals_opt RPAREN COLON primitive FATARROW expr %prec ANON {
+        FunLit({ 
+            formals = $3; return_type = $6; body = Block([$8]); 
+        })
     }
-    | LAMBDA LPAREN actuals_opt RPAREN FATARROW block {
-        FunLit($3, Block($6))
+    | LAMBDA LPAREN formals_opt RPAREN COLON primitive FATARROW block {
+        FunLit({ 
+            formals = $3; return_type = $6; body = Block($8);
+        })
     }
     | LSQUARE actuals_opt RSQUARE              { ListLit($2) }
     | LBRACE kv_pairs RBRACE                   { MapLit($2) }
@@ -133,3 +124,4 @@ actuals_opt:
 
 assigns:
     | VAL ID COLON primitive ASSIGN expr       { Assign($2, $4, $6) }
+    | VAL ID ASSIGN expr                       { Assign($2, TSome, $4) }
