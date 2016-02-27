@@ -599,6 +599,37 @@ args:
 | args = separated_list(COMMA, primitive) { args }
 ```
 
+## Function Calls and Usage
+Functions are called by invoking the name of the function and passing it actual arguments. These arguments can be any kind of expressions.  
+Every function call is itself an expression, and evaluates to a value which has a type (the return type of function).
+```scala
+// function called with a numeric literal
+val sq5 = sq(5)
+
+// function called with an expression
+val x = 8;
+val y : num = sq(x);
+val z = cube(x + y);
+
+// function called with a function as an argument
+val addOne = /\(x : num) : num => x + 1;
+val addOneSqr = /\(f: (num) -> num, g: (num) -> num, x : num) : num => f(g(x)); 
+val result = addOneSqr(sq, addOne, 8);
+```
+
+*AST*
+```ocaml
+type expr = 
+| Call of string * expr list
+```
+
+*Grammar*
+```ocaml
+expr:
+| ID LPAREN actuals_opt RPAREN              { Call($1, $3) }
+```
+
+
 \newpage
 
 #Operators
@@ -746,3 +777,116 @@ The following OCaml code defines the operator precedence along with their associ
 %left MULTIPLY DIVIDE MODULUS
 %left NEG
 ```
+
+\newpage
+
+# Expressions
+Everything in JSJS is an expression. Accordingly, an entire JSJS program can be defined as a list of expressions.
+```ocaml
+program:
+    | expr_list EOF                           { $1 }
+
+expr_list:
+    | exprs = nonempty_list(delimited_expr)   { exprs }
+```
+
+All these expressions are composed of identifiers, operators, literals and function calls. Following is an exhaustive list of different types of expressions in JSJS:
+```ocaml
+type expr = 
+  | Binop of expr * op * expr
+  | Unop of op * expr
+  | NumLit of float
+  | BoolLit of bool
+  | StrLit of string
+  | MapLit of (expr * expr) list
+  | ListLit of expr list
+  | Assign of string * primitiveType * expr 
+  | Val of string
+  | Block of expr list
+  | If of expr * expr * expr 
+  | Call of string * expr list
+  | FunLit of func_decl
+  | ModuleLit of string * expr
+and 
+func_decl = {
+  formals     : (string * primitiveType) list;
+  return_type : primitiveType;
+  body        : expr;
+};;
+```
+
+## Blocks
+A block is a list of several expressions enclosed in curly braces. The entire block is executed in the order in which expressions appear and the value of the last expression is returned. In JSJS, blocks are encountered inside of if-then-else statements and function definitions.
+
+```ocaml
+block:
+    | LBRACE expr_list RBRACE                 { $2 }
+
+expr_list:
+    | exprs = nonempty_list(delimited_expr)   { exprs }
+
+delimited_expr:
+    | expr SEMICOLON                          { $1 }
+```
+
+## if-then-else
+if-then-else behaves similarly to the standard control flow constructs of programming languages. Following is the grammar definition of an if-then-else statement.
+
+Grammar:
+```ocaml
+| if expr then block else block     { If($2, Block($4), Block($6)) }
+```
+
+One important point to keep in mind is that the return type of then and else blocks should be same. Otherwise the compiler will throw a type mismatch error. 
+
+Example:
+```scala
+if x > y 
+then { print(x); x; }
+else { print(y); y; }
+```
+
+The curly braces in then and else blocks are required only if the blocks consist of more than one expression but are optional otherwise. They are accordingly handled in the grammar as well.
+
+
+# Standard Library Functions
+
+JSJS provides a simple set of standard library functions to perform basic operations on lists, maps and work with standard input/output. By default, all the following libraries are automatically available.
+
+## List Module
+
+The awesome `List` module provides essential functions to do basic operations on lists:
+
+1. `List.hd`: Returns the head of the list.
+2. `List.tl`: Returns a list without the head of the original list.
+3. `List.cons`: Appends an element to the head of the list.
+4. `List.length`: Returns the total number of elements in the list.
+5. `List.nth`: Returns the nth element of the list.
+6. `List.contains?`: Return true if a given element exists in the list, else returns false.
+7. `List.isEmpty?`: Return true if the list does not contain any elements, else returns false.
+8. `List.rev`: Reverses the given list.
+
+## Map Module
+
+The awesome `Map` module provides essential functions to do basic operations on maps:
+
+1. `Map.set`: Adds an entry in a map.
+2. `Map.get`: Returns a value given the key from a map.
+3. `Map.remove`: Returns a map after removing key from a map.
+4. `Map.clear`: Removes all entries of the map.
+
+## String Module
+
+The `String` module is provided to assist users with string manipulation:
+
+1. `String.length`: Returns the length of the string
+2. `String.concat`: Concatenates two strings
+3. `String.substring`: Returns a substring of the given string
+
+## IO Module
+
+The `IO` module is used to interact with the standard IO
+
+1. `IO.print`: Display on standard output
+2. `IO.println`: Display on standard output, followed by a new line character.
+3. `IO.read`: Reads contents from standard input.
