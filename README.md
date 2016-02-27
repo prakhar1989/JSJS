@@ -16,14 +16,14 @@ val pi : num = 3.14159;
 
 val sq: (num, num) -> num = /\(x, y) => x * y;
 
-def gcd (a: num, b: num) : num {
+val gcd : (num, num) -> num = /\(a,b) => {
    if a == b then a 
    else {
       if a > b 
       then gcd((a - b), b) 
       else gcd((b - a), a);
    };
-}
+};
 
 val people : <string: <string: num>> = {
   "foo" : {"a" : 10},
