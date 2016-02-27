@@ -12,11 +12,11 @@ Read the [proposal](http://prakhar.me/JSJS/) or track the status of the project 
 ```scala
 val isHappy? : bool = true;
 
-val pi : num = 3.14159;
+val pi = 3.14159;
 
-val sq: (num, num) -> num = /\(x, y) => x * y;
+val sq = /\(x: num, y: num): num => x * y;
 
-val gcd : (num, num) -> num = /\(a,b) => {
+val gcd = /\(a: num, b: num): num => {
    if a == b then a 
    else {
       if a > b 
@@ -25,7 +25,16 @@ val gcd : (num, num) -> num = /\(a,b) => {
    };
 };
 
-val sqrs = List.map( /\(x) => x * x; , [1,2,3,4]);  
+val filter = /\(f: (num) -> bool, xs: list num): list num => {
+   if List.empty(xs) then xs
+   else {
+      if f(List.hd(xs)) 
+      then List.cons(List.hd(xs), filter(f, List.tl(xs))) 
+      else filter(List.tl(xs));
+   };
+};
+
+val sqrs = List.map(/\(x:num): num => x * x; , [1,2,3,4]);  
 
 val people : <string: <string: num>> = {
   "foo" : {"a" : 10},
