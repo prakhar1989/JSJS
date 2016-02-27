@@ -1,25 +1,8 @@
 ---
-title: JSJS - Project Proposal 
-author:  A general purpose, strongly typed programming language for the web
-geometry: margin=1.5in
-header-includes:
-    - \usepackage{fancyhdr}
-    - \pagestyle{fancy}
-    - \fancyhead[RO,RE]{Programming Languages \& Translators - Spring 2016}
+layout: page
+title: Proposal
+permalink: /proposal/
 ---
-
-\begin{center}
-
-    \begin{tabular}{ l l }
-      \textbf{\large {J}}ain Bahul        & bkj2111 \\
-      \textbf{\large {S}}rivastav Prakhar & ps2894 \\
-      \textbf{\large {J}}ain Ayush        & aj2672 \\
-      \textbf{\large {S}}adekar Gaurang   & gss2147 \\
-    \end{tabular}
-\end{center}
-
----
-
 
 Description
 ===
