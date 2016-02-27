@@ -27,27 +27,21 @@ val single: string =
   }
 ;
 
-val sum: (num, num) -> num = /\(x, y) => x + y;
+val sum: (num, num) -> num = /\(x: num, y: num): num => x + y;
 
-val myMap: list num = List.map((/\(x) => x * x), [1, 2, 3, 4]);
+val sum = /\(x: num, y: num): num => x + y;
+
+val myMap: list num = List.map((/\(x: num): num => x * x), [1, 2, 3, 4]);
 
 val total: num = sum(a, b);
 
 val x: list T = ["a", "b", "c"];
-
-// function decs
-def add(a: num, b: num): num {
-  a + b;
-}
 
 val people : <string: <string: num>> = {
   "foo" : {"a" : 10},
   "goo" : {"b" : 40},
   "hoo" : {"c" : 2}
 };
-
-
-val sq: (num, num) -> num = /\(x, y) => x * y;
 
 val gcd = /\(a: num, b: num): num => {
   if a == b then a 

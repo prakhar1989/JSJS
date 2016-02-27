@@ -21,9 +21,10 @@ open Ast
 %token <char>   GENERIC
 
 /* associativity rules */
-%nonassoc DOT
 %nonassoc SINGLE
+%nonassoc DOUBLE
 %nonassoc ANON
+%nonassoc DOT
 %right ASSIGN
 %left CARET AND OR
 %left NOT
@@ -114,10 +115,13 @@ expr:
     | LPAREN expr RPAREN                       { $2 }
     | NOT expr                                 { Unop(Not, $2) }
     | MINUS expr %prec NEG                     { Unop(Neg, $2) }
-    | IF expr THEN expr ELSE expr %prec SINGLE { If($2, Block([$4]), Block([$6])) }
-    | IF expr THEN block ELSE block            { If($2, Block($4), Block($6)) }
-    | ID LPAREN actuals_opt RPAREN             { Call($1, $3) }
-    | MODULE_LIT DOT expr                      { ModuleLit($1, $3)}
+    /* Yes, we aren't proud of this either */
+    | IF expr THEN expr ELSE expr %prec SINGLE  { If($2, Block([$4]), Block([$6])) }
+    | IF expr THEN block ELSE expr %prec DOUBLE { If($2, Block($4), Block([$6])) }
+    | IF expr THEN expr ELSE block              { If($2, Block([$4]), Block($6)) }
+    | IF expr THEN block ELSE block             { If($2, Block($4), Block($6)) }
+    | ID LPAREN actuals_opt RPAREN              { Call($1, $3) }
+    | MODULE_LIT DOT expr                       { ModuleLit($1, $3)}
 
 actuals_opt:
     | opts = separated_list(COMMA, expr)       { opts }
