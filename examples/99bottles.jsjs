@@ -1,32 +1,29 @@
-def ninetyNineBottles (): unit = {
-   def toStr(x:num) : string = {
-      if (num == 0)
-      then { "no more" }
-      else { String.toString(num) }
-   };
+val ninetyNineBottles = /\(): unit => {
 
-   def ninetyNine (x:num) : unit = {
-      if(x==0)
+   val toStr = /\(x: num): string => if x == 0 then "no more" else String.toString(x);
+
+   val ninetyNine = /\(x: num): unit => {
+      if x == 0
       then {
          println("No more bottles of beer on the wall, no more bottles of beer.");
          println("Go to the store and buy some more, 99 bottles of beer on the wall.");   
       } 
       else {
-         println(toStr(num) ^ "bottle of beer on the wall, " ^
-                 toStr(num) ^  " bottle of beer.");
-
-         if(x==2)
+         println(toStr(x) ^ "bottle of beer on the wall, " ^ 
+           toStr(x) ^  " bottle of beer.");
+         if x == 2
          then {
             println("Take one down and pass it around, " ^ 
-                    toStr(num - 1) ^ " bottle of beer on the wall.");
+                    toStr(x - 1) ^ " bottle of beer on the wall.");
             nintetyNine(x-1);
          }
-         else{
+         else {
             println("Take one down and pass it around, " ^ 
-                    toStr(num - 1) ^ " bottles of beer on the wall.");
+                    toStr(x - 1) ^ " bottles of beer on the wall.");
             nintetyNine(x-1);
-         }
-      }
-   }
+         };
+      };
+   };
+
    ninetyNine(99);
 };

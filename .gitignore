@@ -11,3 +11,4 @@ src/scanner.ml
 node_modules
 codegen/out.js
 outputs
+.sass-cache
