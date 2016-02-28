@@ -19,17 +19,21 @@ console.log(gen.join('\\n'))" in
 
 let driver filename axn =
   let lexbuf = Lexing.from_channel (open_in filename) in
-  let exprs = Parser.program Scanner.token lexbuf in
+  let program = Parser.program Scanner.token lexbuf in
+  (* TODO: Fix this error catching *)
+  let _ = try Semantic.type_check program
+    with  _ -> exit 1 
+  in
 
   (* JS -> AST -> JS *)
   let print_ast () = 
-    let exps = List.map exprs ~f:Stringify.string_of_expr in
+    let exps = List.map program ~f:Stringify.string_of_expr in
     List.iter exps ~f:(fun x -> print_endline (x ^ ";"));
   in 
 
   (* Compile *)
   let compile_to_js () = 
-    let js_exprs = List.fold_left exprs
+    let js_exprs = List.fold_left program
         ~f:(fun acc expr -> (Codegen.js_of_expr expr) :: acc)
         ~init: [] 
     in

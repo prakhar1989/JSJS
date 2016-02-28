@@ -11,7 +11,6 @@ open Stringify
 3. top level vals that are re-defined should raise errors
 4. vals can be redefined within the scope of a block
 5. vals cannot reference a val defined **after** its declaration
-
 *)
 
 let rec type_of_expr = function
@@ -44,3 +43,18 @@ let rec type_of_expr = function
   | _ -> TNum
 ;;
 
+let type_check exprs = 
+  List.iter 
+    (fun x -> 
+       try let _ = type_of_expr x in () with
+       | InvalidOperation(t, op) -> 
+         let st = string_of_type t and sop = string_of_op op in
+         print_endline (Printf.sprintf "Type error: Invalid operation %s on type '%s'" sop st);
+         raise TypeError
+       | MismatchedTypes(t1, t2) ->
+         let st1 = string_of_type t1 and st2 = string_of_type t2 in
+         print_endline (Printf.sprintf "Type error: expected value of type '%s', got a value of type '%s' instead" st1 st2);
+         raise TypeError
+       | _ -> raise TypeError)
+    exprs
+;;
