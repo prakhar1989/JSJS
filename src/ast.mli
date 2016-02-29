@@ -23,8 +23,8 @@ type expr =
   | NumLit of float
   | BoolLit of bool
   | StrLit of string
-  | MapLit of (expr * expr) list
   | ListLit of expr list
+  | MapLit of (expr * expr) list
   | Assign of string * primitiveType * expr 
   | Val of string
   | Block of expr list

@@ -1,2 +1,5 @@
 10 + 20;
-"asdsad" ^ (10 + "asdad");
+//"asdsad" ^ "asd";
+
+//[10, true, 20, 30, "asd", true];
+20 + if true then 10 else "asdasd";

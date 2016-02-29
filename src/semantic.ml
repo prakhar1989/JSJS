@@ -40,6 +40,21 @@ let rec type_of_expr = function
       | Neg, TNum -> TNum
       | _, _ -> raise (InvalidOperation(t, op))
     end
+  | ListLit(es) -> begin
+      let ts = List.map type_of_expr es in
+      if List.length ts = 0 then TSome
+      else List.fold_left 
+          (fun acc t -> if acc = t then acc
+            else raise (NonUniformTypeContainer(acc, t)))
+          (List.hd ts) (List.tl ts)
+    end 
+  | If(p, e1, e2) -> begin
+      let pt = type_of_expr p in 
+      if pt != TBool
+      then raise (MismatchedTypes(TBool, pt))
+      else let t1 = type_of_expr e1 and t2 = type_of_expr e2 in
+      if t1 = t2 then t2 else raise (MismatchedTypes(t1, t2))
+    end 
   | _ -> TNum
 ;;
 
@@ -54,6 +69,10 @@ let type_check exprs =
        | MismatchedTypes(t1, t2) ->
          let st1 = string_of_type t1 and st2 = string_of_type t2 in
          print_endline (Printf.sprintf "Type error: expected value of type '%s', got a value of type '%s' instead" st1 st2);
+         raise TypeError
+       | NonUniformTypeContainer(t1, t2) ->
+         let st1 = string_of_type t1 and st2 = string_of_type t2 in
+         print_endline (Printf.sprintf "Type error: Lists can only contain one type. Expected '%s', got a '%s' instead" st1 st2);
          raise TypeError
        | _ -> raise TypeError)
     exprs
