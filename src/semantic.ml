@@ -48,6 +48,13 @@ let rec type_of_expr = function
             else raise (NonUniformTypeContainer(acc, t)))
           (List.hd ts) (List.tl ts)
     end 
+  | Block(es) -> begin
+      match es with
+      | [] -> TSome
+      | x  :: xs -> 
+        List.fold_left (fun _ e -> (type_of_expr e)) 
+          (type_of_expr x) xs
+    end
   | If(p, e1, e2) -> begin
       let pt = type_of_expr p in 
       if pt != TBool

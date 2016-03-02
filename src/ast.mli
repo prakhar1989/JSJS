@@ -25,9 +25,9 @@ type expr =
   | StrLit of string
   | ListLit of expr list
   | MapLit of (expr * expr) list
+  | Block of expr list
   | Assign of string * primitiveType * expr 
   | Val of string
-  | Block of expr list
   | If of expr * expr * expr 
   | Call of string * expr list
   | FunLit of func_decl

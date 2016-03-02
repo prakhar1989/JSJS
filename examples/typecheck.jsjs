@@ -2,4 +2,14 @@
 //"asdsad" ^ "asd";
 
 //[10, true, 20, 30, "asd", true];
-20 + if true then 10 else "asdasd";
+20 + if true then 10 else 40;
+
+// concat two strings
+// adding nums at the end, will
+// give type errors
+"hello, " ^ if false then { 
+  "world!";
+} else { 
+  "earth!"; 
+};
+
