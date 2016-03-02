@@ -13,3 +13,6 @@
   "earth!"; 
 };
 
+// explicit type annotations
+val n: num = 10;
+val x = "this is automatically a string";

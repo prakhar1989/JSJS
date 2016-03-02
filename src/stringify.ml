@@ -24,7 +24,7 @@ let rec string_of_type = function
   | TNum    -> "num"
   | TString -> "string"
   | TBool   -> "bool"
-  | TSome   -> "unknown" (* TODO:  figure this out *)
+  | TSome   -> ""
   | TUnit   -> "unit"
   | T(c)    -> Printf.sprintf "%c" c
   | TList(p) -> "list " ^ (string_of_type p)
@@ -47,7 +47,9 @@ let rec string_of_expr = function
   | StrLit(s) -> Printf.sprintf "'%s'" s
   | BoolLit(b) -> if b then "true" else "false"
   | Assign(s, t, e) -> 
-    String.concat " " ["val"; s; ":"; string_of_type t; "="; string_of_expr e]
+    let type_str = string_of_type t in
+    let id_str = if type_str = "" then type_str else " : " ^ type_str in
+    String.concat " " ["val"; s; id_str; "="; string_of_expr e]
   | Val(s) -> s
   | If(e1, b1, b2) ->
     let fhalf = string_of_expr b1 in
