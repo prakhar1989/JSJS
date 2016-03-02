@@ -16,5 +16,16 @@
 // explicit type annotations
 val n: num = 10;
 val x = "this is automatically a string";
-val xs: list bool = [10, 20, 30, 40];
+val xs: list num = [10, 20, 30, 40];
 
+val strMap: <string: num> = {
+  "foo": 10,
+  "bar": 20,
+  "hoo": 40
+};
+
+val nestedMap: <string: <string: num>> = {
+  "foo" : {"a" : 10},
+  "goo" : {"b" : 40},
+  "hoo" : {"c" : 2}
+};

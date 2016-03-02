@@ -65,19 +65,21 @@ let rec type_of_expr = function
       if t1 = t2 then t2 else raise (MismatchedTypes(t1, t2))
     end 
   | MapLit(kvpairs) -> begin
-      (* 1. Check if all keys of the String type
-         2. Keys can be one of string only (since JS allows on string keys)
-         3. All the values have to be of the same type 
-         which can be of any type.  *)
       match kvpairs with
       | [] -> TSome (* TODO: how to handle blank map? *)
       | (key, value) :: xs ->
         (* check if all keys are of the same type *)
-        let key_type = List.fold_left (fun acc (k, v) ->
+        let key_type = List.fold_left (fun acc (k, _) ->
             let t = type_of_expr k in
-            if t != acc then raise (MismatchedTypes(acc, t)) else acc
-          ) (type_of_expr key) xs in
-        key_type
+            if t = acc then acc else raise (MismatchedTypes(acc, t)))
+            (type_of_expr key) xs 
+        in
+        let value_type = List.fold_left (fun acc (_, v) ->
+            let t = type_of_expr v in
+            if t = acc then acc else raise (MismatchedTypes(acc, t)))
+            (type_of_expr value) xs 
+        in
+        TMap(key_type, value_type)
     end
   | Assign(id, t, e) -> begin
       let etype = type_of_expr e in
