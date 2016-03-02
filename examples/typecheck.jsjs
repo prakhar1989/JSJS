@@ -1,7 +1,7 @@
 10 + 20;
 //"asdsad" ^ "asd";
 
-//[10, true, 20, 30, "asd", true];
+[10, 30, 20, 30,20 , 413];
 20 + if true then 10 else 40;
 
 // concat two strings
@@ -16,3 +16,5 @@
 // explicit type annotations
 val n: num = 10;
 val x = "this is automatically a string";
+val xs: list bool = [10, 20, 30, 40];
+

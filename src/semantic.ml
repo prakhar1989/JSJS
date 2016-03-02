@@ -42,11 +42,13 @@ let rec type_of_expr = function
     end
   | ListLit(es) -> begin
       let ts = List.map type_of_expr es in
-      if List.length ts = 0 then TSome
-      else List.fold_left 
+      if List.length ts = 0 then TList(TSome)
+      else let list_type = List.fold_left
           (fun acc t -> if acc = t then acc
             else raise (NonUniformTypeContainer(acc, t)))
           (List.hd ts) (List.tl ts)
+        in
+        TList(list_type)
     end 
   | Block(es) -> begin
       match es with
@@ -81,7 +83,7 @@ let rec type_of_expr = function
       let etype = type_of_expr e in
       let _ = match t with
       | TSome -> etype
-      | t -> if t != etype then raise (MismatchedTypes(t, etype)) else t
+      | t -> if t = etype then t else raise (MismatchedTypes(t, etype))
       in 
       (* TODO: Use idtype and id to update env *)
       TUnit
