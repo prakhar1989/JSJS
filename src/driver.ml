@@ -22,7 +22,9 @@ let driver filename axn =
   let program = Parser.program Scanner.token lexbuf in
   (* TODO: Fix this error catching *)
   let _ = try Semantic.type_check program
-    with  _ -> exit 1
+    with
+    | Exceptions.TypeError(s) -> print_endline s; exit 1
+    | _ -> exit 1
   in
 
   (* JS -> AST -> JS *)

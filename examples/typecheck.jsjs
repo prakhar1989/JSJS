@@ -4,12 +4,12 @@ val msg: string = "hello" ^ ", world";
 val diffcount = 20 + if true then 10 else 40;
 
 // concat two strings
-val msg2 = "hello, " ^ if false then { 
+val msg2 = "hello, " ^ if false then {
   val s1 = 10;
   "world!";
-} else { 
+} else {
   val s2 = 202 + 30;
-  "earth!"; 
+  "earth!";
 };
 
 val xs: list num = [10, 20, 30, 40];
@@ -20,7 +20,7 @@ val strMap = {
   "hoo": 40
 };
 
-val nestedMap: <string: <string: num>> = {
+val nestedMap : <string: <string: bool>> = {
   "foo" : {"a" : 10},
   "goo" : {"b" : 40},
   "hoo" : {"c" : 2}

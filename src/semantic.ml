@@ -18,7 +18,6 @@ type typesTable = Ast.primitiveType NameMap.t;;
 (* A tuple of locals, globals *)
 type typeEnv = typesTable * typesTable;;
 
-
 let rec type_of_expr (env: typeEnv) = function
   | NumLit(_) -> TNum
   | BoolLit(_) -> TBool
@@ -107,17 +106,13 @@ let type_check (program: Ast.program) =
        with
        | InvalidOperation(t, op) ->
          let st = string_of_type t and sop = string_of_op op in
-         print_endline (Printf.sprintf "Type error: Invalid operation %s on type '%s'" sop st);
-         raise TypeError
+         raise (TypeError (Printf.sprintf "Type error: Invalid operation %s on type '%s'" sop st))
        | MismatchedTypes(t1, t2) ->
          let st1 = string_of_type t1 and st2 = string_of_type t2 in
-         print_endline (Printf.sprintf "Type error: expected value of type '%s', got a value of type '%s' instead" st1 st2);
-         raise TypeError
+         raise (TypeError (Printf.sprintf "Type error: expected value of type '%s', got a value of type '%s' instead" st1 st2))
        | NonUniformTypeContainer(t1, t2) ->
          let st1 = string_of_type t1 and st2 = string_of_type t2 in
-         print_endline (Printf.sprintf "Type error: Lists can only contain one type. Expected '%s', got a '%s' instead" st1 st2);
-         raise TypeError
-       | _ -> raise TypeError)
+         raise (TypeError (Printf.sprintf "Type error: Lists can only contain one type. Expected '%s', got a '%s' instead" st1 st2)))
     (NameMap.empty, NameMap.empty)
     program
 ;;

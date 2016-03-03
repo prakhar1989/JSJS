@@ -12,4 +12,4 @@ exception AlreadyDefined of string
 exception NonUniformTypeContainer of primitiveType * primitiveType
 
 (* Driver *)
-exception TypeError
+exception TypeError of string
