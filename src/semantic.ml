@@ -13,12 +13,18 @@ open Stringify
 5. vals cannot reference a val defined **after** its declaration
 *)
 
-let rec type_of_expr = function
+module NameMap = Map.Make(String);;
+type typesTable = Ast.primitiveType NameMap.t;;
+(* A tuple of locals, globals *)
+type typeEnv = typesTable * typesTable;;
+
+
+let rec type_of_expr (env: typeEnv) = function
   | NumLit(_) -> TNum
   | BoolLit(_) -> TBool
   | StrLit(_) -> TString
   | Binop(e1, op, e2) ->
-    let t1 = type_of_expr e1 and t2 = type_of_expr e2 in
+    let t1 = type_of_expr env e1 and t2 = type_of_expr env e2 in
     if t1 <> t2 then raise (MismatchedTypes (t1, t2))
     else begin
       match op with
@@ -34,14 +40,14 @@ let rec type_of_expr = function
       | _ -> raise (InvalidOperation(t1, op))
     end
   | Unop(op, e) -> begin
-      let t = type_of_expr e in
+      let t = type_of_expr env e in
       match (op, t) with
       | Not, TBool -> TBool
       | Neg, TNum -> TNum
       | _, _ -> raise (InvalidOperation(t, op))
     end
   | ListLit(es) -> begin
-      let ts = List.map type_of_expr es in
+      let ts = List.map (fun x -> type_of_expr env x) es in
       if List.length ts = 0 then TList(TSome)
       else let list_type = List.fold_left
           (fun acc t -> if acc = t then acc
@@ -54,14 +60,14 @@ let rec type_of_expr = function
       match es with
       | [] -> TSome
       | x  :: xs ->
-        List.fold_left (fun _ e -> (type_of_expr e))
-          (type_of_expr x) xs
+        List.fold_left (fun _ e -> (type_of_expr env e))
+          (type_of_expr env x) xs
     end
   | If(p, e1, e2) -> begin
-      let pt = type_of_expr p in
+      let pt = type_of_expr env p in
       if pt <> TBool
       then raise (MismatchedTypes(TBool, pt))
-      else let t1 = type_of_expr e1 and t2 = type_of_expr e2 in
+      else let t1 = type_of_expr env e1 and t2 = type_of_expr env e2 in
       if t1 = t2 then t2 else raise (MismatchedTypes(t1, t2))
     end
   | MapLit(kvpairs) -> begin
@@ -70,19 +76,19 @@ let rec type_of_expr = function
       | (key, value) :: xs ->
         (* check if all keys are of the same type *)
         let key_type = List.fold_left (fun acc (k, _) ->
-            let t = type_of_expr k in
+            let t = type_of_expr env k in
             if t = acc then acc else raise (MismatchedTypes(acc, t)))
-            (type_of_expr key) xs
+            (type_of_expr env key) xs
         in
         let value_type = List.fold_left (fun acc (_, v) ->
-            let t = type_of_expr v in
+            let t = type_of_expr env v in
             if t = acc then acc else raise (MismatchedTypes(acc, t)))
-            (type_of_expr value) xs
+            (type_of_expr env value) xs
         in
         TMap(key_type, value_type)
     end
   | Assign(id, t, e) -> begin
-      let etype = type_of_expr e in
+      let etype = type_of_expr env e in
       let _ = match t with
       | TSome -> etype
       | t -> if t = etype then t else raise (MismatchedTypes(t, etype))
@@ -93,10 +99,12 @@ let rec type_of_expr = function
   | _ -> TNum
 ;;
 
-let type_check exprs =
-  List.iter
-    (fun x ->
-       try let _ = type_of_expr x in () with
+let type_check (program: Ast.program) =
+  List.fold_left
+    (fun env expr ->
+       try
+         let _ = type_of_expr env expr in env
+       with
        | InvalidOperation(t, op) ->
          let st = string_of_type t and sop = string_of_op op in
          print_endline (Printf.sprintf "Type error: Invalid operation %s on type '%s'" sop st);
@@ -110,5 +118,6 @@ let type_check exprs =
          print_endline (Printf.sprintf "Type error: Lists can only contain one type. Expected '%s', got a '%s' instead" st1 st2);
          raise TypeError
        | _ -> raise TypeError)
-    exprs
+    (NameMap.empty, NameMap.empty)
+    program
 ;;
