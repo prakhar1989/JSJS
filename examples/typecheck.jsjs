@@ -1,24 +1,20 @@
-10 + 20;
-//"asdsad" ^ "asd";
+val total = 10 + 20;
+val msg: string = "hello" ^ ", world";
 
-[10, 30, 20, 30,20 , 413];
-20 + if true then 10 else 40;
+val diffcount = 20 + if true then 10 else 40;
 
 // concat two strings
-// adding nums at the end, will
-// give type errors
-"hello, " ^ if false then { 
+val msg2 = "hello, " ^ if false then { 
+  val s1 = 10;
   "world!";
 } else { 
+  val s2 = 202 + 30;
   "earth!"; 
 };
 
-// explicit type annotations
-val n: num = 10;
-val x = "this is automatically a string";
 val xs: list num = [10, 20, 30, 40];
 
-val strMap: <string: num> = {
+val strMap = {
   "foo": 10,
   "bar": 20,
   "hoo": 40

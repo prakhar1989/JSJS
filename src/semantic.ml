@@ -19,7 +19,7 @@ let rec type_of_expr = function
   | StrLit(_) -> TString
   | Binop(e1, op, e2) -> 
     let t1 = type_of_expr e1 and t2 = type_of_expr e2 in
-    if t1 != t2 then raise (MismatchedTypes (t1, t2))
+    if not(t1 = t2) then raise (MismatchedTypes (t1, t2))
     else begin
       match op with
       | Caret -> if t1 = TString then TString
@@ -59,7 +59,7 @@ let rec type_of_expr = function
     end
   | If(p, e1, e2) -> begin
       let pt = type_of_expr p in 
-      if pt != TBool
+      if not(pt = TBool)
       then raise (MismatchedTypes(TBool, pt))
       else let t1 = type_of_expr e1 and t2 = type_of_expr e2 in
       if t1 = t2 then t2 else raise (MismatchedTypes(t1, t2))
