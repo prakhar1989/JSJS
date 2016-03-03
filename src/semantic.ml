@@ -17,14 +17,14 @@ let rec type_of_expr = function
   | NumLit(_) -> TNum
   | BoolLit(_) -> TBool
   | StrLit(_) -> TString
-  | Binop(e1, op, e2) -> 
+  | Binop(e1, op, e2) ->
     let t1 = type_of_expr e1 and t2 = type_of_expr e2 in
-    if not(t1 = t2) then raise (MismatchedTypes (t1, t2))
+    if t1 <> t2 then raise (MismatchedTypes (t1, t2))
     else begin
       match op with
       | Caret -> if t1 = TString then TString
         else raise (InvalidOperation(t1, Caret))
-      | And | Or -> if t1 = TBool then TBool 
+      | And | Or -> if t1 = TBool then TBool
         else raise (InvalidOperation(t1, op))
       | Add | Sub | Mul
       | Div | Mod -> if t1 = TNum then TNum
@@ -49,21 +49,21 @@ let rec type_of_expr = function
           (List.hd ts) (List.tl ts)
         in
         TList(list_type)
-    end 
+    end
   | Block(es) -> begin
       match es with
       | [] -> TSome
-      | x  :: xs -> 
-        List.fold_left (fun _ e -> (type_of_expr e)) 
+      | x  :: xs ->
+        List.fold_left (fun _ e -> (type_of_expr e))
           (type_of_expr x) xs
     end
   | If(p, e1, e2) -> begin
-      let pt = type_of_expr p in 
-      if not(pt = TBool)
+      let pt = type_of_expr p in
+      if pt <> TBool
       then raise (MismatchedTypes(TBool, pt))
       else let t1 = type_of_expr e1 and t2 = type_of_expr e2 in
       if t1 = t2 then t2 else raise (MismatchedTypes(t1, t2))
-    end 
+    end
   | MapLit(kvpairs) -> begin
       match kvpairs with
       | [] -> TSome (* TODO: how to handle blank map? *)
@@ -72,12 +72,12 @@ let rec type_of_expr = function
         let key_type = List.fold_left (fun acc (k, _) ->
             let t = type_of_expr k in
             if t = acc then acc else raise (MismatchedTypes(acc, t)))
-            (type_of_expr key) xs 
+            (type_of_expr key) xs
         in
         let value_type = List.fold_left (fun acc (_, v) ->
             let t = type_of_expr v in
             if t = acc then acc else raise (MismatchedTypes(acc, t)))
-            (type_of_expr value) xs 
+            (type_of_expr value) xs
         in
         TMap(key_type, value_type)
     end
@@ -86,18 +86,18 @@ let rec type_of_expr = function
       let _ = match t with
       | TSome -> etype
       | t -> if t = etype then t else raise (MismatchedTypes(t, etype))
-      in 
+      in
       (* TODO: Use idtype and id to update env *)
       TUnit
-    end 
+    end
   | _ -> TNum
 ;;
 
-let type_check exprs = 
-  List.iter 
-    (fun x -> 
+let type_check exprs =
+  List.iter
+    (fun x ->
        try let _ = type_of_expr x in () with
-       | InvalidOperation(t, op) -> 
+       | InvalidOperation(t, op) ->
          let st = string_of_type t and sop = string_of_op op in
          print_endline (Printf.sprintf "Type error: Invalid operation %s on type '%s'" sop st);
          raise TypeError

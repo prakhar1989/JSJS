@@ -77,12 +77,12 @@ literals:
     | STR_LIT                                  { StrLit($1) }
     | ID                                       { Val($1) }
     | LAMBDA LPAREN formals_opt RPAREN COLON primitive FATARROW expr %prec ANON {
-        FunLit({ 
-            formals = $3; return_type = $6; body = Block([$8]); 
+        FunLit({
+            formals = $3; return_type = $6; body = Block([$8]);
         })
     }
     | LAMBDA LPAREN formals_opt RPAREN COLON primitive FATARROW block {
-        FunLit({ 
+        FunLit({
             formals = $3; return_type = $6; body = Block($8);
         })
     }

@@ -6,7 +6,7 @@ open Core.Std
 type action = Compile | GenAST
 
 (* creates intermediate JS *)
-let dump_javascript filename str = 
+let dump_javascript filename str =
   let template = format_of_string "var ast = require('./jsast');
 var es = require('escodegen');
 var codes = [%s];
@@ -22,20 +22,20 @@ let driver filename axn =
   let program = Parser.program Scanner.token lexbuf in
   (* TODO: Fix this error catching *)
   let _ = try Semantic.type_check program
-    with  _ -> exit 1 
+    with  _ -> exit 1
   in
 
   (* JS -> AST -> JS *)
-  let print_ast () = 
+  let print_ast () =
     let exps = List.map program ~f:Stringify.string_of_expr in
     List.iter exps ~f:(fun x -> print_endline (x ^ ";"));
-  in 
+  in
 
   (* Compile *)
-  let compile_to_js () = 
+  let compile_to_js () =
     let js_exprs = List.fold_left program
         ~f:(fun acc expr -> (Codegen.js_of_expr expr) :: acc)
-        ~init: [] 
+        ~init: []
     in
     let s = String.concat ~sep:",\n" (List.rev js_exprs) in
     dump_javascript "codegen/out.js" s;
@@ -48,7 +48,7 @@ let driver filename axn =
 ;;
 
 let command =
-  Command.basic 
+  Command.basic
     ~summary: "The JSJS compiler."
     ~readme: (fun () -> "Learn more at http://github.com/prakhar1989/JSJS")
     Command.Spec.(
@@ -56,8 +56,8 @@ let command =
       +> anon ("filename" %: file)
       +> flag "-s" no_arg ~doc:" JSJS -> AST -> JSJS"
     )
-    (fun filename f1 () -> 
-       let axn = match f1 with 
+    (fun filename f1 () ->
+       let axn = match f1 with
          | true  -> GenAST
          | false -> Compile
        in
