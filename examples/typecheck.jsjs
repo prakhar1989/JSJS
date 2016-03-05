@@ -1,4 +1,5 @@
-val total = 10 + 20;
+val total: num = 10 + 20;
+
 val msg: string = "hello" ^ ", world";
 
 val diffcount = 20 + if true then 10 else 40;
@@ -12,16 +13,16 @@ val msg2 = "hello, " ^ if false then {
   "earth!";
 };
 
-val xs: list num = [10, 20, 30, 40];
+val xs : list num = [10, 20];
 
-val strMap = {
+val strMap  = {
   "foo": 10,
   "bar": 20,
   "hoo": 40
 };
 
-val nestedMap : <string: <string: bool>> = {
-  "foo" : {"a" : 10},
-  "goo" : {"b" : 40},
-  "hoo" : {"c" : 2}
+val nestedMap: <string: <string: bool>> = {
+  "foo" : {"a" : true},
+  "goo" : {"b" : false},
+  "hoo" : {"c" : true}
 };

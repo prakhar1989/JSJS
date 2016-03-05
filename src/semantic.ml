@@ -19,83 +19,89 @@ type typesTable = Ast.primitiveType NameMap.t;;
 type typeEnv = typesTable * typesTable;;
 
 let rec type_of_expr (env: typeEnv) = function
-  | NumLit(_) -> TNum
-  | BoolLit(_) -> TBool
-  | StrLit(_) -> TString
+  | NumLit(_) -> TNum, env
+  | BoolLit(_) -> TBool, env
+  | StrLit(_) -> TString, env
   | Binop(e1, op, e2) ->
-    let t1 = type_of_expr env e1 and t2 = type_of_expr env e2 in
+    let t1, _ = type_of_expr env e1 and t2, _ = type_of_expr env e2 in
     if t1 <> t2 then raise (MismatchedTypes (t1, t2))
     else begin
       match op with
-      | Caret -> if t1 = TString then TString
+      | Caret -> if t1 = TString then TString, env
         else raise (InvalidOperation(t1, Caret))
-      | And | Or -> if t1 = TBool then TBool
+      | And | Or -> if t1 = TBool then TBool, env
         else raise (InvalidOperation(t1, op))
       | Add | Sub | Mul
-      | Div | Mod -> if t1 = TNum then TNum
+      | Div | Mod -> if t1 = TNum then TNum, env
         else raise (InvalidOperation(t1, op))
       | Lte | Gte | Neq
-      | Equals | Lt | Gt -> TBool
+      | Equals | Lt | Gt -> TBool, env
       | _ -> raise (InvalidOperation(t1, op))
     end
   | Unop(op, e) -> begin
-      let t = type_of_expr env e in
+      let t, _ = type_of_expr env e in
       match (op, t) with
-      | Not, TBool -> TBool
-      | Neg, TNum -> TNum
+      | Not, TBool -> TBool, env
+      | Neg, TNum -> TNum, env
       | _, _ -> raise (InvalidOperation(t, op))
     end
   | ListLit(es) -> begin
-      let ts = List.map (fun x -> type_of_expr env x) es in
-      if List.length ts = 0 then TList(TSome)
+      let ts = List.map (fun x ->
+          let t, _ = type_of_expr env x in t)
+          es
+      in
+      if List.length ts = 0 then TList(TSome), env
       else let list_type = List.fold_left
           (fun acc t -> if acc = t then acc
             else raise (NonUniformTypeContainer(acc, t)))
           (List.hd ts) (List.tl ts)
         in
-        TList(list_type)
+        TList(list_type), env
     end
   | Block(es) -> begin
       match es with
-      | [] -> TSome
+      | [] -> TSome, env
       | x  :: xs ->
-        List.fold_left (fun _ e -> (type_of_expr env e))
-          (type_of_expr env x) xs
+        let t, new_env = List.fold_left
+            (fun _ e -> (type_of_expr env e))
+            (type_of_expr env x) xs
+        in
+        t, new_env
     end
   | If(p, e1, e2) -> begin
-      let pt = type_of_expr env p in
+      let pt, _ = type_of_expr env p in
       if pt <> TBool
       then raise (MismatchedTypes(TBool, pt))
-      else let t1 = type_of_expr env e1 and t2 = type_of_expr env e2 in
-      if t1 = t2 then t2 else raise (MismatchedTypes(t1, t2))
+      else let t1, _ = type_of_expr env e1 and t2, _ = type_of_expr env e2 in
+      if t1 = t2 then t2, env else raise (MismatchedTypes(t1, t2))
     end
   | MapLit(kvpairs) -> begin
       match kvpairs with
-      | [] -> TSome (* TODO: how to handle blank map? *)
+      | [] -> TSome, env
       | (key, value) :: xs ->
-        (* check if all keys are of the same type *)
+        let start_key_type, _ = type_of_expr env key in
         let key_type = List.fold_left (fun acc (k, _) ->
-            let t = type_of_expr env k in
+            let t, _ = type_of_expr env k in
             if t = acc then acc else raise (MismatchedTypes(acc, t)))
-            (type_of_expr env key) xs
+            start_key_type xs
         in
+        let start_value_type, _ = type_of_expr env value in
         let value_type = List.fold_left (fun acc (_, v) ->
-            let t = type_of_expr env v in
+            let t, _ = type_of_expr env v in
             if t = acc then acc else raise (MismatchedTypes(acc, t)))
-            (type_of_expr env value) xs
+            start_value_type xs
         in
-        TMap(key_type, value_type)
+        TMap(key_type, value_type), env
     end
   | Assign(id, t, e) -> begin
-      let etype = type_of_expr env e in
+      let etype, _ = type_of_expr env e in
       let _ = match t with
       | TSome -> etype
       | t -> if t = etype then t else raise (MismatchedTypes(t, etype))
       in
-      (* TODO: Use idtype and id to update env *)
-      TUnit
+      TUnit, env
     end
-  | _ -> TNum
+  | _ -> TNum, env
 ;;
 
 let type_check (program: Ast.program) =
