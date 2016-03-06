@@ -94,13 +94,21 @@ let rec type_of_expr (env: typeEnv) = function
         TMap(key_type, value_type), env
     end
   | Assign(id, t, e) -> begin
-      let etype, _ = type_of_expr env e in
+      let etype, env = type_of_expr env e in
       let _ = match t with
       | TSome -> etype
       | t -> if t = etype then t else raise (MismatchedTypes(t, etype))
       in
       TUnit, env
     end
+  | Val(s) -> begin
+      let locals, globals = env in
+      if NameMap.mem s locals
+      then NameMap.find s locals, env
+      else if NameMap.mem s globals
+      then NameMap.find s globals, env
+      else raise (Undefined(s))
+    end 
   | _ -> TNum, env
 ;;
 
@@ -108,7 +116,7 @@ let type_check (program: Ast.program) =
   List.fold_left
     (fun env expr ->
        try
-         let _ = type_of_expr env expr in env
+         let _, env = type_of_expr env expr in env
        with
        | InvalidOperation(t, op) ->
          let st = string_of_type t and sop = string_of_op op in
@@ -118,7 +126,9 @@ let type_check (program: Ast.program) =
          raise (TypeError (Printf.sprintf "Type error: expected value of type '%s', got a value of type '%s' instead" st1 st2))
        | NonUniformTypeContainer(t1, t2) ->
          let st1 = string_of_type t1 and st2 = string_of_type t2 in
-         raise (TypeError (Printf.sprintf "Type error: Lists can only contain one type. Expected '%s', got a '%s' instead" st1 st2)))
+         raise (TypeError (Printf.sprintf "Type error: Lists can only contain one type. Expected '%s', got a '%s' instead" st1 st2))
+       | Undefined(s) ->
+         raise (TypeError (Printf.sprintf "Error: value '%s' was used before it was defined" s)))
     (NameMap.empty, NameMap.empty)
     program
 ;;

@@ -26,3 +26,5 @@ val nestedMap: <string: <string: bool>> = {
   "goo" : {"b" : false},
   "hoo" : {"c" : true}
 };
+
+msg ^ "120";
