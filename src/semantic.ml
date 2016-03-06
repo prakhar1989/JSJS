@@ -94,12 +94,14 @@ let rec type_of_expr (env: typeEnv) = function
         TMap(key_type, value_type), env
     end
   | Assign(id, t, e) -> begin
-      let etype, env = type_of_expr env e in
+      let etype, _ = type_of_expr env e in
+      let locals, globals = env in
       let _ = match t with
       | TSome -> etype
       | t -> if t = etype then t else raise (MismatchedTypes(t, etype))
       in
-      TUnit, env
+      let globals = NameMap.add id etype globals in
+      TUnit, (locals, globals)
     end
   | Val(s) -> begin
       let locals, globals = env in
