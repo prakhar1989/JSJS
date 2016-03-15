@@ -41,7 +41,7 @@ let driver filename axn =
     in
     let s = String.concat ~sep:",\n" (List.rev js_exprs) in
     dump_javascript "codegen/out.js" s;
-    print_endline "Intermediate JS ready. Run `make js` to compile to JS."
+    print_endline "Type checked!"
   in
 
   match axn with

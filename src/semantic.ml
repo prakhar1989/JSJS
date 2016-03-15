@@ -107,17 +107,30 @@ let rec type_of_expr (env: typeEnv) = function
         TMap(key_type, value_type), env
     end
   | Assign(id, t, e) -> begin
-      let etype, _ = type_of_expr env e in
       let locals, globals = env in
-      if NameMap.mem id locals
-      then raise (AlreadyDefined(id))
+      if NameMap.mem id locals then raise (AlreadyDefined(id))
       else 
-        let _ = match t with
-          | TSome -> etype
-          | t -> if t = etype then t else raise (MismatchedTypes(t, etype))
-        in
-        let locals = (NameMap.add id etype locals) in
-        TUnit, (locals, globals)
+        match e with
+        | FunLit(fdecl) ->
+          let formaltype = List.map (fun (_, x) -> x) fdecl.formals in
+          let functype = TFun(formaltype, fdecl.return_type) in
+          let _ = match t with
+            | TSome -> functype
+            | t -> if t = functype then t else raise (MismatchedTypes(t, functype))
+          in
+          let locals = (NameMap.add id functype locals) in 
+          let etype, _ = type_of_expr (locals, globals) e  in
+          if etype = functype 
+          then TUnit, (locals, globals) 
+          else raise (MismatchedTypes(functype, etype))
+        | _ -> 
+          let etype, _ = type_of_expr env e in
+          let _ = match t with
+            | TSome -> etype
+            | t -> if t = etype then t else raise (MismatchedTypes(t, etype))
+          in
+          let locals = (NameMap.add id etype locals) in
+          TUnit, (locals, globals)
     end
   | Val(s) -> begin
       let locals, globals = env in 
@@ -156,6 +169,22 @@ let rec type_of_expr (env: typeEnv) = function
         TFun(formaltype, fdecl.return_type), env
       else raise (MismatchedTypes(fdecl.return_type, t))
     end 
+  | Call(id, es) -> begin
+      let t, _ = type_of_expr env (Val(id)) in
+      (match t with
+      | TFun(formals_type, return_type) ->
+        let args_type = List.map
+            (fun e -> let t, _ = type_of_expr env e in t) es
+        in
+        let l1 = List.length args_type and l2 = List.length formals_type in
+        if l1 <> l2
+        then raise (MismatchedArgCount(l2, l1))
+        else List.iter2 (fun ft at -> if ft = at then ()
+                     else raise (MismatchedTypes(ft, at)))
+          formals_type args_type;
+        return_type, env
+      | _ -> raise (failwith "unreachable state reached"))
+    end
   | _ -> TNum, env
 ;;
 
