@@ -17,6 +17,12 @@ module NameMap = Map.Make(String);;
 type typesTable = Ast.primitiveType NameMap.t;;
 type typeEnv = typesTable * typesTable;;
 
+let build_map (formals: (string * primitiveType) list) =
+  List.fold_left
+    (fun acc_map (id, t) -> NameMap.add id t acc_map)
+    (NameMap.empty) formals
+;;
+
 let rec type_of_expr (env: typeEnv) = function
   | NumLit(_) -> TNum, env
   | BoolLit(_) -> TBool, env
@@ -121,6 +127,35 @@ let rec type_of_expr (env: typeEnv) = function
       then NameMap.find s globals, env
       else raise (Undefined(s))
     end
+  | FunLit(fdecl) -> begin
+      let locals, globals = env in
+      let formals_map = build_map fdecl.formals in
+      let merged_globals = NameMap.merge (fun k k1 k2 -> match k1, k2 with
+          | Some k1, Some k2 -> Some k1
+          | None, k2 -> k2
+          | k1, None -> k1)
+          locals globals in
+      let env = formals_map, merged_globals in
+      let t, _ = match fdecl.body with
+        | Block (es) -> begin
+            match es with
+            | [] -> TSome, env
+            | x :: [] -> type_of_expr env x 
+            | x :: xs ->
+              List.fold_left
+                (fun (t, acc_env) e -> 
+                   let newt, newenv = type_of_expr acc_env e in
+                   (newt, newenv))
+                (type_of_expr env x) xs
+          end 
+        | e -> type_of_expr env e
+      in 
+      if t = fdecl.return_type 
+      then
+        let formaltype = List.map (fun (_, x) -> x) fdecl.formals in
+        TFun(formaltype, fdecl.return_type), env
+      else raise (MismatchedTypes(fdecl.return_type, t))
+    end 
   | _ -> TNum, env
 ;;
 

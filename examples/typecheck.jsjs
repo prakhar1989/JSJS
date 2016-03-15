@@ -42,5 +42,22 @@ val msg3 = if true then {
   msg == "hello, world";
 };
 
-msg ^ "asdasd";
-val msg : bool = "asdas";
+val identity = /\(a: num): num => a;
+
+val add: (num, num) -> num = /\(a: num, b: num): num => a + b;
+
+val gcd = /\(a: num, b: num): num => {
+  if a == b then a
+  else {
+    if a > b
+    then gcd((a - b), b)
+    else gcd((b - a), a);
+  };
+};
+
+val pow = /\(base: num, exp: num): num => {
+  val aux = /\(accum: num, e: num): num => {
+    if (e == 0) then 1 else 2;
+  };
+  10;
+};
