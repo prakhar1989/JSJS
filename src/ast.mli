@@ -21,6 +21,7 @@ type expr =
   | Unop of op * expr
   | NumLit of float
   | BoolLit of bool
+  | UnitLit
   | StrLit of string
   | ListLit of expr list
   | MapLit of (expr * expr) list

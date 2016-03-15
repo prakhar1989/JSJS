@@ -48,21 +48,17 @@ val ten : num = identity(10);
 val add: (num, num) -> num = /\(a: num, b: num): num => a + b;
 val thirty = add(10, 20);
 
-
 // recursive function
 val gcd = /\(a: num, b: num): num => {
   if a == b then a
   else {
     if a > b
-    then gcd((a && b), b)
+    then gcd((a - b), b)
     else gcd((b - a), a);
   };
 };
 
 val s: num = gcd(10, 20);
-
-
-
 
 // tail-recursive function
 val pow = /\(base: num, exp: num): num => {
@@ -75,14 +71,11 @@ val pow = /\(base: num, exp: num): num => {
 
 val chess_squares = pow(8, 2);
 
-
-
-
 // function as return type
 val addx = /\(x: num): (num) -> num => /\(y: num): num => x + y;
 
 // function as return type with annotations
-val subx: (num) -> (num) -> num = 
+val subx: (num) -> (num) -> num =
   /\(x: num): (num) -> num => /\(y: num): num => x - y;
 
 val adds10 : (num) -> num = addx(10);
@@ -93,3 +86,9 @@ val hundred = adds10(90);
 val applier = /\(fn: (num) -> num, x: num): num => fn(x);
 
 val fourhundred = applier(/\(x: num): num => x * x, 20);
+
+// unit testing :D
+val nothing : unit = ();
+
+// vals are unit type
+val assign_stmt : unit = val something : unit = ();

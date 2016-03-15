@@ -52,6 +52,7 @@ rule token =
     | "unit"                    { UNIT }
     | "string"                  { STRING }
     | "list"                    { LIST }
+    | "()"                      { UNIT_LIT }
     | ':'                       { COLON }
     | '('                       { LPAREN }
     | ')'                       { RPAREN }

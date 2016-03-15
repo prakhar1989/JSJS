@@ -14,6 +14,7 @@ open Ast
 %token NUM LIST BOOL STRING UNIT
 %token COLON SEMICOLON DOT FATARROW COMMA THINARROW
 
+%token UNIT_LIT
 %token <float>  NUM_LIT
 %token <string> STR_LIT
 %token <string> MODULE_LIT
@@ -76,6 +77,7 @@ literals:
     | FALSE                                    { BoolLit(false) }
     | STR_LIT                                  { StrLit($1) }
     | ID                                       { Val($1) }
+    | UNIT_LIT                                 { UnitLit }
     | LAMBDA LPAREN formals_opt RPAREN COLON primitive FATARROW expr %prec ANON {
         FunLit({
             formals = $3; return_type = $6; body = Block([$8]);

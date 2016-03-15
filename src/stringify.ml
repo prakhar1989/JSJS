@@ -42,6 +42,7 @@ let rec string_of_expr = function
   | Unop(o, e1) ->
     String.concat " " [string_of_op o; string_of_expr e1]
   | NumLit(x) -> string_of_float x
+  | UnitLit   -> "()"
   | Block(es) -> let ss = String.concat ";\n" (List.map string_of_expr es) in
     "{" ^ ss ^ "}"
   | StrLit(s) -> Printf.sprintf "'%s'" s

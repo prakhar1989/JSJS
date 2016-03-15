@@ -8,9 +8,6 @@ open Stringify
 (*
 1. re-defined function declarations should raise errors
 2. unit assignments with non-unit type should raise errors
-3. top level vals that are re-defined should raise errors
-4. vals can be redefined within the scope of a block
-5. vals cannot reference a val defined **after** its declaration
 *)
 
 module NameMap = Map.Make(String);;
@@ -24,6 +21,7 @@ let build_map (formals: (string * primitiveType) list) =
 ;;
 
 let rec type_of_expr (env: typeEnv) = function
+  | UnitLit -> TUnit, env
   | NumLit(_) -> TNum, env
   | BoolLit(_) -> TBool, env
   | StrLit(_) -> TString, env
