@@ -1,8 +1,7 @@
 val total: num = 10 + 20;
 
-val msg: string = "hello" ^ ", world";
 
-val diffcount = 20 + if true then 10 else 40;
+val diffcount = 20 + if true then 30 else 40;
 
 // concat two strings
 val msg2 = "hello, " ^ if false then {
@@ -27,4 +26,20 @@ val nestedMap: <string: <string: bool>> = {
   "hoo" : {"c" : true}
 };
 
-msg ^ "120";
+val msg: string = "hello" ^ ", world";
+
+val newmsg = msg ^ "new new new";
+
+val msg3 = if true then {
+  val msg: bool = false;
+  if true then {
+    val msg = 20;
+    msg < 40;
+  } else {
+    msg == false;
+  };
+} else {
+  msg == "hello, world";
+};
+
+msg ^ "asdasd";

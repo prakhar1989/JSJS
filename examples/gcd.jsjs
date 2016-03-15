@@ -1,8 +1,8 @@
 val gcd = /\(a: num, b: num): num => {
-  if a == b then a 
+  if a == b then a
   else {
-    if a > b 
-    then gcd((a - b), b) 
+    if a > b
+    then gcd((a - b), b)
     else gcd((b - a), a);
   };
 };

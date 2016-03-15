@@ -15,8 +15,7 @@ open Stringify
 
 module NameMap = Map.Make(String);;
 type typesTable = Ast.primitiveType NameMap.t;;
-(* A tuple of locals, globals *)
-type typeEnv = typesTable * typesTable;;
+type typeEnv = typesTable;;
 
 let rec type_of_expr (env: typeEnv) = function
   | NumLit(_) -> TNum, env
@@ -46,8 +45,8 @@ let rec type_of_expr (env: typeEnv) = function
       | _, _ -> raise (InvalidOperation(t, op))
     end
   | ListLit(es) -> begin
-      let ts = List.map (fun x ->
-          let t, _ = type_of_expr env x in t)
+      let ts = List.map
+          (fun x -> let t, _ = type_of_expr env x in t)
           es
       in
       if List.length ts = 0 then TList(TSome), env
@@ -61,12 +60,13 @@ let rec type_of_expr (env: typeEnv) = function
   | Block(es) -> begin
       match es with
       | [] -> TSome, env
-      | x  :: xs ->
-        let t, new_env = List.fold_left
-            (fun _ e -> (type_of_expr env e))
-            (type_of_expr env x) xs
-        in
-        t, new_env
+      | x :: [] -> type_of_expr env x 
+      | x :: xs ->
+        List.fold_left
+          (fun (t, env1) e -> 
+             let newt, newenv = type_of_expr env1 e in
+             (newt, newenv))
+          (type_of_expr env x) xs
     end
   | If(p, e1, e2) -> begin
       let pt, _ = type_of_expr env p in
@@ -95,22 +95,17 @@ let rec type_of_expr (env: typeEnv) = function
     end
   | Assign(id, t, e) -> begin
       let etype, _ = type_of_expr env e in
-      let locals, globals = env in
       let _ = match t with
       | TSome -> etype
       | t -> if t = etype then t else raise (MismatchedTypes(t, etype))
       in
-      let globals = NameMap.add id etype globals in
-      TUnit, (locals, globals)
+      TUnit, (NameMap.add id etype env)
     end
   | Val(s) -> begin
-      let locals, globals = env in
-      if NameMap.mem s locals
-      then NameMap.find s locals, env
-      else if NameMap.mem s globals
-      then NameMap.find s globals, env
+      if NameMap.mem s env
+      then NameMap.find s env, env
       else raise (Undefined(s))
-    end 
+    end
   | _ -> TNum, env
 ;;
 
@@ -131,6 +126,6 @@ let type_check (program: Ast.program) =
          raise (TypeError (Printf.sprintf "Type error: Lists can only contain one type. Expected '%s', got a '%s' instead" st1 st2))
        | Undefined(s) ->
          raise (TypeError (Printf.sprintf "Error: value '%s' was used before it was defined" s)))
-    (NameMap.empty, NameMap.empty)
+    NameMap.empty
     program
 ;;
