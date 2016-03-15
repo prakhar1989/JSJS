@@ -15,7 +15,7 @@ open Stringify
 
 module NameMap = Map.Make(String);;
 type typesTable = Ast.primitiveType NameMap.t;;
-type typeEnv = typesTable;;
+type typeEnv = typesTable * typesTable;;
 
 let rec type_of_expr (env: typeEnv) = function
   | NumLit(_) -> TNum, env
@@ -58,13 +58,20 @@ let rec type_of_expr (env: typeEnv) = function
         TList(list_type), env
     end
   | Block(es) -> begin
+      let locals, globals = env in
+      let merged_globals = NameMap.merge (fun k k1 k2 -> match k1, k2 with
+          | Some k1, Some k2 -> Some k1
+          | None, k2 -> k2
+          | k1, None -> k1)
+          locals globals in
+      let env = NameMap.empty, merged_globals in
       match es with
       | [] -> TSome, env
       | x :: [] -> type_of_expr env x 
       | x :: xs ->
         List.fold_left
-          (fun (t, env1) e -> 
-             let newt, newenv = type_of_expr env1 e in
+          (fun (t, acc_env) e -> 
+             let newt, newenv = type_of_expr acc_env e in
              (newt, newenv))
           (type_of_expr env x) xs
     end
@@ -95,15 +102,23 @@ let rec type_of_expr (env: typeEnv) = function
     end
   | Assign(id, t, e) -> begin
       let etype, _ = type_of_expr env e in
-      let _ = match t with
-      | TSome -> etype
-      | t -> if t = etype then t else raise (MismatchedTypes(t, etype))
-      in
-      TUnit, (NameMap.add id etype env)
+      let locals, globals = env in
+      if NameMap.mem id locals
+      then raise (AlreadyDefined(id))
+      else 
+        let _ = match t with
+          | TSome -> etype
+          | t -> if t = etype then t else raise (MismatchedTypes(t, etype))
+        in
+        let locals = (NameMap.add id etype locals) in
+        TUnit, (locals, globals)
     end
   | Val(s) -> begin
-      if NameMap.mem s env
-      then NameMap.find s env, env
+      let locals, globals = env in 
+      if NameMap.mem s locals
+      then NameMap.find s locals, env
+      else if NameMap.mem s globals
+      then NameMap.find s globals, env
       else raise (Undefined(s))
     end
   | _ -> TNum, env
@@ -125,7 +140,9 @@ let type_check (program: Ast.program) =
          let st1 = string_of_type t1 and st2 = string_of_type t2 in
          raise (TypeError (Printf.sprintf "Type error: Lists can only contain one type. Expected '%s', got a '%s' instead" st1 st2))
        | Undefined(s) ->
-         raise (TypeError (Printf.sprintf "Error: value '%s' was used before it was defined" s)))
-    NameMap.empty
+         raise (TypeError (Printf.sprintf "Error: value '%s' was used before it was defined" s))
+       | AlreadyDefined(s) ->
+         raise (TypeError (Printf.sprintf "Error: '%s' cannot be redefined in the current scope" s)))
+    (NameMap.empty, NameMap.empty)
     program
 ;;

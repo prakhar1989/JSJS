@@ -43,3 +43,4 @@ val msg3 = if true then {
 };
 
 msg ^ "asdasd";
+val msg : bool = "asdas";
