@@ -58,12 +58,3 @@ $ make
 $ ./jsjs.out helloworld.jsjs
 $ make js filename=awesome.js
 ```
-
-##### Tests
-To run tests, you need the [OUnit](http://ounit.forge.ocamlcore.org/) library. Run `opam install ounit` to get it.
-```
-$ make
-$ make test
-$ npm test
-```
-
