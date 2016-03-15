@@ -92,3 +92,4 @@ val nothing : unit = ();
 
 // vals are unit type
 val assign_stmt : unit = val something : unit = ();
+

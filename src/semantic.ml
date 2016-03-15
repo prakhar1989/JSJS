@@ -183,7 +183,11 @@ let rec type_of_expr (env: typeEnv) = function
         return_type, env
       | _ -> raise (failwith "unreachable state reached"))
     end
-  | _ -> TNum, env
+  | ModuleLit(id, e) -> begin
+      match e with
+      | Call(_) -> type_of_expr env e
+      | _ -> raise (UndefinedProperty(id, string_of_expr e))
+    end
 ;;
 
 let type_check (program: Ast.program) =
@@ -208,6 +212,8 @@ let type_check (program: Ast.program) =
          raise (TypeError (Printf.sprintf "Error: value '%s' was used before it was defined" s))
        | AlreadyDefined(s) ->
          raise (TypeError (Printf.sprintf "Error: '%s' cannot be redefined in the current scope" s))
+       | UndefinedProperty(module_name, prop) ->
+         raise (TypeError (Printf.sprintf "Error: property '%s' is not defined in module '%s'" prop module_name))
        | MismatchedArgCount(l1, l2) ->
          raise (TypeError (Printf.sprintf "Error: Expected number of argument(s): %d, got %d instead." l1 l2)))
     (NameMap.empty, NameMap.empty)
