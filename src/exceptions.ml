@@ -10,6 +10,8 @@ exception InvalidOperation of primitiveType * op
 exception MismatchedTypes of primitiveType * primitiveType
 exception AlreadyDefined of string
 exception NonUniformTypeContainer of primitiveType * primitiveType
+exception MismatchedArgCount of int * int
+exception MismatchedOperandTypes of op * primitiveType * primitiveType
 
 (* Driver *)
 exception TypeError of string

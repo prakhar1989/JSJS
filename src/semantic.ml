@@ -29,7 +29,7 @@ let rec type_of_expr (env: typeEnv) = function
   | StrLit(_) -> TString, env
   | Binop(e1, op, e2) ->
     let t1, _ = type_of_expr env e1 and t2, _ = type_of_expr env e2 in
-    if t1 <> t2 then raise (MismatchedTypes (t1, t2))
+    if t1 <> t2 then raise (MismatchedOperandTypes (op, t1, t2))
     else begin
       match op with
       | Caret -> if t1 = TString then TString, env
@@ -171,13 +171,18 @@ let type_check (program: Ast.program) =
        | MismatchedTypes(t1, t2) ->
          let st1 = string_of_type t1 and st2 = string_of_type t2 in
          raise (TypeError (Printf.sprintf "Type error: expected value of type '%s', got a value of type '%s' instead" st1 st2))
+       | MismatchedOperandTypes(op, t1, t2) ->
+         let st1 = string_of_type t1 and st2 = string_of_type t2 and sop = string_of_op op in
+         raise (TypeError (Printf.sprintf "Type error: Cannot have types '%s' and '%s' for operator '%s'" st1 st2 sop))
        | NonUniformTypeContainer(t1, t2) ->
          let st1 = string_of_type t1 and st2 = string_of_type t2 in
          raise (TypeError (Printf.sprintf "Type error: Lists can only contain one type. Expected '%s', got a '%s' instead" st1 st2))
        | Undefined(s) ->
          raise (TypeError (Printf.sprintf "Error: value '%s' was used before it was defined" s))
        | AlreadyDefined(s) ->
-         raise (TypeError (Printf.sprintf "Error: '%s' cannot be redefined in the current scope" s)))
+         raise (TypeError (Printf.sprintf "Error: '%s' cannot be redefined in the current scope" s))
+       | MismatchedArgCount(l1, l2) ->
+         raise (TypeError (Printf.sprintf "Error: Expected number of argument(s): %d, got %d instead." l1 l2)))
     (NameMap.empty, NameMap.empty)
     program
 ;;

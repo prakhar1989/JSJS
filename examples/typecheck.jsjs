@@ -43,21 +43,26 @@ val msg3 = if true then {
 };
 
 val identity = /\(a: num): num => a;
+val ten : num = identity(10);
 
 val add: (num, num) -> num = /\(a: num, b: num): num => a + b;
+val thirty = add(10, 20);
+thirty ^ "asdasD";
 
-val gcd = /\(a: num, b: num): num => {
-  if a == b then a
-  else {
-    if a > b
-    then gcd((a - b), b)
-    else gcd((b - a), a);
-  };
-};
 
-val pow = /\(base: num, exp: num): num => {
-  val aux = /\(accum: num, e: num): num => {
-    if (e == 0) then 1 else 2;
-  };
-  10;
-};
+//val gcd = /\(a: num, b: num): num => {
+  //if a == b then a
+  //else {
+    //if a > b
+    //then gcd((a - b), b)
+    //else gcd((b - a), a);
+  //};
+//};
+
+//val pow = /\(base: num, exp: num): num => {
+  //val aux = /\(accum: num, e: num): num => {
+    //if (e == 0) then 1 else 2;
+  //};
+  //10;
+//};
+
