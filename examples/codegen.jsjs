@@ -1,16 +1,9 @@
-// numbers
-val x : num = 10;
-val y : num = 100;
-val z : num = 20;
-val t : num = x + (y * z);
+val x = (10 + 20) * 20;
 
-// strings
-val firstName : string = "foo";
-val secondName : string = "bar";
-val bio : string = "My first name is " ^ firstName ^ ", my second name is " ^ secondName;
+// a comment
+val y = 10 + 20 * 20;
 
-print("Hello World");
-print("Value of 10 + (100 * 20) = ", t);
-print("Bio:", bio);
-print("Boolean:", !true && false);
+val msg = "hello" ^ ", " ^ "world";
 
+// quoted
+val quote = "Mark said - \"Hi! How are you doing?\"";

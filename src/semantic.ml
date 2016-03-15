@@ -198,7 +198,7 @@ let type_check (program: Ast.program) =
        with
        | InvalidOperation(t, op) ->
          let st = string_of_type t and sop = string_of_op op in
-         raise (TypeError (Printf.sprintf "Type error: Invalid operation %s on type '%s'" sop st))
+         raise (TypeError (Printf.sprintf "Type error: Invalid operation '%s' on type '%s'" sop st))
        | MismatchedTypes(t1, t2) ->
          let st1 = string_of_type t1 and st2 = string_of_type t2 in
          raise (TypeError (Printf.sprintf "Type error: expected value of type '%s', got a value of type '%s' instead" st1 st2))

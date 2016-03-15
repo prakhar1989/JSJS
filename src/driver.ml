@@ -7,11 +7,8 @@ type action = Compile | GenAST
 
 (* creates intermediate JS *)
 let dump_javascript filename str =
-  let template = format_of_string "var ast = require('./jsast');
-var es = require('escodegen');
-var codes = [%s];
-var gen = codes.map((c) => es.generate(c));
-console.log(gen.join('\\n'))" in
+  let template = format_of_string "'use strict'
+%s" in
   let outc = Out_channel.create filename in
   Printf.fprintf outc template str;
   Out_channel.close outc
@@ -39,9 +36,9 @@ let driver filename axn =
         ~f:(fun acc expr -> (Codegen.js_of_expr expr) :: acc)
         ~init: []
     in
-    let s = String.concat ~sep:",\n" (List.rev js_exprs) in
-    dump_javascript "codegen/out.js" s;
-    print_endline "Type checked!"
+    let s = String.concat ~sep:"\n" (List.rev js_exprs) in
+    dump_javascript "out.js" s;
+    print_endline s;
   in
 
   match axn with
