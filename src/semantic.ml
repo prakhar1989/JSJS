@@ -71,10 +71,10 @@ let rec type_of_expr (env: typeEnv) = function
       let env = NameMap.empty, merged_globals in
       match es with
       | [] -> TSome, env
-      | x :: [] -> type_of_expr env x 
+      | x :: [] -> type_of_expr env x
       | x :: xs ->
         List.fold_left
-          (fun (t, acc_env) e -> 
+          (fun (t, acc_env) e ->
              let newt, newenv = type_of_expr acc_env e in
              (newt, newenv))
           (type_of_expr env x) xs
@@ -107,7 +107,7 @@ let rec type_of_expr (env: typeEnv) = function
   | Assign(id, t, e) -> begin
       let locals, globals = env in
       if NameMap.mem id locals then raise (AlreadyDefined(id))
-      else 
+      else
         match e with
         | FunLit(fdecl) ->
           let formaltype = List.map (fun (_, x) -> x) fdecl.formals in
@@ -116,12 +116,12 @@ let rec type_of_expr (env: typeEnv) = function
             | TSome -> functype
             | t -> if t = functype then t else raise (MismatchedTypes(t, functype))
           in
-          let locals = (NameMap.add id functype locals) in 
+          let locals = (NameMap.add id functype locals) in
           let etype, _ = type_of_expr (locals, globals) e  in
-          if etype = functype 
-          then TUnit, (locals, globals) 
+          if etype = functype
+          then TUnit, (locals, globals)
           else raise (MismatchedTypes(functype, etype))
-        | _ -> 
+        | _ ->
           let etype, _ = type_of_expr env e in
           let _ = match t with
             | TSome -> etype
@@ -131,7 +131,7 @@ let rec type_of_expr (env: typeEnv) = function
           TUnit, (locals, globals)
     end
   | Val(s) -> begin
-      let locals, globals = env in 
+      let locals, globals = env in
       if NameMap.mem s locals
       then NameMap.find s locals, env
       else if NameMap.mem s globals
@@ -151,17 +151,17 @@ let rec type_of_expr (env: typeEnv) = function
         | Block (es) -> begin
             match es with
             | [] -> TSome, env
-            | x :: [] -> type_of_expr env x 
+            | x :: [] -> type_of_expr env x
             | x :: xs ->
               List.fold_left
-                (fun (t, acc_env) e -> 
+                (fun (t, acc_env) e ->
                    let newt, newenv = type_of_expr acc_env e in
                    (newt, newenv))
                 (type_of_expr env x) xs
-          end 
+          end
         | e -> type_of_expr env e
-      in 
-      if t = fdecl.return_type 
+      in
+      if t = fdecl.return_type
       then
         let formaltype = List.map (fun (_, x) -> x) fdecl.formals in
         TFun(formaltype, fdecl.return_type), env
@@ -191,6 +191,10 @@ let rec type_of_expr (env: typeEnv) = function
 ;;
 
 let type_check (program: Ast.program) =
+  let print_string_type = TFun([TString], TUnit) in
+  let print_num_type = TFun([TNum], TUnit) in
+  let predefined = NameMap.add "print_str" print_string_type NameMap.empty in
+  let predefined = NameMap.add "print_num" print_num_type predefined in
   List.fold_left
     (fun env expr ->
        try
@@ -216,6 +220,6 @@ let type_check (program: Ast.program) =
          raise (TypeError (Printf.sprintf "Error: property '%s' is not defined in module '%s'" prop module_name))
        | MismatchedArgCount(l1, l2) ->
          raise (TypeError (Printf.sprintf "Error: Expected number of argument(s): %d, got %d instead." l1 l2)))
-    (NameMap.empty, NameMap.empty)
+    (predefined, NameMap.empty)
     program
 ;;
