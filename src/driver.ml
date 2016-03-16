@@ -38,7 +38,7 @@ let driver filename axn =
     in
     let s = String.concat ~sep:"\n" (List.rev js_exprs) in
     dump_javascript "out.js" s;
-    print_endline s;
+    print_endline "JS file ready - out.js";
   in
 
   match axn with

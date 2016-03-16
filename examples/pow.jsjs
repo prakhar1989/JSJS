@@ -1,0 +1,12 @@
+val pow = /\(base: num, exp: num): num => {
+  val aux = /\(accum: num, e: num): num => {
+    if (e == 1) then accum
+    else aux (accum * base, e - 1);
+  };
+  aux(base, exp);
+};
+
+val chess_squares = pow(8, 2);
+
+print_str("Total number of squares on a chessboard: ");
+print_num(chess_squares);

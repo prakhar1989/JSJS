@@ -6,3 +6,5 @@ val gcd = /\(a: num, b: num): num => {
     else gcd((b - a), a);
   };
 };
+
+print_num(gcd(12, 8));

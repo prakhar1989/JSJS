@@ -32,3 +32,9 @@ val msg3 = if true then {
   msg == "hello, world";
 };
 
+
+val add: (num, num) -> num = /\(a: num, b: num): num => a + b;
+val seven = add(4, 3);
+
+print_num(seven);
+print_str(msg);

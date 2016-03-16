@@ -49,5 +49,19 @@ let rec js_of_expr = function
     })()" in
     let name = "res_" ^ string_of_int(Random.int 1000000) in
     Printf.sprintf template name pred_s name s1 name s2 name
+  | FunLit(fdecl) ->
+    let formals = List.map (fun (x, _) -> x) fdecl.formals in
+    let string_forms = String.concat "," formals in
+    let string_body = js_of_expr fdecl.body in
+    let template = format_of_string "(function(%s) { return (%s) })" in
+    Printf.sprintf template string_forms string_body
+  | Call(id, es) ->
+    (* TODO: clean this up *)
+    let id = (match id with
+        | "print_num" | "print_str" -> "console.log"
+        | _ -> id)
+    in
+    let es = String.concat ", " (List.map js_of_expr es) in
+    Printf.sprintf "%s(%s)" id es
   | _ -> ""
 ;;
