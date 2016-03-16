@@ -191,10 +191,13 @@ let rec type_of_expr (env: typeEnv) = function
 ;;
 
 let type_check (program: Ast.program) =
-  let print_string_type = TFun([TString], TUnit) in
-  let print_num_type = TFun([TNum], TUnit) in
-  let predefined = NameMap.add "print_str" print_string_type NameMap.empty in
-  let predefined = NameMap.add "print_num" print_num_type predefined in
+  let stdlib = [("print_str", TFun([TString], TUnit));
+                ("print_num", TFun([TNum], TUnit));
+                ("num_to_string", TFun([TNum], TString))] in
+  let predefined = List.fold_left
+      (fun acc (id, t) -> NameMap.add id t acc)
+      NameMap.empty stdlib
+  in
   List.fold_left
     (fun env expr ->
        try

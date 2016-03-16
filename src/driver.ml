@@ -8,6 +8,7 @@ type action = Compile | GenAST
 (* creates intermediate JS *)
 let dump_javascript filename str =
   let template = format_of_string "'use strict'
+let num_to_string = function (x) { return x.toString(); };
 %s" in
   let outc = Out_channel.create filename in
   Printf.fprintf outc template str;
