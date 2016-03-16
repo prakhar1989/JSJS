@@ -7,3 +7,28 @@ val msg = "hello" ^ ", " ^ "world";
 
 // quoted
 val quote = "Mark said - \"Hi! How are you doing?\"";
+
+// if then else
+val z = if true then 10 else 20;
+
+val z2 = if (z == 10) then {
+  val x = 10;
+  val y = x + 20;
+  x + y;
+} else {
+  x + y;
+};
+
+// nested ifs
+val msg3 = if true then {
+  val msg: bool = false;
+  if true then {
+    val msg = 20;
+    msg < 40;
+  } else {
+    msg == false;
+  };
+} else {
+  msg == "hello, world";
+};
+
