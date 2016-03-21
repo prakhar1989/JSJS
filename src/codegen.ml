@@ -1,14 +1,32 @@
 open Ast
 open Stringify
 
-let block_template exprs ret_expr =
-  let template = format_of_string "
-      (function() {
+let block_template ret_expr = function
+  | None -> 
+    let template = format_of_string "(function() { return %s })()"
+    in Printf.sprintf template ret_expr
+  | Some(xs) -> 
+    let template = format_of_string "
+    (function() { 
         %s
         return %s
-      })()"
+    })()"
+    in Printf.sprintf template xs ret_expr
+;;
+
+let if_template pred e1 e2 = 
+  let name = "res_" ^ string_of_int(Random.int 1000000)
+  and template = format_of_string "(function() {
+        let %s
+        if (%s) {
+            %s = %s
+        } else {
+            %s = %s
+        }
+        return %s
+    })()" 
   in
-  Printf.sprintf template exprs ret_expr
+  Printf.sprintf template name pred name e1 name e2 name
 ;;
 
 let rec js_of_expr = function
@@ -31,24 +49,14 @@ let rec js_of_expr = function
     let es = List.rev (List.map js_of_expr es) in
     (match es with
     | [] -> "" (* will never be reached *)
-    | x :: [] -> block_template "" x
+    | x :: [] -> block_template x None
     | x :: xs ->
       let es = String.concat "\n" (List.rev xs) in
-      block_template es x)
+      block_template x (Some es))
   | If(p, e1, e2) ->
     let pred_s = js_of_expr p
-    and s1 = js_of_expr e1 and s2 = js_of_expr e2
-    and template = format_of_string "(function() {
-        let %s
-        if (%s) {
-            %s = %s
-        } else {
-            %s = %s
-        }
-        return %s
-    })()" in
-    let name = "res_" ^ string_of_int(Random.int 1000000) in
-    Printf.sprintf template name pred_s name s1 name s2 name
+    and s1 = js_of_expr e1 and s2 = js_of_expr e2 in
+    if_template pred_s s1 s2
   | FunLit(fdecl) ->
     let formals = List.map (fun (x, _) -> x) fdecl.formals in
     let string_forms = String.concat "," formals in
