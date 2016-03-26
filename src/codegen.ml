@@ -71,6 +71,7 @@ let rec js_of_expr = function
      | "hd" -> Printf.sprintf "(%s).get(0)" (List.hd es)
      | "tl" -> Printf.sprintf "(%s).delete(0)" (List.hd es)
      | "cons" -> Printf.sprintf "(%s).insert(0, %s)" (List.hd (List.tl es)) (List.hd es)
+     | "isempty" -> Printf.sprintf "(%s).isEmpty()" (List.hd es)
      | _ -> Printf.sprintf "%s(%s)" id (String.concat "," es))
   | ListLit(xs) -> let xs = String.concat ", " (List.map js_of_expr xs) in
     Printf.sprintf "Immutable.List.of(%s)" xs

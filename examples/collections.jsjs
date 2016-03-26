@@ -6,3 +6,12 @@ print_num(hd(tl(xs)));
 
 val big_xs = cons(44, xs);
 print_num(hd(big_xs));
+
+val x = isempty(big_xs) && true;
+
+val sum = /\(xs: list num) : num => {
+  if isempty(xs) then 0
+  else hd(xs) + sum(tl(xs));
+};
+
+print_num(sum(big_xs));
