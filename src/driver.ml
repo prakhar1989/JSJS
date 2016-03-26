@@ -7,11 +7,14 @@ type action = Compile | GenAST
 
 (* creates intermediate JS *)
 let dump_javascript filename str =
+  let libs : string = Lib.immutable in
   let template = format_of_string "'use strict'
+%s
 let num_to_string = function (x) { return x.toString(); };
+// generated code follows
 %s" in
   let outc = Out_channel.create filename in
-  Printf.fprintf outc template str;
+  Printf.fprintf outc template libs str;
   Out_channel.close outc
 ;;
 
