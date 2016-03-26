@@ -14,7 +14,7 @@ let block_template ret_expr = function
     in Printf.sprintf template xs ret_expr
 ;;
 
-let if_template pred e1 e2 = 
+let if_template pred e1 e2 =
   let name = "res_" ^ string_of_int(Random.int 1000000)
   and template = format_of_string "(function() {
         let %s
@@ -24,7 +24,7 @@ let if_template pred e1 e2 =
             %s = %s
         }
         return %s
-    })()" 
+    })()"
   in
   Printf.sprintf template name pred name e1 name e2 name
 ;;

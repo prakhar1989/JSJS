@@ -81,15 +81,32 @@ literals:
     | LAMBDA LPAREN formals_opt RPAREN COLON primitive FATARROW expr %prec ANON {
         FunLit({
             formals = $3; return_type = $6; body = Block([$8]);
+            is_generic = false; generic_types = [];
         })
     }
     | LAMBDA LPAREN formals_opt RPAREN COLON primitive FATARROW block {
         FunLit({
             formals = $3; return_type = $6; body = Block($8);
+            is_generic = false; generic_types = [];
+        })
+    }
+    | LAMBDA LSQUARE generic_types RSQUARE LPAREN formals_opt RPAREN COLON primitive FATARROW expr %prec ANON {
+        FunLit({
+            formals = $6; return_type = $9; body = Block([$11]);
+            is_generic = true; generic_types = $3;
+        })
+    }
+    | LAMBDA LSQUARE generic_types RSQUARE LPAREN formals_opt RPAREN COLON primitive FATARROW block {
+        FunLit({
+            formals = $6; return_type = $9; body = Block($11);
+            is_generic = true; generic_types = $3;
         })
     }
     | LSQUARE actuals_opt RSQUARE              { ListLit($2) }
     | LBRACE kv_pairs RBRACE                   { MapLit($2) }
+
+generic_types:
+    | gt = separated_nonempty_list(COMMA, GENERIC)  { gt }
 
 kv_pairs:
     | kv = separated_list(COMMA, kv_pair)      { kv }

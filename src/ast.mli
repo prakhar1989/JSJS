@@ -34,9 +34,11 @@ type expr =
   | ModuleLit of string * expr
 and
 func_decl = {
-  formals     : (string * primitiveType) list;
-  return_type : primitiveType;
-  body        : expr;
+  formals       : (string * primitiveType) list;
+  return_type   : primitiveType;
+  body          : expr;
+  is_generic    : bool;
+  generic_types : char list;
 };;
 
 type program = expr list;;
