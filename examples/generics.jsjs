@@ -3,7 +3,7 @@ val num_to_sign = /\(x: num): string => {
 };
 
 
-val two_args = /\[T, U](x: T): T => {
+val two_args = /\[T, Z, A, B](x: num): T => {
   x;
 };
 

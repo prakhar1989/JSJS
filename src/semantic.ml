@@ -211,16 +211,19 @@ let rec type_of_expr (env: typeEnv) = function
           formals_type args_type;
         return_type, env
       | TFunGeneric((formals_type, return_type), generic_types) -> begin
-          let genMap = List.fold_left (fun map t -> GenericMap.add t TSome map)
-              GenericMap.empty generic_types in
-          let args_type = List.map
-              (fun e -> let t, _ = type_of_expr env e in t) es in
-          let genMap = List.fold_left2 resolve genMap formals_type args_type in
-          (match return_type with
-           | T(c) -> if GenericMap.mem c genMap 
-             then GenericMap.find c genMap 
-             else raise (UndefinedType(c))
-           | t -> t), env
+            let genMap = List.fold_left (fun map t -> GenericMap.add t TSome map)
+                GenericMap.empty generic_types in
+            let args_type = List.map
+                (fun e -> let t, _ = type_of_expr env e in t) es in
+            let l1 = List.length args_type and l2 = List.length formals_type in
+            if l1 <> l2 then raise (MismatchedArgCount(l2, l1))
+            else
+              let genMap = List.fold_left2 resolve genMap formals_type args_type in
+              (match return_type with
+               | T(c) -> if GenericMap.mem c genMap
+                 then GenericMap.find c genMap
+                 else raise (UndefinedType(c))
+             | t -> t), env
         end
       | _ -> raise (failwith "unreacheable state reached"))
     end
