@@ -203,13 +203,19 @@ let rec type_of_expr (env: typeEnv) = function
         let args_type = List.map
             (fun e -> let t, _ = type_of_expr env e in t) es
         in
+        (* check if the lengths of the formal and actuals args match *)
         let l1 = List.length args_type and l2 = List.length formals_type in
-        if l1 <> l2
-        then raise (MismatchedArgCount(l2, l1))
+        if l1 <> l2 then raise (MismatchedArgCount(l2, l1))
+        (* type of each pair of formal and actual args should match *)
         else List.iter2 (fun ft at -> if ft = at then ()
                      else raise (MismatchedTypes(ft, at)))
           formals_type args_type;
         return_type, env
+
+      (* Type-checking generic function calls.
+         1. First, resolve types (thanks to the resolve function above)
+         2. Next type check the body of the function
+         3. Return the "resolved" return type of the call expression *)
       | TFunGeneric((formals_type, return_type), generic_types) -> begin
             let genMap = List.fold_left (fun map t -> GenericMap.add t TSome map)
                 GenericMap.empty generic_types in
@@ -225,8 +231,10 @@ let rec type_of_expr (env: typeEnv) = function
                  else raise (UndefinedType(c))
              | t -> t), env
         end
+
       | _ -> raise (failwith "unreacheable state reached"))
     end
+
   | ModuleLit(id, e) -> begin
       match e with
       | Call(_) -> type_of_expr env e
