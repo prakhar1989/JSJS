@@ -48,6 +48,21 @@ let rec resolve map ft at =
   | _ -> map
 ;;
 
+let rec generate_ret_types map = function
+  | T(c) -> if GenericMap.mem c map
+    then (GenericMap.find c map)
+    else raise (UndefinedType(c))
+  | TFun(formals_types, ret_type) -> 
+    let ftypes = List.map (generate_ret_types map) (ret_type :: formals_types) in 
+    TFun(List.tl ftypes, List.hd ftypes)
+  | TList(t) -> TList(generate_ret_types map t) 
+  | TMap(kt, vt) -> 
+    let keytypes = generate_ret_types map kt 
+    and valuetypes = generate_ret_types map vt in 
+    TMap(keytypes, valuetypes)
+  | TFunGeneric(x, y) -> raise (InvalidArgumentType(TFunGeneric(x,y)))
+  | t -> t
+
 let rec type_of_expr (env: typeEnv) = function
   | UnitLit -> TUnit, env
   | NumLit(_) -> TNum, env
@@ -254,13 +269,7 @@ let rec type_of_expr (env: typeEnv) = function
             if l1 <> l2 then raise (MismatchedArgCount(l2, l1))
             else
               let genMap = List.fold_left2 resolve genMap formals_type args_type in
-              (match return_type with
-               | T(c) -> if GenericMap.mem c genMap
-                 then (match GenericMap.find c genMap with
-                     | TSome -> raise (UndefinedType(c))
-                     | t -> t)
-                 else raise (UndefinedType(c))
-             | t -> t), env
+              (generate_ret_types genMap return_type), env
         end
 
       | _ -> raise (failwith "unreacheable state reached"))
@@ -278,6 +287,7 @@ let type_check (program: Ast.program) =
                 ("print_num", TFun([TNum], TUnit));
                 ("num_to_string", TFun([TNum], TString));
                 ("hd", TFunGeneric(([TList(T('T'))], T('T')), ['T']));
+                ("tl", TFunGeneric(([TList(T('T'))], TList(T('T'))), ['T']));
                ] in
   let predefined = List.fold_left
       (fun acc (id, t) -> NameMap.add id t acc)

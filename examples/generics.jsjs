@@ -20,7 +20,11 @@ val is_positive = apply(to_uppercase, "string");
 val n = two_args(10, 20);
 print_num(n);
 
-val hd = /\[T](xs: list T): T => {
+val head = /\[T](xs: list T): T => {
+  "10";
+};
+
+val tail = /\[T](xs: list list T): list list T => {
   "10";
 };
 

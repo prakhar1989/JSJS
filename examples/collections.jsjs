@@ -1,2 +1,5 @@
 val xs = [1, 2, 3, 4];
 print_num(hd(xs));
+
+val rest = tl(xs);
+print_num(hd(tl(xs)));

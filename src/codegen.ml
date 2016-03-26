@@ -69,6 +69,7 @@ let rec js_of_expr = function
     (match id with
      | "print_num" | "print_str" -> Printf.sprintf "console.log(%s)" (String.concat "," es)
      | "hd" -> Printf.sprintf "(%s).get(0)" (List.hd es)
+     | "tl" -> Printf.sprintf "(%s).delete(0)" (List.hd es)
      | _ -> Printf.sprintf "%s(%s)" id (String.concat "," es))
   | ListLit(xs) -> let xs = String.concat ", " (List.map js_of_expr xs) in
     Printf.sprintf "Immutable.List.of(%s)" xs
