@@ -38,6 +38,13 @@ let rec resolve map ft at =
       | TFunGeneric(x, y) -> raise (InvalidArgumentType(TFunGeneric(x, y)))
       | _ -> raise (MismatchedTypes(ft, at)))
   | TFunGeneric(x, y) -> raise (InvalidArgumentType(TFunGeneric(x, y)))
+  | TList(t) -> (match at with
+      | TList(a) -> resolve map t a
+      | _ -> raise (MismatchedTypes(ft, at)))
+  | TMap(kt, vt) -> (match at with
+      | TMap(akt, avt) -> let map = resolve map kt akt in
+        resolve map vt avt
+      | _ -> raise (MismatchedTypes(ft, at)))
   | _ -> map
 ;;
 

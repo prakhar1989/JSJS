@@ -19,3 +19,20 @@ val is_positive = apply(to_uppercase, "string");
 
 val n = two_args(10, 20);
 print_num(n);
+
+val hd = /\[T](xs: list T): T => {
+  "10";
+};
+
+val t = hd([1, 2, 3, 4]);
+
+val get = /\[T, U](map: <T: U>, key: T): U => {
+  "10";
+};
+
+val foomap: <string: num> = {
+  "a": 10,
+  "b": 20
+};
+
+val is_num: num = get(foomap, "a");
