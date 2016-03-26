@@ -276,7 +276,9 @@ let rec type_of_expr (env: typeEnv) = function
 let type_check (program: Ast.program) =
   let stdlib = [("print_str", TFun([TString], TUnit));
                 ("print_num", TFun([TNum], TUnit));
-                ("num_to_string", TFun([TNum], TString))] in
+                ("num_to_string", TFun([TNum], TString));
+                ("hd", TFunGeneric(([TList(T('T'))], T('T')), ['T']));
+               ] in
   let predefined = List.fold_left
       (fun acc (id, t) -> NameMap.add id t acc)
       NameMap.empty stdlib

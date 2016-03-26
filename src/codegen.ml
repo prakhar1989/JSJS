@@ -65,12 +65,11 @@ let rec js_of_expr = function
     Printf.sprintf template string_forms string_body
   | Call(id, es) ->
     (* TODO: clean this up *)
-    let id = (match id with
-        | "print_num" | "print_str" -> "console.log"
-        | _ -> id)
-    in
-    let es = String.concat ", " (List.map js_of_expr es) in
-    Printf.sprintf "%s(%s)" id es
+    let es = List.map js_of_expr es in
+    (match id with
+     | "print_num" | "print_str" -> Printf.sprintf "console.log(%s)" (String.concat "," es)
+     | "hd" -> Printf.sprintf "(%s).get(0)" (List.hd es)
+     | _ -> Printf.sprintf "%s(%s)" id (String.concat "," es))
   | ListLit(xs) -> let xs = String.concat ", " (List.map js_of_expr xs) in
     Printf.sprintf "Immutable.List.of(%s)" xs
   | _ -> ""
