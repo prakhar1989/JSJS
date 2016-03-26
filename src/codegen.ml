@@ -2,12 +2,12 @@ open Ast
 open Stringify
 
 let block_template ret_expr = function
-  | None -> 
+  | None ->
     let template = format_of_string "(function() { return %s })()"
     in Printf.sprintf template ret_expr
-  | Some(xs) -> 
+  | Some(xs) ->
     let template = format_of_string "
-    (function() { 
+    (function() {
         %s
         return %s
     })()"
@@ -71,5 +71,7 @@ let rec js_of_expr = function
     in
     let es = String.concat ", " (List.map js_of_expr es) in
     Printf.sprintf "%s(%s)" id es
+  | ListLit(xs) -> let xs = String.concat ", " (List.map js_of_expr xs) in
+    Printf.sprintf "Immutable.List.of(%s)" xs
   | _ -> ""
 ;;
