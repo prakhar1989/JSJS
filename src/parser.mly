@@ -64,6 +64,7 @@ primitive:
     | STRING                                  { TString }
     | UNIT                                    { TUnit }
     | LPAREN args RPAREN THINARROW primitive  { TFun($2, $5) }
+    | LSQUARE generic_types RSQUARE LPAREN args RPAREN THINARROW primitive  { TFunGeneric(($5, $8), $2) }
     | LIST primitive                          { TList($2) }
     | LT primitive COLON primitive GT         { TMap($2, $4) }
     | GENERIC                                 { T($1) }

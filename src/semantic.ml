@@ -19,7 +19,10 @@ let build_map (formals: (string * primitiveType) list) =
    1. Checks whether all generic types have been defined
    2. Associates concrete types with generic types
    3. Raises exception for inconsistent generic type resolution
-*)
+   4. Raises exception for generic function arguments
+   5. Cannot declare nested generic functions 
+
+Fancy way of saying: Rank-1 Polymorphism \o/ *)
 let rec resolve map ft at =
   match ft with
   | T(c) -> if GenericMap.mem c map
@@ -82,6 +85,7 @@ let rec type_of_expr (env: typeEnv) = function
         in
         TList(list_type), env
     end
+
   | Block(es) -> begin
       let locals, globals = env in
       let merged_globals = NameMap.merge (fun k k1 k2 -> match k1, k2 with
@@ -100,6 +104,7 @@ let rec type_of_expr (env: typeEnv) = function
              (newt, newenv))
           (type_of_expr env x) xs
     end
+
   | If(p, e1, e2) -> begin
       let pt, _ = type_of_expr env p in
       if pt <> TBool
@@ -107,6 +112,7 @@ let rec type_of_expr (env: typeEnv) = function
       else let t1, _ = type_of_expr env e1 and t2, _ = type_of_expr env e2 in
       if t1 = t2 then t2, env else raise (MismatchedTypes(t1, t2))
     end
+
   | MapLit(kvpairs) -> begin
       match kvpairs with
       | [] -> TSome, env
@@ -125,6 +131,7 @@ let rec type_of_expr (env: typeEnv) = function
         in
         TMap(key_type, value_type), env
     end
+
   | Assign(id, t, e) -> begin
       (* 1. Get the type of expression
          2. Check if it matches with t
@@ -133,14 +140,15 @@ let rec type_of_expr (env: typeEnv) = function
       if NameMap.mem id locals then raise (AlreadyDefined(id))
       else
         match e with
+
         (* In case of function literals, to get the type of expression
            we need to populate the local scope with the types of the
            formals arguments so that the body can be correctly typechecked *)
         | FunLit(fdecl) ->
           let formaltype = List.map (fun (_, x) -> x) fdecl.formals in
-          let functype = if fdecl.is_generic 
+          let functype = if fdecl.is_generic
             then TFunGeneric((formaltype, fdecl.return_type), fdecl.generic_types)
-            else TFun(formaltype, fdecl.return_type) 
+            else TFun(formaltype, fdecl.return_type)
           in
           let _ = match t with
             | TSome -> functype
@@ -151,6 +159,7 @@ let rec type_of_expr (env: typeEnv) = function
           if etype = functype
           then TUnit, (locals, globals)
           else raise (MismatchedTypes(functype, etype))
+
         | _ ->
           let etype, _ = type_of_expr env e in
           let _ = match t with
@@ -160,6 +169,7 @@ let rec type_of_expr (env: typeEnv) = function
           let locals = (NameMap.add id etype locals) in
           TUnit, (locals, globals)
     end
+
   | Val(s) -> begin
       let locals, globals = env in
       if NameMap.mem s locals

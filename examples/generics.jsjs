@@ -2,7 +2,8 @@ val num_to_sign = /\(x: num): string => {
   if (x >= 0) then "non-negative" else "negative";
 };
 
-val two_args = /\[T, U](x: T, y: U): T => {
+// annotated generic function decl
+val two_args: [T, U](T, U) -> T = /\[T, U](x: T, y: U): T => {
   x;
 };
 
@@ -14,14 +15,7 @@ val add = /\(a: num): num => a;
 
 val to_uppercase = /\(x: string): string => "Upper";
 
-val s_to_n = /\(x: string): num => 10;
-
 val is_positive = apply(to_uppercase, "string");
-
-
-//val check = apply(s_to_n, "string");
-
-val tatti = apply(/\[T](x: T): T => x, 10);
 
 val n = two_args(10, 20);
 print_num(n);
