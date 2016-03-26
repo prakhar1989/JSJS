@@ -28,7 +28,11 @@ let rec string_of_type = function
   | TUnit   -> "unit"
   | T(c)    -> Printf.sprintf "%c" c
   | TList(p) -> "list " ^ (string_of_type p)
-  | TFunGeneric(f, _) | TFun(f) ->
+  | TFunGeneric(f, _) ->
+    let args, t = f in
+    let s = String.concat  " -> " ((List.map string_of_type args) @ [string_of_type t]) in
+    "/\\ []" ^ s
+  | TFun(f) ->
     let args, t = f in
     String.concat  " -> " ((List.map string_of_type args) @ [string_of_type t])
   | TMap(k, v) ->

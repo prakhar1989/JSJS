@@ -20,22 +20,30 @@ let build_map (formals: (string * primitiveType) list) =
    2. Associates concrete types with generic types
    3. Raises exception for inconsistent generic type resolution
 *)
-let resolve map ft at =
+let rec resolve map ft at =
   match ft with
-  | T(c) -> if GenericMap.mem c map 
+  | T(c) -> if GenericMap.mem c map
     then (match GenericMap.find c map with
         | TSome -> GenericMap.add c at map
         | t -> if t = at then map else raise (MismatchedTypes(t, at)))
     else raise (UndefinedType(c))
+  | TFun(formals_types, ret_type) -> (match at with
+      | TFun(actual_types, actual_return_type) ->
+        let l1 = List.length formals_types and l2 = List.length actual_types in
+        if l1 <> l2 then raise (MismatchedArgCount(l1, l2)) else
+          List.fold_left2 resolve map (ret_type :: formals_types) (actual_return_type :: actual_types)
+      | TFunGeneric(x, y) -> raise (InvalidArgumentType(TFunGeneric(x, y)))
+      | _ -> raise (MismatchedTypes(ft, at)))
+  | TFunGeneric(x, y) -> raise (InvalidArgumentType(TFunGeneric(x, y)))
   | _ -> map
 ;;
-
 
 let rec type_of_expr (env: typeEnv) = function
   | UnitLit -> TUnit, env
   | NumLit(_) -> TNum, env
   | BoolLit(_) -> TBool, env
   | StrLit(_) -> TString, env
+
   | Binop(e1, op, e2) ->
     let t1, _ = type_of_expr env e1 and t2, _ = type_of_expr env e2 in
     if t1 <> t2 then raise (MismatchedOperandTypes (op, t1, t2))
@@ -52,6 +60,7 @@ let rec type_of_expr (env: typeEnv) = function
       | Equals | Lt | Gt -> TBool, env
       | _ -> raise (InvalidOperation(t1, op))
     end
+
   | Unop(op, e) -> begin
       let t, _ = type_of_expr env e in
       match (op, t) with
@@ -59,6 +68,7 @@ let rec type_of_expr (env: typeEnv) = function
       | Neg, TNum -> TNum, env
       | _, _ -> raise (InvalidOperation(t, op))
     end
+
   | ListLit(es) -> begin
       let ts = List.map
           (fun x -> let t, _ = type_of_expr env x in t)
@@ -158,6 +168,7 @@ let rec type_of_expr (env: typeEnv) = function
       then NameMap.find s globals, env
       else raise (Undefined(s))
     end
+
   | FunLit(fdecl) -> begin
       if fdecl.is_generic
       then begin
@@ -196,6 +207,7 @@ let rec type_of_expr (env: typeEnv) = function
         else raise (MismatchedTypes(fdecl.return_type, t))
       end
     end
+
   | Call(id, es) -> begin
       let t, _ = type_of_expr env (Val(id)) in
       (match t with
@@ -277,7 +289,9 @@ let type_check (program: Ast.program) =
          raise (TypeError (Printf.sprintf "Error: Expected number of argument(s): %d, got %d instead." l1 l2))
        | UndefinedType(c) ->
          raise (TypeError (Printf.sprintf "Error: Type '%c' not found." c))
-       | _ -> raise (TypeError (Printf.sprintf "Error: something")))
+       | InvalidArgumentType(_) ->
+         raise (TypeError (Printf.sprintf "Error: Invalid argument type. Cannot pass generic functions as arguments."))
+       | e -> raise (TypeError (Printexc.to_string e)))
     (predefined, NameMap.empty)
     program
 ;;

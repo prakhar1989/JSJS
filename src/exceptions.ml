@@ -14,7 +14,7 @@ exception MismatchedArgCount of int * int
 exception MismatchedOperandTypes of op * primitiveType * primitiveType
 exception UndefinedProperty of string * string
 exception UndefinedType of char
-
+exception InvalidArgumentType of primitiveType
 
 (* Driver *)
 exception TypeError of string
