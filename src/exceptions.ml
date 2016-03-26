@@ -13,6 +13,8 @@ exception NonUniformTypeContainer of primitiveType * primitiveType
 exception MismatchedArgCount of int * int
 exception MismatchedOperandTypes of op * primitiveType * primitiveType
 exception UndefinedProperty of string * string
+exception UndefinedType of char
+
 
 (* Driver *)
 exception TypeError of string

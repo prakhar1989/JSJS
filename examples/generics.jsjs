@@ -2,8 +2,15 @@ val num_to_sign = /\(x: num): string => {
   if (x >= 0) then "non-negative" else "negative";
 };
 
-val apply = /\[T, U](fn: (T) -> U, x: T): U => {
-  fn(x);
+
+val two_args = /\[T, U](x: T): T => {
+  x;
 };
 
-val is_positive = apply(num_to_sign, -10);
+
+//val apply = /\[T, U](fn: (T) -> U, x: T): U => {
+  //fn(x);
+//};
+//val is_positive = apply(num_to_sign, -10);
+val n = two_args(10);
+print_num(n);

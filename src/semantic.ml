@@ -4,13 +4,8 @@ open Parsing
 open Exceptions
 open Stringify
 
-
-(*
-1. re-defined function declarations should raise errors
-2. unit assignments with non-unit type should raise errors
-*)
-
 module NameMap = Map.Make(String);;
+module GenericMap = Map.Make(Char);;
 type typesTable = Ast.primitiveType NameMap.t;;
 type typeEnv = typesTable * typesTable;;
 
@@ -19,6 +14,22 @@ let build_map (formals: (string * primitiveType) list) =
     (fun acc_map (id, t) -> NameMap.add id t acc_map)
     (NameMap.empty) formals
 ;;
+
+(* resolves generic types at function call
+   1. Checks whether all generic types have been defined
+   2. Associates concrete types with generic types
+   3. Raises exception for inconsistent generic type resolution
+*)
+let resolve map ft at =
+  match ft with
+  | T(c) -> if GenericMap.mem c map 
+    then (match GenericMap.find c map with
+        | TSome -> GenericMap.add c at map
+        | t -> if t = at then map else raise (MismatchedTypes(t, at)))
+    else raise (UndefinedType(c))
+  | _ -> map
+;;
+
 
 let rec type_of_expr (env: typeEnv) = function
   | UnitLit -> TUnit, env
@@ -105,13 +116,22 @@ let rec type_of_expr (env: typeEnv) = function
         TMap(key_type, value_type), env
     end
   | Assign(id, t, e) -> begin
+      (* 1. Get the type of expression
+         2. Check if it matches with t
+         3. Update locals if all is well.  *)
       let locals, globals = env in
       if NameMap.mem id locals then raise (AlreadyDefined(id))
       else
         match e with
+        (* In case of function literals, to get the type of expression
+           we need to populate the local scope with the types of the
+           formals arguments so that the body can be correctly typechecked *)
         | FunLit(fdecl) ->
           let formaltype = List.map (fun (_, x) -> x) fdecl.formals in
-          let functype = TFun(formaltype, fdecl.return_type) in
+          let functype = if fdecl.is_generic 
+            then TFunGeneric((formaltype, fdecl.return_type), fdecl.generic_types)
+            else TFun(formaltype, fdecl.return_type) 
+          in
           let _ = match t with
             | TSome -> functype
             | t -> if t = functype then t else raise (MismatchedTypes(t, functype))
@@ -139,34 +159,43 @@ let rec type_of_expr (env: typeEnv) = function
       else raise (Undefined(s))
     end
   | FunLit(fdecl) -> begin
-      let locals, globals = env in
-      let formals_map = build_map fdecl.formals in
-      let merged_globals = NameMap.merge (fun k k1 k2 -> match k1, k2 with
-          | Some k1, Some k2 -> Some k1
-          | None, k2 -> k2
-          | k1, None -> k1)
-          locals globals in
-      let env = formals_map, merged_globals in
-      let t, _ = match fdecl.body with
-        | Block (es) -> begin
-            match es with
-            | [] -> TSome, env
-            | x :: [] -> type_of_expr env x
-            | x :: xs ->
-              List.fold_left
-                (fun (t, acc_env) e ->
-                   let newt, newenv = type_of_expr acc_env e in
-                   (newt, newenv))
-                (type_of_expr env x) xs
-          end
-        | e -> type_of_expr env e
-      in
-      if t = fdecl.return_type
-      then
+      if fdecl.is_generic
+      then begin
+        (* in case of a generic function, check if
+           parameteric types exist in generic types field of function *)
         let formaltype = List.map (fun (_, x) -> x) fdecl.formals in
-        TFun(formaltype, fdecl.return_type), env
-      else raise (MismatchedTypes(fdecl.return_type, t))
-    end 
+        TFunGeneric((formaltype, fdecl.return_type), fdecl.generic_types), env
+      end
+      else begin
+        let locals, globals = env in
+        let formals_map = build_map fdecl.formals in
+        let merged_globals = NameMap.merge (fun k k1 k2 -> match k1, k2 with
+            | Some k1, Some k2 -> Some k1
+            | None, k2 -> k2
+            | k1, None -> k1)
+            locals globals in
+        let env = formals_map, merged_globals in
+        let t, _ = match fdecl.body with
+          | Block (es) -> begin
+              match es with
+              | [] -> TSome, env
+              | x :: [] -> type_of_expr env x
+              | x :: xs ->
+                List.fold_left
+                  (fun (t, acc_env) e ->
+                     let newt, newenv = type_of_expr acc_env e in
+                     (newt, newenv))
+                  (type_of_expr env x) xs
+            end
+          | e -> type_of_expr env e
+        in
+        if t = fdecl.return_type
+        then
+          let formaltype = List.map (fun (_, x) -> x) fdecl.formals in
+          TFun(formaltype, fdecl.return_type), env
+        else raise (MismatchedTypes(fdecl.return_type, t))
+      end
+    end
   | Call(id, es) -> begin
       let t, _ = type_of_expr env (Val(id)) in
       (match t with
@@ -181,7 +210,19 @@ let rec type_of_expr (env: typeEnv) = function
                      else raise (MismatchedTypes(ft, at)))
           formals_type args_type;
         return_type, env
-      | _ -> raise (failwith "unreachable state reached"))
+      | TFunGeneric((formals_type, return_type), generic_types) -> begin
+          let genMap = List.fold_left (fun map t -> GenericMap.add t TSome map)
+              GenericMap.empty generic_types in
+          let args_type = List.map
+              (fun e -> let t, _ = type_of_expr env e in t) es in
+          let genMap = List.fold_left2 resolve genMap formals_type args_type in
+          (match return_type with
+           | T(c) -> if GenericMap.mem c genMap 
+             then GenericMap.find c genMap 
+             else raise (UndefinedType(c))
+           | t -> t), env
+        end
+      | _ -> raise (failwith "unreacheable state reached"))
     end
   | ModuleLit(id, e) -> begin
       match e with
@@ -222,7 +263,10 @@ let type_check (program: Ast.program) =
        | UndefinedProperty(module_name, prop) ->
          raise (TypeError (Printf.sprintf "Error: property '%s' is not defined in module '%s'" prop module_name))
        | MismatchedArgCount(l1, l2) ->
-         raise (TypeError (Printf.sprintf "Error: Expected number of argument(s): %d, got %d instead." l1 l2)))
+         raise (TypeError (Printf.sprintf "Error: Expected number of argument(s): %d, got %d instead." l1 l2))
+       | UndefinedType(c) ->
+         raise (TypeError (Printf.sprintf "Error: Type '%c' not found." c))
+       | _ -> raise (TypeError (Printf.sprintf "Error: something")))
     (predefined, NameMap.empty)
     program
 ;;

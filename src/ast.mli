@@ -11,6 +11,7 @@ type primitiveType =
   | TString
   | TBool
   | TUnit
+  | TFunGeneric of funcType * char list
   | TFun of funcType
   | TList of primitiveType
   | TMap of primitiveType * primitiveType

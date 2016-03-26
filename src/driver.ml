@@ -22,7 +22,7 @@ let driver filename axn =
   let _ = try Semantic.type_check program
     with
     | Exceptions.TypeError(s) -> print_endline s; exit 1
-    | _ -> exit 1
+    | e -> Printf.printf "%s" (Exn.to_string e); exit 1
   in
 
   (* JS -> AST -> JS *)
