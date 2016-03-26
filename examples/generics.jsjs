@@ -7,7 +7,7 @@ val two_args: [T, U](T, U) -> T = /\[T, U](x: T, y: U): T => {
   x;
 };
 
-val apply = /\[T, U](fn: (T) -> T, x: T): U => {
+val apply = /\[T, U](fn: (T) -> U, x: T): U => {
   fn(x);
 };
 

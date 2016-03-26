@@ -249,7 +249,9 @@ let rec type_of_expr (env: typeEnv) = function
               let genMap = List.fold_left2 resolve genMap formals_type args_type in
               (match return_type with
                | T(c) -> if GenericMap.mem c genMap
-                 then GenericMap.find c genMap
+                 then (match GenericMap.find c genMap with
+                     | TSome -> raise (UndefinedType(c))
+                     | t -> t)
                  else raise (UndefinedType(c))
              | t -> t), env
         end
