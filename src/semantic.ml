@@ -288,7 +288,7 @@ let type_check (program: Ast.program) =
                 ("num_to_string", TFun([TNum], TString));
                 ("hd", TFunGeneric(([TList(T('T'))], T('T')), ['T']));
                 ("tl", TFunGeneric(([TList(T('T'))], TList(T('T'))), ['T']));
-               ] in
+                ("cons", TFunGeneric(([T('T'); TList(T('T'))], TList(T('T'))), ['T']))] in
   let predefined = List.fold_left
       (fun acc (id, t) -> NameMap.add id t acc)
       NameMap.empty stdlib
