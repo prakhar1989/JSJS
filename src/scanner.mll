@@ -53,6 +53,7 @@ rule token =
     | "string"                  { STRING }
     | "list"                    { LIST }
     | "(-)"                     { UNIT_LIT }
+    | "::"                      { CONS }
     | ':'                       { COLON }
     | '('                       { LPAREN }
     | ')'                       { RPAREN }

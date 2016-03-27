@@ -9,7 +9,7 @@ open Ast
 %token AND OR NOT
 %token LPAREN RPAREN LBRACE RBRACE RSQUARE LSQUARE
 %token ASSIGN LAMBDA
-%token CARET
+%token CARET CONS
 %token VAL IF THEN ELSE TRUE FALSE
 %token NUM LIST BOOL STRING UNIT
 %token COLON SEMICOLON DOT FATARROW COMMA THINARROW
@@ -27,6 +27,7 @@ open Ast
 %nonassoc ANON
 %nonassoc DOT
 %right ASSIGN
+%left CONS
 %left CARET AND OR
 %left NOT
 %left LTE GTE LT GT EQUALS NEQ
@@ -132,6 +133,7 @@ expr:
     | expr GT expr                             { Binop($1, Gt, $3) }
     | expr EQUALS expr                         { Binop($1, Equals, $3) }
     | expr NEQ expr                            { Binop($1, Neq, $3) }
+    | expr CONS expr                           { Binop($1, Cons, $3) }
     | LPAREN expr RPAREN                       { $2 }
     | NOT expr                                 { Unop(Not, $2) }
     | MINUS expr %prec NEG                     { Unop(Neg, $2) }

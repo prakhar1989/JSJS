@@ -3,6 +3,7 @@ type op =
   | Caret                                   (* string operators *)
   | And | Or | Not                          (* boolean operators *)
   | Lte | Gte | Neq | Equals | Lt | Gt      (* relational operators *)
+  | Cons                                    (* list operators *)
 
 type primitiveType =
   | T of char

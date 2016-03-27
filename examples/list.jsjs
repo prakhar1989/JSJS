@@ -8,9 +8,14 @@ val length = /\[T](xs: list T): num => {
 };
 
 // returns the nth element of the list
-val nth = /\(xs: list num, n: num): num => {
+val nth = /\[T](xs: list T, n: num): T => {
   if n == 0 then hd(xs)
   else nth(tl(xs), n-1);
+};
+
+val map = /\(fn: (num) -> string, xs: list num): list string => {
+  if isempty(xs) then []
+  else cons(fn(hd(xs)), map(fn, tl(xs)));
 };
 
 print_num(nth([10, 20, 34, 40, 50], 2));

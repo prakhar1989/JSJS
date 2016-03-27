@@ -18,6 +18,7 @@ let string_of_op = function
   | Equals    -> "=="
   | Lt        -> "<"
   | Gt        -> ">"
+  | Cons      -> "::"
 ;;
 
 let rec string_of_type = function
