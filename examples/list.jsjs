@@ -1,0 +1,17 @@
+// returns the length of a list
+val length = /\[T](xs: list T): num => {
+  val aux = /\[T](c: num, ys: list T): num => {
+    if isempty(ys) then c
+    else aux(c + 1, tl(ys));
+  };
+  aux(0, xs);
+};
+
+// returns the nth element of the list
+val nth = /\(xs: list num, n: num): num => {
+  if n == 0 then hd(xs)
+  else nth(tl(xs), n-1);
+};
+
+print_num(nth([10, 20, 34, 40, 50], 2));
+
