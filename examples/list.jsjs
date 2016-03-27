@@ -13,10 +13,19 @@ val nth = /\[T](xs: list T, n: num): T => {
   else nth(tl(xs), n-1);
 };
 
-val map = /\(fn: (num) -> string, xs: list num): list string => {
-  if isempty(xs) then []
-  else cons(fn(hd(xs)), map(fn, tl(xs)));
+// filters the list based on the predicate
+val filter = /\[T](pred: (T) -> bool, xs: list T): list T => {
+  if isempty(xs) then xs
+  else {
+    if pred(hd(xs))
+      then hd(xs) :: filter(pred, tl(xs))
+      else filter(pred, tl(xs));
+  };
 };
 
-print_num(nth([10, 20, 34, 40, 50], 2));
+val iseven = /\(x: num): bool => x % 2 == 0;
+
+val evens = filter(iseven, [1, 2, 3, 4]);
+
+print_num(length(evens)); // gives 2
 

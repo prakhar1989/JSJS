@@ -15,12 +15,12 @@ let build_map (formals: (string * primitiveType) list) =
     (NameMap.empty) formals
 ;;
 
-(* resolves generic types at function call
+(* Resolves generic types at function call
    1. Checks whether all generic types have been defined
    2. Associates concrete types with generic types
    3. Raises exception for inconsistent generic type resolution
    4. Raises exception for generic function arguments
-   5. Cannot declare nested generic functions 
+   5. Cannot declare nested generic functions
 
 Fancy way of saying: Rank-1 Polymorphism \o/ *)
 let rec resolve map ft at =
@@ -52,16 +52,17 @@ let rec generate_ret_types map = function
   | T(c) -> if GenericMap.mem c map
     then (GenericMap.find c map)
     else raise (UndefinedType(c))
-  | TFun(formals_types, ret_type) -> 
-    let ftypes = List.map (generate_ret_types map) (ret_type :: formals_types) in 
+  | TFun(formals_types, ret_type) ->
+    let ftypes = List.map (generate_ret_types map) (ret_type :: formals_types) in
     TFun(List.tl ftypes, List.hd ftypes)
-  | TList(t) -> TList(generate_ret_types map t) 
-  | TMap(kt, vt) -> 
-    let keytypes = generate_ret_types map kt 
-    and valuetypes = generate_ret_types map vt in 
+  | TList(t) -> TList(generate_ret_types map t)
+  | TMap(kt, vt) ->
+    let keytypes = generate_ret_types map kt
+    and valuetypes = generate_ret_types map vt in
     TMap(keytypes, valuetypes)
   | TFunGeneric(x, y) -> raise (InvalidArgumentType(TFunGeneric(x,y)))
   | t -> t
+;;
 
 let rec type_of_expr (env: typeEnv) = function
   | UnitLit -> TUnit, env
@@ -71,7 +72,11 @@ let rec type_of_expr (env: typeEnv) = function
 
   | Binop(e1, op, e2) ->
     let t1, _ = type_of_expr env e1 and t2, _ = type_of_expr env e2 in
-    if t1 <> t2 then raise (MismatchedOperandTypes (op, t1, t2))
+    if op = Cons
+    then (match t1, t2 with
+        | t1, TList(t2) when t1 = t2 -> TList(t1), env
+        | _, _ -> raise (MismatchedOperandTypes(op, t1, t2)))
+    else if t1 <> t2 then raise (MismatchedOperandTypes (op, t1, t2))
     else begin
       match op with
       | Caret -> if t1 = TString then TString, env

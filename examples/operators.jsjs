@@ -44,19 +44,10 @@ val people : <string: <string: num>> = {
 };
 
 val gcd = /\(a: num, b: num): num => {
-  if a == b then a 
+  if a == b then a
   else {
-    if a > b 
-    then gcd((a - b), b) 
+    if a > b
+    then gcd((a - b), b)
     else gcd((b - a), a);
-  };
-};
-
-val filter = /\(f: (num) -> bool, xs: list num): list num => {
-  if List.empty(xs) then xs
-  else {
-    if f(List.hd(xs)) 
-      then List.cons(List.hd(xs), filter(f, List.tl(xs))) 
-      else filter(List.tl(xs));
   };
 };
