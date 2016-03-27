@@ -17,24 +17,25 @@ val pi = 3.14159;
 val sq = /\(x: num, y: num): num => x * y;
 
 val gcd = /\(a: num, b: num): num => {
-   if a == b then a 
+   if a == b then a
    else {
-      if a > b 
-      then gcd((a - b), b) 
+      if a > b
+      then gcd((a - b), b)
       else gcd((b - a), a);
    };
 };
 
-val filter = /\(f: (num) -> bool, xs: list num): list num => {
-   if List.empty(xs) then xs
-   else {
-      if f(List.hd(xs)) 
-      then List.cons(List.hd(xs), filter(f, List.tl(xs))) 
-      else filter(List.tl(xs));
-   };
+// generics!
+val filter = /\[T](pred: (T) -> bool, xs: list T): list T => {
+  if isempty(xs) then xs
+  else {
+    if pred(hd(xs))
+      then hd(xs) :: filter(pred, tl(xs))
+      else filter(pred, tl(xs));
+  };
 };
 
-val sqrs = List.map(/\(x:num): num => x * x; , [1,2,3,4]);  
+val sqrs = List.map(/\(x:num): num => x * x; , [1,2,3,4]);
 
 val people : <string: <string: num>> = {
   "foo" : {"a" : 10},
