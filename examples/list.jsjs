@@ -18,18 +18,34 @@ val filter = /\[T](pred: (T) -> bool, xs: list T): list T => {
   if empty?(xs) then xs
   else {
     if pred(hd(xs))
-      then hd(xs) :: filter(pred, tl(xs))
-      else filter(pred, tl(xs));
+    then hd(xs) :: filter(pred, tl(xs))
+    else filter(pred, tl(xs));
   };
 };
 
+// prints the elements of a list
+val print_list = /\[T](xs: list T): unit => {
+  if empty?(xs) then (-) // the unit literal
+  else {
+    print(hd(xs));
+    print_list(tl(xs));
+  };
+};
+
+// returns a list of numbers from start to end. Like python
+// start is inclusive, end is exclusive.
 val range = /\(start: num, end: num): list num => {
   if start >= end then [0]
-  else start :: (range(start+1, end));
+  else start :: range(start+1, end);
 };
 
 val even? = /\(x: num): bool => x % 2 == 0;
 
-val evens = filter(even?, range(1, 5));
-
 print(length(range(1, 4)));
+print(length(filter(even?, range(1, 10))));
+
+print("\nlist of numbers: ");
+print_list(range(1, 4));
+
+print("\nlist of strings: ");
+print_list(["foo", "bar", "baz"]);
