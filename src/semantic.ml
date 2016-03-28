@@ -288,11 +288,10 @@ let rec type_of_expr (env: typeEnv) = function
 ;;
 
 let type_check (program: Ast.program) =
-  let stdlib = [("print_str", TFun([TString], TUnit));
-                ("print_num", TFun([TNum], TUnit));
+  let stdlib = [("print", TFunGeneric(([T('T')], TUnit), ['T']));
+                ("isempty", TFunGeneric(([TList(T('T'))], TBool), ['T']));
                 ("num_to_string", TFun([TNum], TString));
                 ("hd", TFunGeneric(([TList(T('T'))], T('T')), ['T']));
-                ("isempty", TFunGeneric(([TList(T('T'))], TBool), ['T']));
                 ("tl", TFunGeneric(([TList(T('T'))], TList(T('T'))), ['T']));
                 ("cons", TFunGeneric(([T('T'); TList(T('T'))], TList(T('T'))), ['T']))] in
   let predefined = List.fold_left

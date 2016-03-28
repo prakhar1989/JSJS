@@ -67,7 +67,7 @@ let rec js_of_expr = function
     (* TODO: clean this up *)
     let es = List.map js_of_expr es in
     (match id with
-     | "print_num" | "print_str" -> Printf.sprintf "console.log(%s)" (String.concat "," es)
+     | "print" -> Printf.sprintf "console.log(%s)" (String.concat "," es)
      | "hd" -> Printf.sprintf "(%s).get(0)" (List.hd es)
      | "tl" -> Printf.sprintf "(%s).delete(0)" (List.hd es)
      | "cons" -> Printf.sprintf "(%s).insert(0, %s)" (List.hd (List.tl es)) (List.hd es)
