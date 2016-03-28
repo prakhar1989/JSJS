@@ -1,7 +1,7 @@
 // returns the length of a list
 val length = /\[T](xs: list T): num => {
   val aux = /\[T](c: num, ys: list T): num => {
-    if isempty(ys) then c
+    if empty?(ys) then c
     else aux(c + 1, tl(ys));
   };
   aux(0, xs);
@@ -15,7 +15,7 @@ val nth = /\[T](xs: list T, n: num): T => {
 
 // filters the list based on the predicate
 val filter = /\[T](pred: (T) -> bool, xs: list T): list T => {
-  if isempty(xs) then xs
+  if empty?(xs) then xs
   else {
     if pred(hd(xs))
       then hd(xs) :: filter(pred, tl(xs))
@@ -28,9 +28,8 @@ val range = /\(start: num, end: num): list num => {
   else start :: (range(start+1, end));
 };
 
-val iseven = /\(x: num): bool => x % 2 == 0;
+val even? = /\(x: num): bool => x % 2 == 0;
 
-val evens = filter(iseven, range(1, 5));
+val evens = filter(even?, range(1, 5));
 
 print(length(range(1, 4)));
-

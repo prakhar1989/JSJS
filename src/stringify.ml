@@ -15,7 +15,7 @@ let string_of_op = function
   | Lte       -> "<="
   | Gte       -> ">="
   | Neq       -> "!="
-  | Equals    -> "=="
+  | Equals    -> "==="
   | Lt        -> "<"
   | Gt        -> ">"
   | Cons      -> "::"

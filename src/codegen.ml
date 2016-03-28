@@ -29,10 +29,16 @@ let if_template pred e1 e2 =
   Printf.sprintf template name pred name e1 name e2 name
 ;;
 
+(* removes all ? from string and replaces with __. used for codegen
+   since JS doesnt support ? in var names *)
+let remove_qmark s =
+  Str.global_replace (Str.regexp_string "?") "__" s
+;;
+
 let rec js_of_expr = function
   | NumLit(x) -> Printf.sprintf "%s" (string_of_float x)
   | StrLit(s) -> Printf.sprintf "\"%s\"" s
-  | Val(s) -> s
+  | Val(s) -> remove_qmark s
   | BoolLit(b) -> Printf.sprintf "%s" (string_of_bool b)
   | UnitLit -> "null"
   | Unop(o, e) ->
@@ -44,7 +50,7 @@ let rec js_of_expr = function
       | Cons -> Printf.sprintf "(%s).insert(0, %s)" s3 s2
       | Caret -> Printf.sprintf "(%s + %s)" s2 s3
       | _ -> Printf.sprintf "(%s %s %s)" s2 (string_of_op o) s3)
-  | Assign(id, _, e) -> Printf.sprintf "let %s = %s" id (js_of_expr e)
+  | Assign(id, _, e) -> Printf.sprintf "let %s = %s" (remove_qmark id) (js_of_expr e)
   | Block(es) ->
     let es = List.rev (List.map js_of_expr es) in
     (match es with
@@ -71,7 +77,7 @@ let rec js_of_expr = function
      | "hd" -> Printf.sprintf "(%s).get(0)" (List.hd es)
      | "tl" -> Printf.sprintf "(%s).delete(0)" (List.hd es)
      | "cons" -> Printf.sprintf "(%s).insert(0, %s)" (List.hd (List.tl es)) (List.hd es)
-     | "isempty" -> Printf.sprintf "(%s).isEmpty()" (List.hd es)
+     | "empty?" -> Printf.sprintf "(%s).isEmpty()" (List.hd es)
      | _ -> Printf.sprintf "%s(%s)" id (String.concat "," es))
   | ListLit(xs) -> let xs = String.concat ", " (List.map js_of_expr xs) in
     Printf.sprintf "Immutable.List.of(%s)" xs
