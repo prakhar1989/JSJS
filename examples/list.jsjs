@@ -32,11 +32,28 @@ val print_list = /\[T](xs: list T): unit => {
   };
 };
 
+// concatenates two lists
+val concat = /\[T](xs: list T, ys: list T): list T => {
+  if empty?(xs) then ys
+  else concat(tl(xs), hd(xs) :: ys);
+};
+
 // returns a list of numbers from start to end. Like python
 // start is inclusive, end is exclusive.
+// TODO: fix the empty list scenario
 val range = /\(start: num, end: num): list num => {
   if start >= end then [0]
   else start :: range(start+1, end);
+};
+
+// reverses a list
+// TODO: fix the empty list scenario
+val rev = /\(xs: list num): list num => {
+  val aux = /\(acc: list num, ys: list num): list num => {
+    if empty?(ys) then acc
+    else aux(hd(ys) :: acc, tl(ys));
+  };
+  aux([0], xs);
 };
 
 val even? = /\(x: num): bool => x % 2 == 0;
@@ -49,3 +66,8 @@ print_list(range(1, 4));
 
 print("\nlist of strings: ");
 print_list(["foo", "bar", "baz"]);
+
+print_list(concat([1, 2, 3], [4, 5, 6]));
+
+print("\nReversing a list: ");
+print_list(rev([3, 2, 1]));
