@@ -27,7 +27,7 @@ let rec resolve map ft at =
   match ft with
   | T(c) -> if GenericMap.mem c map
     then (match GenericMap.find c map with
-        | TSome -> GenericMap.add c at map
+        | TAny -> GenericMap.add c at map
         | t -> if t = at then map else raise (MismatchedTypes(t, at)))
     else raise (UndefinedType(c))
   | TFun(formals_types, ret_type) -> (match at with
@@ -104,7 +104,7 @@ let rec type_of_expr (env: typeEnv) = function
           (fun x -> let t, _ = type_of_expr env x in t)
           es
       in
-      if List.length ts = 0 then TList(TSome), env
+      if List.length ts = 0 then TList(TAny), env
       else let list_type = List.fold_left
           (fun acc t -> if acc = t then acc
             else raise (NonUniformTypeContainer(acc, t)))
@@ -122,7 +122,7 @@ let rec type_of_expr (env: typeEnv) = function
           locals globals in
       let env = NameMap.empty, merged_globals in
       match es with
-      | [] -> TSome, env
+      | [] -> TAny, env
       | x :: [] -> type_of_expr env x
       | x :: xs ->
         List.fold_left
@@ -142,7 +142,7 @@ let rec type_of_expr (env: typeEnv) = function
 
   | MapLit(kvpairs) -> begin
       match kvpairs with
-      | [] -> TSome, env
+      | [] -> TAny, env
       | (key, value) :: xs ->
         let start_key_type, _ = type_of_expr env key in
         let key_type = List.fold_left (fun acc (k, _) ->
@@ -178,7 +178,7 @@ let rec type_of_expr (env: typeEnv) = function
             else TFun(formaltype, fdecl.return_type)
           in
           let _ = match t with
-            | TSome -> functype
+            | TAny -> functype
             | t -> if t = functype then t else raise (MismatchedTypes(t, functype))
           in
           let locals = (NameMap.add id functype locals) in
@@ -190,7 +190,7 @@ let rec type_of_expr (env: typeEnv) = function
         | _ ->
           let etype, _ = type_of_expr env e in
           let _ = match t with
-            | TSome -> etype
+            | TAny -> etype
             | t -> if t = etype then t else raise (MismatchedTypes(t, etype))
           in
           let locals = (NameMap.add id etype locals) in
@@ -235,7 +235,7 @@ let rec type_of_expr (env: typeEnv) = function
           (* check if the body is a list of expressions or just one expr *)
           | Block (es) -> begin
               match es with
-              | [] -> TSome, env
+              | [] -> TAny, env
               | x :: [] -> type_of_expr env x
               | x :: xs ->
                 List.fold_left
@@ -277,7 +277,7 @@ let rec type_of_expr (env: typeEnv) = function
          2. Next type check the body of the function
          3. Return the "resolved" return type of the call expression *)
       | TFunGeneric((formals_type, return_type), generic_types) -> begin
-            let genMap = List.fold_left (fun map t -> GenericMap.add t TSome map)
+            let genMap = List.fold_left (fun map t -> GenericMap.add t TAny map)
                 GenericMap.empty generic_types in
             let args_type = List.map
                 (fun e -> let t, _ = type_of_expr env e in t) es in

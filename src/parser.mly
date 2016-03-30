@@ -150,4 +150,4 @@ actuals_opt:
 
 assigns:
     | VAL ID COLON primitive ASSIGN expr       { Assign($2, $4, $6) }
-    | VAL ID ASSIGN expr                       { Assign($2, TSome, $4) }
+    | VAL ID ASSIGN expr                       { Assign($2, TAny, $4) }

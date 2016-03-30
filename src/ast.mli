@@ -7,7 +7,7 @@ type op =
 
 type primitiveType =
   | T of char
-  | TSome
+  | TAny
   | TNum
   | TString
   | TBool
