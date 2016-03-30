@@ -214,16 +214,25 @@ let rec type_of_expr (env: typeEnv) = function
         let formaltype = List.map (fun (_, x) -> x) fdecl.formals in
         TFunGeneric((formaltype, fdecl.return_type), fdecl.generic_types), env
       end
+      (* when the function is not generic *)
       else begin
         let locals, globals = env in
-        let formals_map = build_map fdecl.formals in
+        (* build a map for formals. string -> type of formals *)
+        let type_formals = List.fold_left
+            (fun acc (id, t) -> NameMap.add id t acc)
+            (NameMap.empty) (fdecl.formals) in
+        (* merge the global and local maps into one such that
+           local definitions take priority *)
         let merged_globals = NameMap.merge (fun k k1 k2 -> match k1, k2 with
             | Some k1, Some k2 -> Some k1
             | None, k2 -> k2
             | k1, None -> k1)
             locals globals in
-        let env = formals_map, merged_globals in
+        (* augment the environment with merged locals and globals *)
+        let env = type_formals, merged_globals in
+        (* get the type of the body *)
         let t, _ = match fdecl.body with
+          (* check if the body is a list of expressions or just one expr *)
           | Block (es) -> begin
               match es with
               | [] -> TSome, env
@@ -237,6 +246,8 @@ let rec type_of_expr (env: typeEnv) = function
             end
           | e -> type_of_expr env e
         in
+        (* check if the type of last block expr is
+           same as function's return type *)
         if t = fdecl.return_type
         then
           let formaltype = List.map (fun (_, x) -> x) fdecl.formals in

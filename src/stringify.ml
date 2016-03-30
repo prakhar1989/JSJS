@@ -25,7 +25,7 @@ let rec string_of_type = function
   | TNum    -> "num"
   | TString -> "string"
   | TBool   -> "bool"
-  | TSome   -> ""
+  | TSome   -> "any"
   | TUnit   -> "unit"
   | T(c)    -> Printf.sprintf "%c" c
   | TList(p) -> "list " ^ (string_of_type p)
