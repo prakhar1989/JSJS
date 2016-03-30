@@ -57,6 +57,11 @@ val concat = /\[T](xs: list T, ys: list T): list T => {
   aux(rev(xs), ys);
 };
 
+val map = /\[T, U](fn: (T) -> U, xs: list T): list U => {
+  if empty?(xs) then xs
+  else fn(hd(xs)) :: map(fn, tl(xs));
+};
+
 val xs = 1000 :: 4000 :: [];
 print_list(xs);
 
@@ -78,3 +83,7 @@ print_list(concat([1, 2, 3], [4, 5, 6]));
 
 print("\nReversing a list: ");
 print_list(rev([3, 2, 1]));
+
+print("\nTesting map");
+val squares = map(/\(x:num): string => "10", [1, 2, 3]);
+print_list(squares);
