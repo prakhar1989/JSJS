@@ -42,7 +42,7 @@ val concat = /\[T](xs: list T, ys: list T): list T => {
 // start is inclusive, end is exclusive.
 // TODO: fix the empty list scenario
 val range = /\(start: num, end: num): list num => {
-  if start >= end then [0]
+  if start >= end then [30]
   else start :: range(start+1, end);
 };
 
@@ -55,6 +55,9 @@ val rev = /\(xs: list num): list num => {
   };
   aux([0], xs);
 };
+
+val xs: list num = 1000 :: 4000 :: [];
+print_list(xs);
 
 val even? = /\(x: num): bool => x % 2 == 0;
 

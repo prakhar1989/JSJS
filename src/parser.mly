@@ -27,7 +27,7 @@ open Ast
 %nonassoc ANON
 %nonassoc DOT
 %right ASSIGN
-%left CONS
+%right CONS
 %left CARET AND OR
 %left NOT
 %left LTE GTE LT GT EQUALS NEQ

@@ -72,9 +72,13 @@ let rec type_of_expr (env: typeEnv) = function
 
   | Binop(e1, op, e2) ->
     let t1, _ = type_of_expr env e1 and t2, _ = type_of_expr env e2 in
+    (* for the cons operator, check if the element being added
+       has the same type as the rest of the list. In case the list
+       is of type TAny, just emit the type of element *)
     if op = Cons
     then (match t1, t2 with
         | t1, TList(t2) when t1 = t2 -> TList(t1), env
+        | t1, TList(TAny) -> TList(t1), env
         | _, _ -> raise (MismatchedOperandTypes(op, t1, t2)))
     else if t1 <> t2 then raise (MismatchedOperandTypes (op, t1, t2))
     else begin
