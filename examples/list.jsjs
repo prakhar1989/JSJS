@@ -40,28 +40,29 @@ val concat = /\[T](xs: list T, ys: list T): list T => {
 
 // returns a list of numbers from start to end. Like python
 // start is inclusive, end is exclusive.
-// TODO: fix the empty list scenario
 val range = /\(start: num, end: num): list num => {
-  if start >= end then [30]
+  if start >= end then []
   else start :: range(start+1, end);
 };
 
 // reverses a list
-// TODO: fix the empty list scenario
-val rev = /\(xs: list num): list num => {
-  val aux = /\(acc: list num, ys: list num): list num => {
+val rev = /\[T](xs: list T): list T => {
+  val aux = /\[T](acc: list T, ys: list T): list T => {
     if empty?(ys) then acc
     else aux(hd(ys) :: acc, tl(ys));
   };
-  aux([0], xs);
+  aux([], xs);
 };
 
-val xs: list num = 1000 :: 4000 :: [];
+val xs = 1000 :: 4000 :: [];
 print_list(xs);
 
 val even? = /\(x: num): bool => x % 2 == 0;
 
+print("length of list range(1,4) ->");
 print(length(range(1, 4)));
+
+print("length of list with odd numb in range(1, 10) ->");
 print(length(filter(even?, range(1, 10))));
 
 print("\nlist of numbers: ");
