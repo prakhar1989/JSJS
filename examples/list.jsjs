@@ -32,12 +32,6 @@ val print_list = /\[T](xs: list T): unit => {
   };
 };
 
-// concatenates two lists
-val concat = /\[T](xs: list T, ys: list T): list T => {
-  if empty?(xs) then ys
-  else concat(tl(xs), hd(xs) :: ys);
-};
-
 // returns a list of numbers from start to end. Like python
 // start is inclusive, end is exclusive.
 val range = /\(start: num, end: num): list num => {
@@ -52,6 +46,15 @@ val rev = /\[T](xs: list T): list T => {
     else aux(hd(ys) :: acc, tl(ys));
   };
   aux([], xs);
+};
+
+// concatenates two lists
+val concat = /\[T](xs: list T, ys: list T): list T => {
+  val aux = /\[T](as: list T, bs: list T): list T => {
+    if empty?(as) then bs
+    else aux(tl(as), hd(as) :: bs);
+  };
+  aux(rev(xs), ys);
 };
 
 val xs = 1000 :: 4000 :: [];
