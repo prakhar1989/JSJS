@@ -122,7 +122,7 @@ let rec type_of_expr (env: typeEnv) = function
           locals globals in
       let env = NameMap.empty, merged_globals in
       match es with
-      | [] -> TAny, env
+      | [] -> TAny, env (* unreachable state since {} is a maplit and not a block *)
       | x :: [] -> type_of_expr env x
       | x :: xs ->
         List.fold_left
@@ -142,7 +142,7 @@ let rec type_of_expr (env: typeEnv) = function
 
   | MapLit(kvpairs) -> begin
       match kvpairs with
-      | [] -> TAny, env
+      | [] -> TMap(TAny, TAny), env
       | (key, value) :: xs ->
         let start_key_type, _ = type_of_expr env key in
         let key_type = List.fold_left (fun acc (k, _) ->
@@ -177,22 +177,28 @@ let rec type_of_expr (env: typeEnv) = function
             then TFunGeneric((formaltype, fdecl.return_type), fdecl.generic_types)
             else TFun(formaltype, fdecl.return_type)
           in
+          (* check if the annotated type is same as what computed *)
           let _ = match t with
             | TAny -> functype
             | t -> if t = functype then t else raise (MismatchedTypes(t, functype))
           in
+          (* update the locals environment with the new value *)
           let locals = (NameMap.add id functype locals) in
           let etype, _ = type_of_expr (locals, globals) e  in
           if etype = functype
           then TUnit, (locals, globals)
           else raise (MismatchedTypes(functype, etype))
 
+        (* For every other kind of expression, simply determine its type
+           and check if it same as the annotated type (if any). *)
         | _ ->
           let etype, _ = type_of_expr env e in
           let _ = match t with
+            (* check if the annotated type is same as what computed *)
             | TAny -> etype
             | t -> if t = etype then t else raise (MismatchedTypes(t, etype))
           in
+          (* update the locals environment with the new value *)
           let locals = (NameMap.add id etype locals) in
           TUnit, (locals, globals)
     end
