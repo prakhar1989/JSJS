@@ -6,24 +6,12 @@ List.print_list(xs);
 val even? = /\(x: num): bool => x % 2 == 0;
 
 print("length of list range(1,4) ->");
-val l: num = List.length(["world"]);
 
-//print(length(range(1, 4)));
+print(List.length(List.range(1, 4)));
 
-//print("length of list with odd numb in range(1, 10) ->");
-//print(length(filter(even?, range(1, 10))));
+print("length of list with odd numb in range(1, 10) ->");
+List.print_list(List.filter(even?, List.range(1, 10)));
 
-//print("\nlist of numbers: ");
-//print_list(range(1, 4));
-
-//print("\nlist of strings: ");
-//print_list(["foo", "bar", "baz"]);
-
-//print_list(concat([1, 2, 3], [4, 5, 6]));
-
-//print("\nReversing a list: ");
-//print_list(rev([3, 2, 1]));
-
-//print("\nTesting map");
-//val squares = map(/\(x:num): string => "10", [1, 2, 3]);
-//print_list(squares);
+print("\nTesting map");
+val squares = List.map(/\(x:num): string => "10", [1, 2, 3]);
+List.print_list(squares);
