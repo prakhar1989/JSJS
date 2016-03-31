@@ -1,6 +1,7 @@
 open Ast
 open Lexing
 open Parsing
+open Codegen
 open Core.Std
 
 type action = Compile | GenAST
@@ -37,7 +38,7 @@ let driver filename axn =
   (* Compile *)
   let compile_to_js () =
     let js_exprs = List.fold_left program
-        ~f:(fun acc expr -> (Codegen.js_of_expr expr) :: acc)
+        ~f:(fun acc expr -> (js_of_expr "" NameMap.empty expr) :: acc)
         ~init: []
     in
     let s = String.concat ~sep:"\n" (List.rev js_exprs) in

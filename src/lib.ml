@@ -60,10 +60,10 @@ let list_definitions = [
   ("rev", TFunGeneric(([TList(T('T'))], TList(T('T'))), ['T']));
   ("nth", TFunGeneric(([TList(T('T')); TNum], T('T')), ['T']));
   ("filter", TFunGeneric(([TFunGeneric( ([T('T')], TBool), ['T']);
-                           TList(T('T'))], 
+                           TList(T('T'))],
                           TList(T('T'))), ['T']));
   ("map", TFunGeneric(([TFunGeneric( ([T('T')], T('U')), ['T'; 'U']);
-                           TList(T('T'))], 
+                           TList(T('T'))],
                           TList(T('U'))), ['T'; 'U']));
   ("print_list", TFunGeneric(([TList(T('T'))], TUnit), ['T']));
   ("range", TFun([TNum; TNum], TList(TNum)));
