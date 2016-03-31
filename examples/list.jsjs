@@ -39,6 +39,7 @@ val range = /\(start: num, end: num): list num => {
   else start :: range(start+1, end);
 };
 
+
 // reverses a list
 val rev = /\[T](xs: list T): list T => {
   val aux = /\[T](acc: list T, ys: list T): list T => {
@@ -87,3 +88,5 @@ print_list(rev([3, 2, 1]));
 print("\nTesting map");
 val squares = map(/\(x:num): string => "10", [1, 2, 3]);
 print_list(squares);
+
+val eee = [[[34]]] :: [[[[[]]]]];

@@ -65,12 +65,15 @@ let rec generate_ret_types map = function
 ;;
 
 (* ... *)
-let validate_types type1 type2 =
+let rec validate_types type1 type2 =
   match (type1, type2) with
-  | TList(TAny), TList(t) | TList(t), TList(TAny) -> TList(t)
-  | t1, t2 when t1 = t2 -> t2
-  | TAny, t | t, TAny -> t
-  | t1, t2 -> raise (MismatchedTypes(t1, t2))
+  | TList(t1), TList(t2) ->
+    (match (validate_types t1 t2) with
+    | Some(t) -> Some(TList(t))
+    | None -> None)
+  | t1, t2 when t1 = t2 -> Some(t2)
+  | TAny, t | t, TAny -> Some(t)
+  | t1, t2 -> None
 ;;
 
 let rec type_of_expr (env: typeEnv) = function
@@ -86,8 +89,10 @@ let rec type_of_expr (env: typeEnv) = function
        is of type TAny, just emit the type of element *)
     if op = Cons
     then (match t1, t2 with
-        | t1, TList(t2) when t1 = t2 -> TList(t1), env
-        | t1, TList(TAny) -> TList(t1), env
+        | x, TList(y) ->
+          (match validate_types x y with
+           | Some(t) -> TList(t), env
+           | None -> raise (MismatchedOperandTypes(op, t1, t2)))
         | _, _ -> raise (MismatchedOperandTypes(op, t1, t2)))
     else if t1 <> t2 then raise (MismatchedOperandTypes (op, t1, t2))
     else begin
@@ -150,8 +155,9 @@ let rec type_of_expr (env: typeEnv) = function
       if pt <> TBool then raise (MismatchedTypes(TBool, pt))
       else
         let t1, _ = type_of_expr env e1 and t2, _ = type_of_expr env e2 in
-        let t = validate_types t1 t2 in
-        t, env
+        (match validate_types t1 t2 with
+         | Some(t) -> t, env
+         | None -> raise (MismatchedTypes(t1, t2)))
     end
 
   | MapLit(kvpairs) -> begin
@@ -192,7 +198,9 @@ let rec type_of_expr (env: typeEnv) = function
             else TFun(formaltype, fdecl.return_type)
           in
           (* check if the annotated type is same as what computed *)
-          let val_type = validate_types t functype in
+          let val_type = (match validate_types t functype with
+            | Some(t) -> t
+            | None -> raise (MismatchedTypes(t, functype))) in
           (* update the locals environment with the new value *)
           let locals = (NameMap.add id val_type locals) in
           let etype, _ = type_of_expr (locals, globals) e  in
@@ -205,7 +213,9 @@ let rec type_of_expr (env: typeEnv) = function
         | _ ->
           let etype, _ = type_of_expr env e in
           (* check if the annotated type is same as what computed *)
-          let val_type = validate_types t etype in
+          let val_type = (match validate_types t etype with
+            | Some(t) -> t
+            | None -> raise (MismatchedTypes(t, etype))) in
           (* update the locals environment with the new value *)
           let locals = (NameMap.add id val_type locals) in
           TUnit, (locals, globals)
