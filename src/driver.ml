@@ -21,9 +21,9 @@ let generate_stdlib file_path module_name =
   in
   let string_of_stdlib = String.concat ~sep:"\n" (List.rev js_exprs) in
   let template = format_of_string "
-      let %s = {};
-      %s" in
-  Printf.sprintf template module_name string_of_stdlib
+%s
+" in
+  Printf.sprintf template string_of_stdlib
 ;;
 
 (* creates intermediate JS *)
@@ -31,14 +31,18 @@ let dump_javascript filename str =
   let template = format_of_string "'use strict'
 %s
 %s
+%s
 let num_to_string = function (x) { return x.toString(); };
 // generated code follows
 %s" in
   let stdlib = [("List", "lib/list.jsjs"); ("Map", "lib/map.jsjs")] in
+  let module_names = String.concat ~sep:"" (List.map
+      ~f: (fun (x, _) -> Printf.sprintf "let %s = {};" x) stdlib)
+  in
   let js_of_stdlib = List.fold_left ~init: "" stdlib
       ~f: (fun acc (name, path) -> acc ^ (generate_stdlib path name)) in
   let outc = Out_channel.create filename in
-  Printf.fprintf outc template Lib.immutable js_of_stdlib str;
+  Printf.fprintf outc template Lib.immutable module_names js_of_stdlib str;
   Out_channel.close outc
 ;;
 
