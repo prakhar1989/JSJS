@@ -8,5 +8,5 @@ val pow = /\(base: num, exp: num): num => {
 
 val chess_squares = pow(8, 2);
 
-print_str("Total number of squares on a chessboard: ");
-print_num(chess_squares);
+print("Total number of squares on a chessboard: ");
+print(chess_squares);

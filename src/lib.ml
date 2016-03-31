@@ -1,3 +1,5 @@
+open Ast
+
 (**
  *  Copyright (c) 2014-2015, Facebook, Inc.
  *  All rights reserved.
@@ -35,6 +37,57 @@ return this.pushAll(t)},Ve.prototype.shift=function(){return this.pop.apply(this
 return F(this,t)},entrySeq:function(){var t=this;if(t._cache)return new j(t._cache);var e=t.toSeq().map(Ze).toIndexedSeq();return e.fromEntrySeq=function(){return t.toSeq()},e},filterNot:function(t,e){return this.filter($e(t),e)},findLast:function(t,e,r){return this.toKeyedSeq().reverse().find(t,e,r)},first:function(){return this.find(y)},flatMap:function(t,e){return be(this,me(this,t,e))},flatten:function(t){return be(this,de(this,t,!0))},fromEntrySeq:function(){return new ue(this)},get:function(t,e){return this.find(function(e,r){return X(r,t)},void 0,e)},getIn:function(t,e){for(var r,n=this,i=ke(t);!(r=i.next()).done;){var o=r.value;if(n=n&&n.get?n.get(o,yr):yr,n===yr)return e}return n},groupBy:function(t,e){return _e(this,t,e)},has:function(t){return this.get(t,yr)!==yr},hasIn:function(t){return this.getIn(t,yr)!==yr},isSubset:function(t){return t=\"function\"==typeof t.includes?t:e(t),this.every(function(e){return t.includes(e)})},isSuperset:function(t){return t=\"function\"==typeof t.isSubset?t:e(t),t.isSubset(this)},keySeq:function(){return this.toSeq().map(Ge).toIndexedSeq()},last:function(){return this.toSeq().reverse().first()},max:function(t){return Se(this,t)},maxBy:function(t,e){return Se(this,e,t)},min:function(t){return Se(this,t?tr(t):nr)},minBy:function(t,e){return Se(this,e?tr(e):nr,t)},rest:function(){return this.slice(1)},skip:function(t){return this.slice(Math.max(0,t))},skipLast:function(t){return be(this,this.toSeq().reverse().skip(t).reverse())},skipWhile:function(t,e){return be(this,le(this,t,e,!0))},skipUntil:function(t,e){return this.skipWhile($e(t),e)},sortBy:function(t,e){return be(this,we(this,e,t))},take:function(t){return this.slice(0,Math.max(0,t))},takeLast:function(t){return be(this,this.toSeq().reverse().take(t).reverse())},takeWhile:function(t,e){return be(this,ve(this,t,e))},takeUntil:function(t,e){return this.takeWhile($e(t),e)},valueSeq:function(){return this.toIndexedSeq()},hashCode:function(){return this.__hash||(this.__hash=ir(this))}});var sn=e.prototype;sn[ar]=!0,sn[br]=sn.values,
 sn.__toJS=sn.toArray,sn.__toStringMapper=er,sn.inspect=sn.toSource=function(){return\"\"+this},sn.chain=sn.flatMap,sn.contains=sn.includes,function(){try{Object.defineProperty(sn,\"length\",{get:function(){if(!e.noLengthWarning){var t;try{throw Error()}catch(r){t=r.stack}if(-1===t.indexOf(\"_wrapObject\"))return console&&console.warn&&console.warn(\"iterable.length has been deprecated, use iterable.size or iterable.count(). This warning will become a silent error in a future version. \"+t),this.size}}})}catch(t){}}(),Fe(r,{flip:function(){return be(this,se(this))},findKey:function(t,e){var r=this.findEntry(t,e);return r&&r[0]},findLastKey:function(t,e){return this.toSeq().reverse().findKey(t,e)},keyOf:function(t){return this.findKey(function(e){return X(e,t)})},lastKeyOf:function(t){return this.findLastKey(function(e){return X(e,t)})},mapEntries:function(t,e){var r=this,n=0;return be(this,this.toSeq().map(function(i,o){return t.call(e,[o,i],n++,r)}).fromEntrySeq())},mapKeys:function(t,e){var r=this;return be(this,this.toSeq().flip().map(function(n,i){return t.call(e,n,i,r)}).flip())}});var an=r.prototype;an[hr]=!0,an[br]=sn.entries,an.__toJS=sn.toObject,an.__toStringMapper=function(t,e){return JSON.stringify(e)+\": \"+er(t)},Fe(n,{toKeyedSeq:function(){return new ne(this,!1)},filter:function(t,e){return be(this,fe(this,t,e,!1))},findIndex:function(t,e){var r=this.findEntry(t,e);return r?r[0]:-1},indexOf:function(t){var e=this.toKeyedSeq().keyOf(t);return void 0===e?-1:e},lastIndexOf:function(t){var e=this.toKeyedSeq().reverse().keyOf(t);return void 0===e?-1:e},reverse:function(){return be(this,he(this,!1))},slice:function(t,e){return be(this,pe(this,t,e,!1))},splice:function(t,e){var r=arguments.length;if(e=Math.max(0|e,0),0===r||2===r&&!e)return this;t=m(t,0>t?this.count():this.size);var n=this.slice(0,t);return be(this,1===r?n:n.concat(p(arguments,2),this.slice(t+e)))},findLastIndex:function(t,e){var r=this.toKeyedSeq().findLastKey(t,e);return void 0===r?-1:r},first:function(){return this.get(0)},flatten:function(t){return be(this,de(this,t,!1));
 },get:function(t,e){return t=l(this,t),0>t||this.size===1/0||void 0!==this.size&&t>this.size?e:this.find(function(e,r){return r===t},void 0,e)},has:function(t){return t=l(this,t),t>=0&&(void 0!==this.size?this.size===1/0||this.size>t:-1!==this.indexOf(t))},interpose:function(t){return be(this,ge(this,t))},interleave:function(){var t=[this].concat(p(arguments)),e=Ie(this.toSeq(),k.of,t),r=e.flatten(!0);return e.size&&(r.size=e.size*t.length),be(this,r)},last:function(){return this.get(-1)},skipWhile:function(t,e){return be(this,le(this,t,e,!1))},zip:function(){var t=[this].concat(p(arguments));return be(this,Ie(this,rr,t))},zipWith:function(t){var e=p(arguments);return e[0]=this,be(this,Ie(this,t,e))}}),n.prototype[fr]=!0,n.prototype[cr]=!0,Fe(i,{get:function(t,e){return this.has(t)?t:e},includes:function(t){return this.has(t)},keySeq:function(){return this.valueSeq()}}),i.prototype.has=sn.includes,i.prototype.contains=i.prototype.includes,Fe(x,r.prototype),Fe(k,n.prototype),Fe(A,i.prototype),Fe(et,r.prototype),Fe(rt,n.prototype),Fe(nt,i.prototype);var hn={Iterable:e,Seq:O,Collection:tt,Map:ct,OrderedMap:Zt,List:Wt,Stack:Ve,Set:Le,OrderedSet:Je,Record:Ae,Range:$,Repeat:G,is:X,fromJS:H};return hn})();
-"
+" ;;
+
+module ModuleMap = Map.Make(String);;
+module NameMap = Map.Make(String);;
+type typesTable = Ast.primitiveType NameMap.t;;
+type moduleTable = typesTable ModuleMap.t;;
+
+let top_level_definitions = [
+  ("print", TFunGeneric(([T('T')], TUnit), ['T']));
+  ("empty?", TFunGeneric(([TList(T('T'))], TBool), ['T']));
+  ("num_to_string", TFun([TNum], TString));
+  ("hd", TFunGeneric(([TList(T('T'))], T('T')), ['T']));
+  ("tl", TFunGeneric(([TList(T('T'))], TList(T('T'))), ['T']));
+];;
+
+let predefined = List.fold_left
+    (fun acc (id, t) -> NameMap.add id t acc)
+    NameMap.empty top_level_definitions
 ;;
+
+let list_definitions = [
+  ("length", TFunGeneric(([TList(T('T'))], TNum), ['T']));
+  ("rev", TFunGeneric(([TList(T('T'))], TList(T('T'))), ['T']));
+  ("nth", TFunGeneric(([TList(T('T')); TNum], T('T')), ['T']));
+  ("filter", TFunGeneric(([TFunGeneric( ([T('T')], TBool), ['T']);
+                           TList(T('T'))], 
+                          TList(T('T'))), ['T']));
+  ("map", TFunGeneric(([TFunGeneric( ([T('T')], T('U')), ['T'; 'U']);
+                           TList(T('T'))], 
+                          TList(T('U'))), ['T'; 'U']));
+  ("print_list", TFunGeneric(([TList(T('T')); TUnit], T('T')), ['T']));
+  ("range", TFun([TNum; TNum], TList(TNum)));
+  ("concat", TFunGeneric(([TList(T('T')); TList(T('T'))], TList(T('T'))), ['T']));
+];;
+
+let map_definitions = [];;
+
+let modules = 
+  (* a function that takes a module map and adds definitions as value
+     and module name as key *)
+  let update_module_map map name definitions = 
+    let definitions = List.fold_left 
+        (fun acc (id, t) -> NameMap.add id t acc)
+        NameMap.empty definitions in
+    ModuleMap.add name definitions map in
+
+  (* generate the map for all definitions *)
+  let map = update_module_map ModuleMap.empty "List" list_definitions in
+  let map = update_module_map map "Map" map_definitions in
+  map
+;;
+
+
 
