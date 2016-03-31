@@ -1,27 +1,29 @@
 val somefun = /\(x: list num): list num => [];
 
 val xs = 1000 :: 4000 :: [];
-print_list(xs);
+List.print_list(xs);
 
 val even? = /\(x: num): bool => x % 2 == 0;
 
 print("length of list range(1,4) ->");
-print(length(range(1, 4)));
+val l: num = List.length(["world"]);
 
-print("length of list with odd numb in range(1, 10) ->");
-print(length(filter(even?, range(1, 10))));
+//print(length(range(1, 4)));
 
-print("\nlist of numbers: ");
-print_list(range(1, 4));
+//print("length of list with odd numb in range(1, 10) ->");
+//print(length(filter(even?, range(1, 10))));
 
-print("\nlist of strings: ");
-print_list(["foo", "bar", "baz"]);
+//print("\nlist of numbers: ");
+//print_list(range(1, 4));
 
-print_list(concat([1, 2, 3], [4, 5, 6]));
+//print("\nlist of strings: ");
+//print_list(["foo", "bar", "baz"]);
 
-print("\nReversing a list: ");
-print_list(rev([3, 2, 1]));
+//print_list(concat([1, 2, 3], [4, 5, 6]));
 
-print("\nTesting map");
-val squares = map(/\(x:num): string => "10", [1, 2, 3]);
-print_list(squares);
+//print("\nReversing a list: ");
+//print_list(rev([3, 2, 1]));
+
+//print("\nTesting map");
+//val squares = map(/\(x:num): string => "10", [1, 2, 3]);
+//print_list(squares);

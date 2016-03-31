@@ -6,6 +6,8 @@ open Stringify
 
 module NameMap = Map.Make(String);;
 module GenericMap = Map.Make(Char);;
+module ModuleMap = Map.Make(String);;
+
 type typesTable = Ast.primitiveType NameMap.t;;
 type typeEnv = typesTable * typesTable;;
 
@@ -75,6 +77,8 @@ let rec validate_types type1 type2 =
   | TAny, t | t, TAny -> Some(t)
   | t1, t2 -> None
 ;;
+
+let modules = Lib.modules;;
 
 let rec type_of_expr (env: typeEnv) = function
   | UnitLit -> TUnit, env
@@ -315,9 +319,41 @@ let rec type_of_expr (env: typeEnv) = function
       | _ -> raise (failwith "unreacheable state reached"))
     end
 
+  (* 1. check if id exists in modules
+     2. then check if e exists in that map
+     3. return type of e *)
   | ModuleLit(id, e) -> begin
+      let defs = if ModuleMap.mem id modules
+        then ModuleMap.find id modules
+        else raise (ModuleNotFound(id)) in 
       match e with
-      | Call(_) -> type_of_expr env e
+      | Call(prop, args) -> 
+        let prop_type = if NameMap.mem prop defs
+          then NameMap.find prop defs 
+          else raise (UndefinedProperty(id, prop)) in 
+        (match prop_type with
+         | TFun(formals_type, return_type) ->
+           let args_type = List.map
+               (fun e -> let t, _ = type_of_expr env e in t) args
+           in
+           let l1 = List.length args_type and l2 = List.length formals_type in
+           if l1 <> l2 then raise (MismatchedArgCount(l2, l1))
+           else List.iter2 (fun ft at -> let _ = validate_types ft at in ())
+               formals_type args_type;
+           return_type, env
+         | TFunGeneric((formals_type, return_type), generic_types) -> begin
+             let genMap = List.fold_left (fun map t -> GenericMap.add t TAny map)
+                 GenericMap.empty generic_types in
+             let args_type = List.map
+                 (fun e -> let t, _ = type_of_expr env e in t) args in
+             let l1 = List.length args_type and l2 = List.length formals_type in
+             if l1 <> l2 then raise (MismatchedArgCount(l2, l1))
+             else
+               let genMap = List.fold_left2 resolve genMap formals_type args_type in
+               (generate_ret_types genMap return_type), env
+           end
+         | _ -> raise (failwith "unreacheable state reached"))
+
       | _ -> raise (UndefinedProperty(id, string_of_expr e))
     end
 ;;
@@ -329,6 +365,8 @@ let type_check (program: Ast.program) =
        try
          let _, env = type_of_expr env expr in env
        with
+       | ModuleNotFound(s) -> 
+         raise (TypeError (Printf.sprintf "Type error: Module '%s' not defined" s))
        | InvalidOperation(t, op) ->
          let st = string_of_type t and sop = string_of_op op in
          raise (TypeError (Printf.sprintf "Type error: Invalid operation '%s' on type '%s'" sop st))

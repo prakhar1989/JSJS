@@ -4,7 +4,7 @@ open Ast
 (* Scanner *)
 exception IllegalCharacter of string * int * int
 
-(* SAST *)
+(* Typechecker *)
 exception Undefined of string
 exception InvalidOperation of primitiveType * op
 exception MismatchedTypes of primitiveType * primitiveType
@@ -15,6 +15,7 @@ exception MismatchedOperandTypes of op * primitiveType * primitiveType
 exception UndefinedProperty of string * string
 exception UndefinedType of char
 exception InvalidArgumentType of primitiveType
+exception ModuleNotFound of string
 
 (* Driver *)
 exception TypeError of string

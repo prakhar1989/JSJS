@@ -1,5 +1,8 @@
 open Ast
 
+module ModuleMap = Map.Make(String);;
+module NameMap = Map.Make(String);;
+
 (**
  *  Copyright (c) 2014-2015, Facebook, Inc.
  *  All rights reserved.
@@ -39,11 +42,6 @@ sn.__toJS=sn.toArray,sn.__toStringMapper=er,sn.inspect=sn.toSource=function(){re
 },get:function(t,e){return t=l(this,t),0>t||this.size===1/0||void 0!==this.size&&t>this.size?e:this.find(function(e,r){return r===t},void 0,e)},has:function(t){return t=l(this,t),t>=0&&(void 0!==this.size?this.size===1/0||this.size>t:-1!==this.indexOf(t))},interpose:function(t){return be(this,ge(this,t))},interleave:function(){var t=[this].concat(p(arguments)),e=Ie(this.toSeq(),k.of,t),r=e.flatten(!0);return e.size&&(r.size=e.size*t.length),be(this,r)},last:function(){return this.get(-1)},skipWhile:function(t,e){return be(this,le(this,t,e,!1))},zip:function(){var t=[this].concat(p(arguments));return be(this,Ie(this,rr,t))},zipWith:function(t){var e=p(arguments);return e[0]=this,be(this,Ie(this,t,e))}}),n.prototype[fr]=!0,n.prototype[cr]=!0,Fe(i,{get:function(t,e){return this.has(t)?t:e},includes:function(t){return this.has(t)},keySeq:function(){return this.valueSeq()}}),i.prototype.has=sn.includes,i.prototype.contains=i.prototype.includes,Fe(x,r.prototype),Fe(k,n.prototype),Fe(A,i.prototype),Fe(et,r.prototype),Fe(rt,n.prototype),Fe(nt,i.prototype);var hn={Iterable:e,Seq:O,Collection:tt,Map:ct,OrderedMap:Zt,List:Wt,Stack:Ve,Set:Le,OrderedSet:Je,Record:Ae,Range:$,Repeat:G,is:X,fromJS:H};return hn})();
 " ;;
 
-module ModuleMap = Map.Make(String);;
-module NameMap = Map.Make(String);;
-type typesTable = Ast.primitiveType NameMap.t;;
-type moduleTable = typesTable ModuleMap.t;;
-
 let top_level_definitions = [
   ("print", TFunGeneric(([T('T')], TUnit), ['T']));
   ("empty?", TFunGeneric(([TList(T('T'))], TBool), ['T']));
@@ -67,18 +65,18 @@ let list_definitions = [
   ("map", TFunGeneric(([TFunGeneric( ([T('T')], T('U')), ['T'; 'U']);
                            TList(T('T'))], 
                           TList(T('U'))), ['T'; 'U']));
-  ("print_list", TFunGeneric(([TList(T('T')); TUnit], T('T')), ['T']));
+  ("print_list", TFunGeneric(([TList(T('T'))], TUnit), ['T']));
   ("range", TFun([TNum; TNum], TList(TNum)));
   ("concat", TFunGeneric(([TList(T('T')); TList(T('T'))], TList(T('T'))), ['T']));
 ];;
 
 let map_definitions = [];;
 
-let modules = 
+let modules =
   (* a function that takes a module map and adds definitions as value
      and module name as key *)
-  let update_module_map map name definitions = 
-    let definitions = List.fold_left 
+  let update_module_map map name definitions =
+    let definitions = List.fold_left
         (fun acc (id, t) -> NameMap.add id t acc)
         NameMap.empty definitions in
     ModuleMap.add name definitions map in
@@ -88,6 +86,3 @@ let modules =
   let map = update_module_map map "Map" map_definitions in
   map
 ;;
-
-
-
