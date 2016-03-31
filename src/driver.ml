@@ -26,19 +26,19 @@ let generate_stdlib file_path module_name =
   Printf.sprintf template module_name string_of_stdlib
 ;;
 
-
 (* creates intermediate JS *)
 let dump_javascript filename str =
-  let libs : string = Lib.immutable in
   let template = format_of_string "'use strict'
 %s
 %s
 let num_to_string = function (x) { return x.toString(); };
 // generated code follows
 %s" in
-  let list_module = generate_stdlib "lib/list.jsjs" "List" in
+  let stdlib = [("List", "lib/list.jsjs"); ("Map", "lib/map.jsjs")] in
+  let js_of_stdlib = List.fold_left ~init: "" stdlib
+      ~f: (fun acc (name, path) -> acc ^ (generate_stdlib path name)) in
   let outc = Out_channel.create filename in
-  Printf.fprintf outc template libs list_module str;
+  Printf.fprintf outc template Lib.immutable js_of_stdlib str;
   Out_channel.close outc
 ;;
 

@@ -325,12 +325,12 @@ let rec type_of_expr (env: typeEnv) = function
   | ModuleLit(id, e) -> begin
       let defs = if ModuleMap.mem id modules
         then ModuleMap.find id modules
-        else raise (ModuleNotFound(id)) in 
+        else raise (ModuleNotFound(id)) in
       match e with
-      | Call(prop, args) -> 
+      | Call(prop, args) ->
         let prop_type = if NameMap.mem prop defs
-          then NameMap.find prop defs 
-          else raise (UndefinedProperty(id, prop)) in 
+          then NameMap.find prop defs
+          else raise (UndefinedProperty(id, prop)) in
         (match prop_type with
          | TFun(formals_type, return_type) ->
            let args_type = List.map
@@ -353,7 +353,11 @@ let rec type_of_expr (env: typeEnv) = function
                (generate_ret_types genMap return_type), env
            end
          | _ -> raise (failwith "unreacheable state reached"))
-
+      | Val(prop) -> begin
+          if NameMap.mem prop defs
+          then NameMap.find prop defs, env
+          else raise (UndefinedProperty(id, prop))
+        end
       | _ -> raise (UndefinedProperty(id, string_of_expr e))
     end
 ;;

@@ -58,7 +58,7 @@ let rec js_of_expr name map = function
     else (remove_qmark s)
   | Assign(id, _, e) ->
     if NameMap.mem id map
-    then Printf.sprintf "%s.%s = %s" name id (js_of_expr name map e)
+    then Printf.sprintf "%s.%s = %s" name (remove_qmark id) (js_of_expr name map e)
     else Printf.sprintf "let %s = %s" (remove_qmark id) (js_of_expr name map e)
   | Block(es) ->
     let es = List.rev (List.map (fun e -> js_of_expr name map e) es) in

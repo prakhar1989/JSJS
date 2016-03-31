@@ -66,7 +66,9 @@ let list_definitions = [
   ("concat", TFunGeneric(([TList(T('T')); TList(T('T'))], TList(T('T'))), ['T']));
 ];;
 
-let map_definitions = [];;
+let map_definitions = [
+  ("even?", TFun([TNum], TBool))
+];;
 
 let modules =
   (* a function that takes a module map and adds definitions as value
@@ -78,7 +80,7 @@ let modules =
     ModuleMap.add name definitions map in
 
   (* generate the map for all definitions *)
-  let map = update_module_map ModuleMap.empty "List" list_definitions in
-  let map = update_module_map map "Map" map_definitions in
-  map
+  let module_defs = [("List", list_definitions); ("Map", map_definitions)] in
+  List.fold_left (fun acc (name, defs) -> update_module_map acc name defs)
+    ModuleMap.empty module_defs
 ;;
