@@ -88,11 +88,15 @@ let rec js_of_expr name map = function
      | "print" -> Printf.sprintf "console.log(%s)" (String.concat "," es)
      | "hd" -> Printf.sprintf "(%s).get(0)" (List.hd es)
      | "tl" -> Printf.sprintf "(%s).delete(0)" (List.hd es)
-     | "cons" -> Printf.sprintf "(%s).insert(0, %s)" (List.hd (List.tl es)) (List.hd es)
      | "empty__" -> Printf.sprintf "(%s).isEmpty()" (List.hd es)
+     | "get" -> Printf.sprintf "(%s).get(%s)" (List.hd es) (List.nth es 1)
      | _ -> Printf.sprintf "%s(%s)" id (String.concat "," es))
   | ListLit(es) -> let es = String.concat ", " (List.map (fun e -> js_of_expr name map e) es) in
     Printf.sprintf "Immutable.List.of(%s)" es
   | ModuleLit(id, e) -> Printf.sprintf "%s.%s" id (js_of_expr name map e)
-  | _ -> "" (* handle map lit *)
+  | MapLit(kvpairs) ->
+    let pairs = List.map (fun (k, v) ->
+        Printf.sprintf "%s:%s" (js_of_expr name map k)
+          (js_of_expr name map v)) kvpairs in
+    Printf.sprintf "Immutable.Map({ %s })" (String.concat "," pairs)
 ;;

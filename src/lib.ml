@@ -48,6 +48,7 @@ let top_level_definitions = [
   ("num_to_string", TFun([TNum], TString));
   ("hd", TFunGeneric(([TList(T('T'))], T('T')), ['T']));
   ("tl", TFunGeneric(([TList(T('T'))], TList(T('T'))), ['T']));
+  ("get", TFunGeneric( ([TMap(T('T'), T('U')); T('T')], T('U')), ['T'; 'U']));
 ];;
 
 let predefined = List.fold_left
@@ -67,7 +68,8 @@ let list_definitions = [
 ];;
 
 let map_definitions = [
-  ("even?", TFun([TNum], TBool))
+  ("even?", TFun([TNum], TBool));
+  ("odd?", TFun([TNum], TBool));
 ];;
 
 let modules =
@@ -81,6 +83,6 @@ let modules =
 
   (* generate the map for all definitions *)
   let module_defs = [("List", list_definitions); ("Map", map_definitions)] in
-  List.fold_left (fun acc (name, defs) -> update_module_map acc name defs)
+    List.fold_left (fun acc (name, defs) -> update_module_map acc name defs)
     ModuleMap.empty module_defs
 ;;

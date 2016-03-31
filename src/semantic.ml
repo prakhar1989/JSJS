@@ -369,7 +369,7 @@ let type_check (program: Ast.program) =
        try
          let _, env = type_of_expr env expr in env
        with
-       | ModuleNotFound(s) -> 
+       | ModuleNotFound(s) ->
          raise (TypeError (Printf.sprintf "Type error: Module '%s' not defined" s))
        | InvalidOperation(t, op) ->
          let st = string_of_type t and sop = string_of_op op in

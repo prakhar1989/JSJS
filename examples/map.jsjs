@@ -1,0 +1,5 @@
+val m = {"foo": 10, "bar": 20};
+
+val f = {"true": m, "false": {"baz": 30}};
+
+print(get(get(f, "true"), "foo"));

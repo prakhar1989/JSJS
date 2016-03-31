@@ -13,6 +13,7 @@ print(List.length(List.range(1, 4)));
 
 print("length of list with odd numb in range(1, 10) ->");
 p(List.filter(Map.even?, List.range(1, 10)));
+p(List.filter(Map.odd?, List.range(1, 10)));
 
 print("\nTesting map");
 val squares = List.map(/\(x:num): string => "10", [1, 2, 3]);
