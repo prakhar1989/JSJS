@@ -74,8 +74,8 @@ let list_definitions = [
 ];;
 
 let map_definitions = [
-  ("even?", TFun([TNum], TBool));
-  ("odd?", TFun([TNum], TBool));
+  ("count", TFunGeneric(([TMap(T('T'), T('U'));], TNum), ['T'; 'U']));
+  ("values", TFunGeneric(([TMap(T('T'), T('U'));], TList(T('U'))), ['T'; 'U']));
 ];;
 
 let modules =

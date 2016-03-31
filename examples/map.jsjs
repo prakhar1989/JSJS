@@ -20,3 +20,9 @@ print(has?(new_m, "foo"));
 val k : list string = keys(m);
 print(List.length(k));
 List.print_list(keys(set(m, "baz", 30)));
+
+// testing count
+print(Map.count(p));
+
+// testing values
+List.print_list(Map.values(set(m, "baz", 30)));
