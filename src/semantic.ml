@@ -179,7 +179,7 @@ let rec type_of_expr (env: typeEnv) = function
         TMap(key_type, value_type), env
     end
 
-  | Assign(id, t, e) -> begin
+  | Assign(id, annotated_type, e) -> begin
       (* 1. Get the type of expression
          2. Check if it matches with t
          3. Update locals if all is well.  *)
@@ -192,15 +192,15 @@ let rec type_of_expr (env: typeEnv) = function
            we need to populate the local scope with the types of the
            formals arguments so that the body can be correctly typechecked *)
         | FunLit(fdecl) ->
-          let formaltype = List.map (fun (_, x) -> x) fdecl.formals in
+          let formaltypes = List.map (fun (_, x) -> x) fdecl.formals in
           let functype = if fdecl.is_generic
-            then TFunGeneric((formaltype, fdecl.return_type), fdecl.generic_types)
-            else TFun(formaltype, fdecl.return_type)
+            then TFunGeneric((formaltypes, fdecl.return_type), fdecl.generic_types)
+            else TFun(formaltypes, fdecl.return_type)
           in
           (* check if the annotated type is same as what computed *)
-          let val_type = (match validate_types t functype with
+          let val_type = (match validate_types annotated_type functype with
             | Some(t) -> t
-            | None -> raise (MismatchedTypes(t, functype))) in
+            | None -> raise (MismatchedTypes(annotated_type, functype))) in
           (* update the locals environment with the new value *)
           let locals = (NameMap.add id val_type locals) in
           let etype, _ = type_of_expr (locals, globals) e  in
@@ -213,9 +213,9 @@ let rec type_of_expr (env: typeEnv) = function
         | _ ->
           let etype, _ = type_of_expr env e in
           (* check if the annotated type is same as what computed *)
-          let val_type = (match validate_types t etype with
+          let val_type = (match validate_types annotated_type etype with
             | Some(t) -> t
-            | None -> raise (MismatchedTypes(t, etype))) in
+            | None -> raise (MismatchedTypes(annotated_type, etype))) in
           (* update the locals environment with the new value *)
           let locals = (NameMap.add id val_type locals) in
           TUnit, (locals, globals)
@@ -255,7 +255,7 @@ let rec type_of_expr (env: typeEnv) = function
         (* augment the environment with merged locals and globals *)
         let env = type_formals, merged_globals in
         (* get the type of the body *)
-        let t, _ = match fdecl.body with
+        let block_type, _ = match fdecl.body with
           (* check if the body is a list of expressions or just one expr *)
           | Block (es) -> begin
               match es with
@@ -272,11 +272,12 @@ let rec type_of_expr (env: typeEnv) = function
         in
         (* check if the type of last block expr is
            same as function's return type *)
-        if t = fdecl.return_type
-        then
-          let formaltype = List.map (fun (_, x) -> x) fdecl.formals in
-          TFun(formaltype, fdecl.return_type), env
-        else raise (MismatchedTypes(fdecl.return_type, t))
+        let return_type =
+          (match validate_types block_type fdecl.return_type with
+           | Some(t) -> t
+           | None -> raise (MismatchedTypes(fdecl.return_type, block_type))) in
+        let formaltype = List.map (fun (_, x) -> x) fdecl.formals in
+        TFun(formaltype, return_type), env
       end
     end
 

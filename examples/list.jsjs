@@ -63,6 +63,8 @@ val map = /\[T, U](fn: (T) -> U, xs: list T): list U => {
   else fn(hd(xs)) :: map(fn, tl(xs));
 };
 
+val somefun = /\(x: list num): list num => [];
+
 val xs = 1000 :: 4000 :: [];
 print_list(xs);
 
@@ -88,5 +90,3 @@ print_list(rev([3, 2, 1]));
 print("\nTesting map");
 val squares = map(/\(x:num): string => "10", [1, 2, 3]);
 print_list(squares);
-
-val eee = [[[34]]] :: [[[[[]]]]];
