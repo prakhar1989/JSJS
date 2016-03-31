@@ -44,11 +44,17 @@ sn.__toJS=sn.toArray,sn.__toStringMapper=er,sn.inspect=sn.toSource=function(){re
 
 let top_level_definitions = [
   ("print", TFunGeneric(([T('T')], TUnit), ['T']));
-  ("empty?", TFunGeneric(([TList(T('T'))], TBool), ['T']));
   ("num_to_string", TFun([TNum], TString));
+  (* top-level functions for lists *)
   ("hd", TFunGeneric(([TList(T('T'))], T('T')), ['T']));
+  ("empty?", TFunGeneric(([TList(T('T'))], TBool), ['T']));
   ("tl", TFunGeneric(([TList(T('T'))], TList(T('T'))), ['T']));
-  ("get", TFunGeneric( ([TMap(T('T'), T('U')); T('T')], T('U')), ['T'; 'U']));
+  (* top-level functions for maps *)
+  ("get", TFunGeneric(([TMap(T('T'), T('U')); T('T')], T('U')), ['T'; 'U']));
+  ("set", TFunGeneric(([TMap(T('T'), T('U')); T('T'); T('U')], TMap(T('T'), T('U'))), ['T'; 'U']));
+  ("del", TFunGeneric(([TMap(T('T'), T('U')); T('T');], TMap(T('T'), T('U'))), ['T'; 'U']));
+  ("has?", TFunGeneric(([TMap(T('T'), T('U')); T('T')], TBool), ['T'; 'U']));
+  ("keys", TFunGeneric(([TMap(T('T'), T('U'));], TList(T('T'))), ['T'; 'U']));
 ];;
 
 let predefined = List.fold_left

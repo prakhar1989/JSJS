@@ -3,3 +3,20 @@ val m = {"foo": 10, "bar": 20};
 val f = {"true": m, "false": {"baz": 30}};
 
 print(get(get(f, "true"), "foo"));
+
+val p = set(m, "foo", 20);
+print(get(m, "foo"));
+print(get(p, "foo"));
+
+print(has?(m, "foo"));
+print(has?(m, "goo"));
+print(has?(get(f, "true"), "bar"));
+
+val new_m = del(m, "foo");
+print(has?(m, "foo"));
+print(has?(new_m, "foo"));
+
+// testing keys
+val k : list string = keys(m);
+print(List.length(k));
+List.print_list(keys(set(m, "baz", 30)));
