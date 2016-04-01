@@ -76,6 +76,7 @@ let list_definitions = [
 let map_definitions = [
   ("count", TFunGeneric(([TMap(T('T'), T('U'));], TNum), ['T'; 'U']));
   ("values", TFunGeneric(([TMap(T('T'), T('U'));], TList(T('U'))), ['T'; 'U']));
+  ("merge", TFunGeneric(([TMap(T('T'), T('U')); TMap(T('T'), T('U'));], TMap(T('T'), T('U'))), ['T'; 'U']));
 ];;
 
 let modules =

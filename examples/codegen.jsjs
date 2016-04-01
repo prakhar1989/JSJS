@@ -1,40 +1,6 @@
-val x = (10 + 20) * 20;
+val m1 = {"name": "foo", "age": "20"};
+val m2 = {"name": "bar", "gender": "m"};
+val m3 = Map.merge(m1, m2);
 
-// a comment
-val y = 10 + 20 * 20;
-
-val msg = "hello" ^ ", " ^ "world";
-
-// quoted
-val quote = "Mark said - \"Hi! How are you doing?\"";
-
-// if then else
-val z = if true then 10 else 20;
-
-val z2 = if (z == 10) then {
-  val x = 10;
-  val y = x + 20;
-  x + y;
-} else {
-  x + y;
-};
-
-// nested ifs
-val msg3 = if true then {
-  val msg: bool = false;
-  if true then {
-    val msg = 20;
-    msg < 40;
-  } else {
-    msg == false;
-  };
-} else {
-  msg == "hello, world";
-};
-
-
-val add: (num, num) -> num = /\(a: num, b: num): num => a + b;
-val seven = add(4, 3);
-
-print_num(seven);
-print_str(msg);
+print(get(m3, "name"));
+print(get(m3, "gender"));
