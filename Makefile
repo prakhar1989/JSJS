@@ -11,12 +11,10 @@ jsjs:
 	@echo JSJS is ready to be served! 🍕 🍕 🍕
 	@echo ----------------------------------
 
-buildocs: $(DOCS)
-	pandoc $(DOCS) -o docs/proposal.pdf
-
 .PHONY: test
 test:
-	python test/menhir.py
+	@#python test/menhir.py
+	@find examples -name "*.jsjs" -exec /bin/echo "Compiling {}" \; -exec ./jsjs.out {} \;
 
 .PHONY : clean
 clean:
