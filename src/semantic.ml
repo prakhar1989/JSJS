@@ -145,13 +145,17 @@ let rec type_of_expr (env: typeEnv) = function
       let env = NameMap.empty, merged_globals in
       match es with
       | [] -> TAny, env (* unreachable state since {} is a maplit and not a block *)
+      | Assign(id, _, _) :: [] -> raise (InvalidReturnExpression(id))
       | x :: [] -> type_of_expr env x
-      | x :: xs ->
-        List.fold_left
-          (fun (t, acc_env) e ->
-             let newt, newenv = type_of_expr acc_env e in
-             (newt, newenv))
-          (type_of_expr env x) xs
+      | x :: xs -> (* two or more expressions *)
+        (match List.rev(xs) with
+         | [] -> raise (failwith("unreachable state reached"))
+         | Assign(id, _, _) :: _ -> raise (InvalidReturnExpression(id))
+         | _ -> List.fold_left
+                  (fun (t, acc_env) e ->
+                     let newt, newenv = type_of_expr acc_env e in
+                     (newt, newenv))
+                  (type_of_expr env x) xs)
     end
 
   | If(p, e1, e2) -> begin
@@ -371,6 +375,8 @@ let type_check (program: Ast.program) =
        with
        | ModuleNotFound(s) ->
          raise (TypeError (Printf.sprintf "Type error: Module '%s' not defined" s))
+       | InvalidReturnExpression(s) ->
+         raise (TypeError (Printf.sprintf "Type error: Last statement of block cannot be an assignment"))
        | InvalidOperation(t, op) ->
          let st = string_of_type t and sop = string_of_op op in
          raise (TypeError (Printf.sprintf "Type error: Invalid operation '%s' on type '%s'" sop st))
