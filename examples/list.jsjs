@@ -1,10 +1,6 @@
 val xs = 1000 :: 4000 :: [];
 List.print_list(xs);
 
-val notnot = /\(x: bool): bool => !x;
-
-val not = /\(fn: (T) -> bool): bool => notnot(fn);
-
 val p = List.print_list;
 
 val even? = /\(x: num): bool => x % 2 == 0;
@@ -16,7 +12,7 @@ print(List.length(List.range(1, 4)));
 print("length of list with odd numb in range(1, 10) ->");
 p(List.filter(even?, List.range(1, 10)));
 
-p(List.filter(/\(x:num):bool => !even?(x), List.range(1,10)));
+p(List.filter(/\(x: num): bool => !even?(x), List.range(1,10)));
 
 print("\nTesting map");
 val squares = List.map(/\(x:num): num => x * x, List.range(1, 10));

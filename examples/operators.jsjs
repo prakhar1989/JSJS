@@ -1,4 +1,21 @@
-print(10, "a", 10 + 20);
+val sum: (num, num) -> num = /\(x: num, y: num): num => x + y;
+
+val myMap: list num = List.map((/\(x: num): num => x * x), [1, 2, 3, 4]);
+
+val people : <string: <string: num>> = {
+  "foo" : {"a" : 10},
+  "goo" : {"b" : 40},
+  "hoo" : {"c" : 2}
+};
+
+val gcd = /\(a: num, b: num): num => {
+  if a == b then a
+  else {
+    if a > b
+    then gcd((a - b), b)
+    else gcd((b - a), a);
+  };
+};
 
 // numbers
 val x : num = 10;
@@ -18,7 +35,6 @@ val hungry? : bool = false;
 val sleepy? : bool = !true; // false
 val happy? : bool = !hungry? && !sleepy?;
 
-// if else
 val resp: string = if happy? then { "yes"; } else { "no"; };
 val single: string =
   if resp == "yes" then { "Y";
@@ -27,27 +43,3 @@ val single: string =
   }
 ;
 
-val sum: (num, num) -> num = /\(x: num, y: num): num => x + y;
-
-val sum = /\(x: num, y: num): num => x + y;
-
-val myMap: list num = List.map((/\(x: num): num => x * x), [1, 2, 3, 4]);
-
-val total: num = sum(a, b);
-
-val x: list T = ["a", "b", "c"];
-
-val people : <string: <string: num>> = {
-  "foo" : {"a" : 10},
-  "goo" : {"b" : 40},
-  "hoo" : {"c" : 2}
-};
-
-val gcd = /\(a: num, b: num): num => {
-  if a == b then a
-  else {
-    if a > b
-    then gcd((a - b), b)
-    else gcd((b - a), a);
-  };
-};

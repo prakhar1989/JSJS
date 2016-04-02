@@ -18,7 +18,7 @@ val to_uppercase = /\(x: string): string => "Upper";
 val is_positive = apply(to_uppercase, "string");
 
 val n = two_args(10, 20);
-print_num(n);
+print(n);
 
 val head = /\[T](xs: list T): T => {
   "10";
@@ -29,10 +29,6 @@ val tail = /\[T](xs: list list T): list list T => {
 };
 
 val t = hd([1, 2, 3, 4]);
-
-val get = /\[T, U](map: <T: U>, key: T): U => {
-  "10";
-};
 
 val foomap: <string: num> = {
   "a": 10,

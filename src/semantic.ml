@@ -195,6 +195,7 @@ let rec type_of_expr (env: typeEnv) = function
       if NameMap.mem id locals then raise (AlreadyDefined(id))
       else
         match e with
+        | Assign(s, _, _) -> raise (InvalidReturnExpression(s))
 
         (* In case of function literals, to get the type of expression
            we need to populate the local scope with the types of the
@@ -300,8 +301,8 @@ let rec type_of_expr (env: typeEnv) = function
         let l1 = List.length args_type and l2 = List.length formals_type in
         if l1 <> l2 then raise (MismatchedArgCount(l2, l1))
         (* type of each pair of formal and actual args should match *)
-        else List.iter2 
-            (fun ft at -> 
+        else List.iter2
+            (fun ft at ->
                match validate_types ft at with
                | Some(t) -> ()
                | None -> raise (MismatchedTypes(ft, at)))
@@ -380,7 +381,7 @@ let type_check (program: Ast.program) =
        | ModuleNotFound(s) ->
          raise (TypeError (Printf.sprintf "Type error: Module '%s' not defined" s))
        | InvalidReturnExpression(s) ->
-         raise (TypeError (Printf.sprintf "Type error: Last statement of block cannot be an assignment"))
+         raise (TypeError (Printf.sprintf "Type error: Assignment expressions cannot be returned"))
        | InvalidOperation(t, op) ->
          let st = string_of_type t and sop = string_of_op op in
          raise (TypeError (Printf.sprintf "Type error: Invalid operation '%s' on type '%s'" sop st))

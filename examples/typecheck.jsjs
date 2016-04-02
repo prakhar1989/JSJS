@@ -90,9 +90,6 @@ val fourhundred = applier(/\(x: num): num => x * x, 20);
 // unit testing :D
 val nothing : unit = (-);
 
-// vals are unit type
-val assign_stmt : unit = val something : unit = (-);
-
 // print functions
-print_num(chess_squares);
-print_str(msg);
+print(chess_squares);
+print(msg);
