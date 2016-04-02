@@ -1,6 +1,0 @@
-val m1 = {"name": "foo", "age": "20"};
-val m2 = {"name": "bar", "gender": "m"};
-val m3 = Map.merge(m1, m2);
-
-print(get(m3, "name"));
-print(get(m3, "gender"));
