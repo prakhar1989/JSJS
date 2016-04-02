@@ -300,7 +300,11 @@ let rec type_of_expr (env: typeEnv) = function
         let l1 = List.length args_type and l2 = List.length formals_type in
         if l1 <> l2 then raise (MismatchedArgCount(l2, l1))
         (* type of each pair of formal and actual args should match *)
-        else List.iter2 (fun ft at -> let _ = validate_types ft at in ())
+        else List.iter2 
+            (fun ft at -> 
+               match validate_types ft at with
+               | Some(t) -> ()
+               | None -> raise (MismatchedTypes(ft, at)))
           formals_type args_type;
         return_type, env
 
