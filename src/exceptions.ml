@@ -17,6 +17,7 @@ exception UndefinedType of char
 exception InvalidArgumentType of primitiveType
 exception ModuleNotFound of string
 exception InvalidReturnExpression of string
+exception InvalidKeyType of primitiveType
 
 (* Driver *)
 exception TypeError of string

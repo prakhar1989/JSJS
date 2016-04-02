@@ -26,3 +26,5 @@ print(Map.count(p));
 
 // testing values
 List.print_list(Map.values(set(m, "baz", 30)));
+
+val empty_map = {"true": m, "false": {}};

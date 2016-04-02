@@ -73,6 +73,12 @@ let rec validate_types type1 type2 =
     (match (validate_types t1 t2) with
     | Some(t) -> Some(TList(t))
     | None -> None)
+  | TMap(k1, v1), TMap(k2, v2) ->
+    (match validate_types k1 k2 with
+     | Some(k) -> (match validate_types v1 v2 with
+        | Some(v) -> Some(TMap(k, v))
+        | None -> None)
+     | None -> None)
   | t1, t2 when t1 = t2 -> Some(t2)
   | TAny, t | t, TAny -> Some(t)
   | t1, t2 -> None
@@ -172,16 +178,30 @@ let rec type_of_expr (env: typeEnv) = function
       match kvpairs with
       | [] -> TMap(TAny, TAny), env
       | (key, value) :: xs ->
+        (* we find the type of key by folding over
+           all k-v pairs by taking the type of first
+           k-v pair as reference *)
+
+        (* figuring out the type of key *)
         let start_key_type, _ = type_of_expr env key in
         let key_type = List.fold_left (fun acc (k, _) ->
             let t, _ = type_of_expr env k in
-            if t = acc then acc else raise (MismatchedTypes(acc, t)))
+            match validate_types t acc with
+            | Some(resolved_type) -> resolved_type
+            | None -> raise (MismatchedTypes(acc, t)))
             start_key_type xs
         in
+        let _ = match key_type with
+          | TNum | TBool | TString -> ()
+          | _ -> raise (InvalidKeyType(key_type))
+        in
+        (* figuring out the type of value *)
         let start_value_type, _ = type_of_expr env value in
         let value_type = List.fold_left (fun acc (_, v) ->
             let t, _ = type_of_expr env v in
-            if t = acc then acc else raise (MismatchedTypes(acc, t)))
+            match validate_types t acc with
+            | Some(resolved_type) -> resolved_type
+            | None -> raise (MismatchedTypes(acc, t)))
             start_value_type xs
         in
         TMap(key_type, value_type), env
@@ -406,6 +426,8 @@ let type_check (program: Ast.program) =
          raise (TypeError (Printf.sprintf "Error: Type '%c' not found." c))
        | InvalidArgumentType(_) ->
          raise (TypeError (Printf.sprintf "Error: Invalid argument type. Cannot pass generic functions as arguments."))
+       | InvalidKeyType(t) ->
+         raise (TypeError (Printf.sprintf "Type Error: Cannot have '%s' as key type in a Map." (string_of_type t)))
        | e -> raise (TypeError (Printexc.to_string e)))
     (predefined, NameMap.empty)
     program
