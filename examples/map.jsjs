@@ -28,3 +28,7 @@ print(Map.count(p));
 List.print_list(Map.values(set(m, "baz", 30)));
 
 val empty_map = {"true": m, "false": {}};
+
+val num_map = {10: "ten", 20: "twenty"};
+
+print(get(num_map, 5 + 5));

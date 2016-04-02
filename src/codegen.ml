@@ -89,11 +89,11 @@ let rec js_of_expr name map = function
      | "hd" -> Printf.sprintf "(%s).get(0)" (List.hd es)
      | "tl" -> Printf.sprintf "(%s).delete(0)" (List.hd es)
      | "empty__" -> Printf.sprintf "(%s).isEmpty()" (List.hd es)
-     | "get" -> Printf.sprintf "(%s).get(%s)" (List.hd es) (List.nth es 1)
-     | "set" -> Printf.sprintf "(%s).set(%s, %s)" (List.hd es) (List.nth es 1) (List.nth es 2)
-     | "has__" -> Printf.sprintf "(%s).has(%s)" (List.hd es) (List.nth es 1)
+     | "get" -> Printf.sprintf "(%s).get((%s).toString())" (List.hd es) (List.nth es 1)
+     | "set" -> Printf.sprintf "(%s).set((%s).toString(), %s)" (List.hd es) (List.nth es 1) (List.nth es 2)
+     | "has__" -> Printf.sprintf "(%s).has((%s).toString())" (List.hd es) (List.nth es 1)
      | "keys" -> Printf.sprintf "Immutable.fromJS(Array.from((%s).keys()))" (List.hd es)
-     | "del" -> Printf.sprintf "(%s).remove(%s)" (List.hd es) (List.nth es 1)
+     | "del" -> Printf.sprintf "(%s).remove((%s).toString())" (List.hd es) (List.nth es 1)
      | _ -> Printf.sprintf "%s(%s)" id (String.concat "," es))
   | ListLit(es) -> let es = String.concat ", " (List.map (fun e -> js_of_expr name map e) es) in
     Printf.sprintf "Immutable.List.of(%s)" es

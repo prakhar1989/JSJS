@@ -54,7 +54,7 @@ let top_level_definitions = [
   ("set", TFunGeneric(([TMap(T('T'), T('U')); T('T'); T('U')], TMap(T('T'), T('U'))), ['T'; 'U']));
   ("del", TFunGeneric(([TMap(T('T'), T('U')); T('T');], TMap(T('T'), T('U'))), ['T'; 'U']));
   ("has?", TFunGeneric(([TMap(T('T'), T('U')); T('T')], TBool), ['T'; 'U']));
-  ("keys", TFunGeneric(([TMap(T('T'), T('U'));], TList(T('T'))), ['T'; 'U']));
+  ("keys", TFunGeneric(([TMap(T('T'), T('U'));], TList(TString)), ['T'; 'U']));
 ];;
 
 let predefined = List.fold_left
