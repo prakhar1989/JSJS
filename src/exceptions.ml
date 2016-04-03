@@ -18,6 +18,7 @@ exception InvalidArgumentType of primitiveType
 exception ModuleNotFound of string
 exception InvalidReturnExpression of string
 exception InvalidKeyType of primitiveType
+exception InvalidGenericFunctionDefinition
 
 (* Driver *)
 exception TypeError of string

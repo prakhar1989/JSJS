@@ -50,6 +50,13 @@ let rec resolve map ft at =
   | _ -> map
 ;;
 
+let rec is_generic_type = function
+  | TString | TNum | TBool | TUnit | TAny | TFun(_) -> false
+  | T(_) -> true
+  | TList(t) -> is_generic_type t
+  | TMap(kt, vt) -> is_generic_type kt || is_generic_type vt
+  | TFunGeneric(_) -> true
+;;
 
 (* TODO: add documentation for this *)
 let rec generate_ret_types map = function
@@ -274,7 +281,12 @@ let rec type_of_expr (env: typeEnv) = function
         let locals, globals = env in
         (* build a map for formals. string -> type of formals *)
         let type_formals = List.fold_left
-            (fun acc (id, t) -> NameMap.add id t acc)
+            (fun acc (id, t) -> 
+               (* check if none of the formals are generic in which 
+                  case raise an exception *)
+               match is_generic_type t with
+               | true -> raise InvalidGenericFunctionDefinition
+               | false -> NameMap.add id t acc)
             (NameMap.empty) (fdecl.formals) in
         (* merge the global and local maps into one such that
            local definitions take priority *)
@@ -400,6 +412,8 @@ let type_check (program: Ast.program) =
        try
          let _, env = type_of_expr env expr in env
        with
+       | InvalidGenericFunctionDefinition ->
+         raise (TypeError (Printf.sprintf "Error: Generic type found. Use [Type] to declare generic functions."))
        | ModuleNotFound(s) ->
          raise (TypeError (Printf.sprintf "Type error: Module '%s' not defined" s))
        | InvalidReturnExpression(s) ->
