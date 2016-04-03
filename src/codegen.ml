@@ -3,6 +3,12 @@ open Stringify
 
 module NameMap = Map.Make(String);;
 
+(************************************************************************
+***1. Create an anonymous function***************************************
+***2. Execute all the statements in the block****************************
+***3. Return the result of execution of the last statement in the block**
+***4. Call the Anonymous function.***************************************
+************************************************************************)
 let block_template ret_expr = function
   | None ->
     let template = format_of_string "(function() { return %s })()"
@@ -31,8 +37,10 @@ let if_template pred e1 e2 =
   Printf.sprintf template name pred name e1 name e2 name
 ;;
 
-(* removes all ? from string and replaces with __. used for codegen
-   since JS doesnt support ? in var names *)
+(* 
+ * removes all ? from string and replaces with __. used for codegen
+ * since JS doesnt support ? in var names 
+ *)
 let remove_qmark s =
   Str.global_replace (Str.regexp_string "?") "__" s
 ;;
