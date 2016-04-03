@@ -50,6 +50,8 @@ let rec resolve map ft at =
   | _ -> map
 ;;
 
+
+(* TODO: add documentation for this *)
 let rec generate_ret_types map = function
   | T(c) -> if GenericMap.mem c map
     then (GenericMap.find c map)
@@ -66,8 +68,8 @@ let rec generate_ret_types map = function
   | t -> t
 ;;
 
-(* ... *)
-let rec validate_types type1 type2 =
+(* checks if two types are equal and returns an option type *)
+let rec validate_types type1 type2 : (Ast.primitiveType option) =
   match (type1, type2) with
   | TList(t1), TList(t2) ->
     (match (validate_types t1 t2) with

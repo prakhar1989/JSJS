@@ -1,10 +1,15 @@
 (* Operators in JSJS *)
 type op =
-  | Add | Sub | Mul | Div | Mod | Neg       (* num operators *)
-  | Caret                                   (* string operators *)
-  | And | Or | Not                          (* boolean operators *)
-  | Lte | Gte | Neq | Equals | Lt | Gt      (* relational operators *)
-  | Cons                                    (* list operators *)
+  (* num operators *)
+  | Add | Sub | Mul | Div | Mod | Neg
+  (* string operators *)
+  | Caret
+  (* boolean operators *)
+  | And | Or | Not
+  (* relational operators *)
+  | Lte | Gte | Neq | Equals | Lt | Gt
+  (* list operators *)
+  | Cons
 
 (* Types in JSJS are either a primitive type
    or a function type. both of these types are
@@ -38,9 +43,9 @@ type expr =
   | NumLit of float
   | BoolLit of bool
   | StrLit of string
-  (* Binary operation *)
+  (* binary operation *)
   | Binop of expr * op * expr
-  (* Unary operation *)
+  (* unary operation *)
   | Unop of op * expr
   (* a list literal is a list of expressions *)
   | ListLit of expr list
@@ -56,7 +61,7 @@ type expr =
   (* if-then-else takes 3 expressions - predicate,
      then expr and else expr *)
   | If of expr * expr * expr
-  (* A function call takes fn name and a list of arguments (exprs) *)
+  (* a function call takes fn name and a list of arguments (exprs) *)
   | Call of string * expr list
   (* a fn literal is of func_decl record *)
   | FunLit of func_decl
