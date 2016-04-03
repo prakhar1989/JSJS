@@ -7,7 +7,7 @@ type op =
 
 type primitiveType =
   | T of char
-  | TAny
+  | TAny                                    (* used to describe type of empty list and map literals *)
   | TNum
   | TString
   | TBool
@@ -17,6 +17,11 @@ type primitiveType =
   | TList of primitiveType
   | TMap of primitiveType * primitiveType
 and funcType = primitiveType list * primitiveType
+
+(********************************
+***Everything is an Expression***
+************in JSJS**************
+********************************)
 
 type expr =
   | Binop of expr * op * expr
