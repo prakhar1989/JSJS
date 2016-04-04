@@ -37,9 +37,9 @@ let if_template pred e1 e2 =
   Printf.sprintf template name pred name e1 name e2 name
 ;;
 
-(* 
+(*
  * removes all ? from string and replaces with __. used for codegen
- * since JS doesnt support ? in var names 
+ * since JS doesnt support ? in var names
  *)
 let remove_qmark s =
   Str.global_replace (Str.regexp_string "?") "__" s
