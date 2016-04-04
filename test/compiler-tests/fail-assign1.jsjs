@@ -1,0 +1,5 @@
+val x : num = 10;
+val y : bool = true;
+val s : string = "hello";
+
+val z : num = "string"; // Fail: assinging a string to a num

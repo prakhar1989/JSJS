@@ -13,3 +13,4 @@ codegen/out.js
 outputs
 .sass-cache
 out.js
+venv
