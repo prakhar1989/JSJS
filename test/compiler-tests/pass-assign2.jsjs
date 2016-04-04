@@ -1,0 +1,6 @@
+val x : num = 10;
+val y : bool = true;
+val s : string = "hello";
+
+val z : num = x + 10;
+print(z);
