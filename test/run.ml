@@ -18,12 +18,25 @@ let run_cmd cmd =
     (List.rev !res, s)
 ;;
 
-let dump_to_file lines fname = 
+let dump_to_file lines fname =
   let oc = open_out fname in
-  List.iter 
-    (fun line -> Printf.fprintf oc "%s\n" line) 
+  List.iter
+    (fun line -> Printf.fprintf oc "%s\n" line)
     lines;
   close_out oc;
+;;
+
+let validate_output output output_fname =
+  let _ = dump_to_file output "temp.out" in
+  let cmd = Printf.sprintf "diff temp.out %s" output_fname in
+  let diff_output, status = run_cmd cmd in
+  begin
+    match status with
+    | Pass -> print_endline "diff gave 0"
+    | Fail -> print_endline "diff gave 1"
+    ;
+    print_endline (String.concat "\n" diff_output);
+  end
 ;;
 
 let run_testcase fname =
@@ -35,11 +48,11 @@ let run_testcase fname =
   let fpath = Filename.concat test_location fname in
   let cmd = Printf.sprintf "./jsjs.out %s" fpath in
   let output_filename = Printf.sprintf "out-%s" test_name in
-  let _ = Filename.concat test_location output_filename in
+  let output_path = Filename.concat test_location output_filename in
   let cmd_output, status = run_cmd cmd in
   match test_type, status with
   | Pass, Pass -> print_endline "all passing";
-  | Fail, Fail -> print_endline "all failing"; dump_to_file cmd_output "temp-out.txt";
+  | Fail, Fail -> validate_output cmd_output output_path;
   | _ -> print_endline "failing";
 ;;
 
@@ -47,6 +60,6 @@ let run testcases () =
   List.iter run_testcase testcases;
 ;;
 
-let testcases = ["fail-assign1.jsjs";];;
+let testcases = ["fail-assign1.jsjs"];;
 
 run testcases ();;
