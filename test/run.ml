@@ -1,3 +1,5 @@
+open Printf
+
 let test_location = "test/compiler-tests/"
 
 type test_kind = Pass | Fail
@@ -12,7 +14,9 @@ let colorize msg c =
     | Red -> "31"
     | Green -> "32"
     | White -> "37" in
-  Printf.sprintf "\027[%sm %s" pad msg
+  let template = format_of_string "
+    \027[%sm%s" in 
+  printf template pad msg
 ;;
 
 (* runs a unix command and returns
@@ -43,12 +47,12 @@ let diff_output lines filename =
   let dump_to_file lines fname =
     let oc = open_out fname in
     List.iter
-      (fun line -> Printf.fprintf oc "%s\n" line)
+      (fun line -> fprintf oc "%s\n" line)
       lines;
     close_out oc in
 
   let _ = dump_to_file lines "temp.out" in
-  let cmd = Printf.sprintf "diff temp.out %s" filename in
+  let cmd = sprintf "diff temp.out %s" filename in
   let diff_output, status = run_cmd cmd in
   begin
     match status with
@@ -67,7 +71,7 @@ let run_testcase fname =
 
   (* generate command to run *)
   let fpath = Filename.concat test_location fname in
-  let cmd = Printf.sprintf "./jsjs.out %s" fpath in
+  let cmd = sprintf "./jsjs.out %s" fpath in
 
   (* get output filename and path *)
   let output_filename = Str.replace_first (Str.regexp "jsjs") "out" fname in
@@ -81,32 +85,32 @@ let run_testcase fname =
       (* run the generated file with node and diff output *)
       let node_output, status = run_cmd "node out.js" in
       (match diff_output node_output output_path with
-     | None -> Printf.printf "\027[32m✓ %s\n" fname; Pass
+     | None -> colorize (sprintf "✓ %s\n" fname) Green; Pass
      | Some(op) -> begin
-         Printf.printf "\027[31m✖ %s\n." fname;
-         Printf.printf "\n\027[37m %s\n\n" op;
+         colorize (sprintf "✖ %s\n" fname) Red;
+         colorize (sprintf "%s\n\n" op) Red;
        end; Fail)
     end
 
   (* expected and actual match on test type - both failing *)
   | Fail, Fail ->
     (match diff_output cmd_output output_path with
-     | None -> Printf.printf "\027[32m✓ %s\n" fname; Pass
+     | None -> colorize (sprintf "✓ %s\n" fname) Green; Pass
      | Some(op) -> begin
-         Printf.printf "\027[31m✖ %s\n." fname;
-         Printf.printf "\n\027[37m %s\n\n" op;
+         colorize (sprintf "✖ %s\n" fname) Red;
+         colorize (sprintf "%s\n\n" op) Red;
        end; Fail)
 
   (* expected pass and got failure *)
   | Pass, Fail -> begin
-      Printf.printf "\027[31m✖ %s\n" fname;
-      Printf.printf "Expected test case to pass, but it failed";
+      colorize (sprintf "✖ %s\n." fname) Red;
+      colorize "Expected test case to pass, but it failed" Red;
     end; Fail
 
   (* expected failure but passed *)
   | Fail, Pass -> begin
-      Printf.printf "\027[31m✖ %s\n" fname;
-      Printf.printf "Expected test case to fail, but it passed";
+      colorize (sprintf "✖ %s\n." fname) Red;
+      colorize "Expected test case to fail, but it passed" Red;
     end; Fail
 ;;
 
@@ -137,6 +141,7 @@ let run testcases () =
     (Sys.time() -. t_start)
 ;;
 
+(* returns a list of file names in a directory *)
 let get_files dirname =
     let d = Unix.opendir dirname in
     let files = ref ([] : string list) in
@@ -151,6 +156,7 @@ let get_files dirname =
 
 let init () =
   let files = !(get_files test_location) in
+  (* testcases -> all files that end in .jsjs *)
   let testcases = List.filter
       (fun f ->
          try ignore (Str.search_forward (Str.regexp ".jsjs") f 0); true
