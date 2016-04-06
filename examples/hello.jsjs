@@ -1,0 +1,5 @@
+val x : num = 10 + 20;
+val y = x * 10;
+
+print_str("the value of y is");
+print_num(y);
