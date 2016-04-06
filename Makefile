@@ -13,10 +13,14 @@ jsjs:
 
 .PHONY: test
 test:
-	ocamlbuild -j 0 -lib str -lib unix -r test/run.byte
-	@mv run.byte run-tests.out
-	@#python test/menhir.py
-	@#find examples -name "*.jsjs" -exec /bin/echo "Compiling {}" \; -exec ./jsjs.out {} \;
+	ocamlc -o run-tests.out str.cma unix.cma test/run.ml
+	@rm test/*.cm*
+
+.PHONY: run-test
+run-test:
+	@#python test/parser-tests/menhir.py
+	@find examples -name "*.jsjs" -exec /bin/echo "Compiling {}" \; -exec ./jsjs.out {} \;
+	@./run-tests.out
 
 .PHONY : clean
 clean:

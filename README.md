@@ -26,4 +26,5 @@ $ node out.js
 #### Test
 ```shell
 $ make test
+$ make run-test
 ```
