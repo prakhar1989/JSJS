@@ -15,3 +15,5 @@ outputs
 out.js
 venv
 *.native
+
+!test/compiler-tests/*.out

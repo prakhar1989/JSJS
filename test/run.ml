@@ -4,7 +4,8 @@ type test_kind = Pass | Fail
 
 type color = Grey | Red | Green | White
 
-(* reference: http://misc.flogisoft.com/bash/tip_colors_and_formatting *)
+(* reference: http://misc.flogisoft.com/bash/tip_colors_and_formatting
+   returns a string that has been color coded *)
 let colorize msg c =
   let pad = match c with
     | Grey -> "90"
@@ -14,6 +15,8 @@ let colorize msg c =
   Printf.sprintf "\027[%sm %s" pad msg
 ;;
 
+(* runs a unix command and returns
+   the output as a list and the status code *)
 let run_cmd cmd =
   let chan = Unix.open_process_in cmd in
   let res = ref ([] : string list) in
@@ -24,12 +27,13 @@ let run_cmd cmd =
   try aux ()
   with End_of_file ->
     let status = Unix.close_process_in chan in
-    let s = match status with
+    let cmd_result = match status with
       | Unix.WEXITED(c) -> if c == 0 then Pass else Fail
       | _ -> Fail in
-    (List.rev !res, s)
+    (List.rev !res, cmd_result)
 ;;
 
+(* dumps a list of lines to a file *)
 let dump_to_file lines fname =
   let oc = open_out fname in
   List.iter
@@ -57,7 +61,7 @@ let run_testcase fname =
     | _ -> raise (failwith "Invalid file format") in
   let fpath = Filename.concat test_location fname in
   let cmd = Printf.sprintf "./jsjs.out %s" fpath in
-  let output_filename = Printf.sprintf "out-%s" test_name in
+  let output_filename = Str.replace_first (Str.regexp "jsjs") "out" fname in
   let output_path = Filename.concat test_location output_filename in
   let cmd_output, status = run_cmd cmd in
   match test_type, status with
@@ -68,12 +72,12 @@ let run_testcase fname =
      | Some(op) -> Printf.printf "\027[31m✖ %s\n." fname;
        Printf.printf "\n\027[37m %s\n\n" op; Fail)
   | Pass, Fail -> begin
-    Printf.printf "\027[31m✖ Failed.\n";
-    Printf.printf "Expected test case to pass, but it failed";
+      Printf.printf "\027[31m✖ %s\n" fname;
+      Printf.printf "Expected test case to pass, but it failed";
     end; Fail
   | Fail, Pass -> begin
-    Printf.printf "\027[31m✖ Failed.\n";
-    Printf.printf "Expected test case to fail, but it passed";
+      Printf.printf "\027[31m✖ %s\n" fname;
+      Printf.printf "Expected test case to fail, but it passed";
     end; Fail
 ;;
 
@@ -106,4 +110,4 @@ let run testcases () =
 
 let testcases = ["fail-assign3.jsjs"; "fail-assign1.jsjs"];;
 
-(*run testcases ();;*)
+run testcases ()
