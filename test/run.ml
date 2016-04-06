@@ -137,6 +137,27 @@ let run testcases () =
     (Sys.time() -. t_start)
 ;;
 
-let testcases = ["fail-assign3.jsjs"; "fail-assign1.jsjs"; "pass-assign2.jsjs"];;
+let get_files dirname =
+    let d = Unix.opendir dirname in
+    let files = ref ([] : string list) in
+    let rec aux () =
+      let fname = Unix.readdir d in
+      files := fname :: !files;
+      aux () in
+    try aux ()
+    with End_of_file ->
+      Unix.closedir d; files
+;;
 
-run testcases ()
+let init () =
+  let files = !(get_files test_location) in
+  let testcases = List.filter
+      (fun f ->
+         try ignore (Str.search_forward (Str.regexp ".jsjs") f 0); true
+         with Not_found -> false)
+      files
+  in
+  run testcases ()
+;;
+
+init ();
