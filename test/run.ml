@@ -33,18 +33,22 @@ let run_cmd cmd =
     (List.rev !res, cmd_result)
 ;;
 
-(* dumps a list of lines to a file *)
-let dump_to_file lines fname =
-  let oc = open_out fname in
-  List.iter
-    (fun line -> Printf.fprintf oc "%s\n" line)
-    lines;
-  close_out oc;
-;;
+(* takes a diff between a list of lines and a filename
+   by first dumping the lines to a file
+   and then running the `diff` command in unix`
+   Returns an option with the diff output *)
+let diff_output lines filename =
 
-let validate_output output output_fname =
-  let _ = dump_to_file output "temp.out" in
-  let cmd = Printf.sprintf "diff temp.out %s" output_fname in
+  (* dumps a list of lines to a file *)
+  let dump_to_file lines fname =
+    let oc = open_out fname in
+    List.iter
+      (fun line -> Printf.fprintf oc "%s\n" line)
+      lines;
+    close_out oc in
+
+  let _ = dump_to_file lines "temp.out" in
+  let cmd = Printf.sprintf "diff temp.out %s" filename in
   let diff_output, status = run_cmd cmd in
   begin
     match status with
@@ -54,27 +58,52 @@ let validate_output output output_fname =
 ;;
 
 let run_testcase fname =
+  (* determine test type - pass or fail *)
   let test_type, test_name =
     match (Str.split (Str.regexp "-") fname) with
     | "fail" :: x :: [] -> Fail, x
     | "pass" :: x :: [] -> Pass, x
     | _ -> raise (failwith "Invalid file format") in
+
+  (* generate command to run *)
   let fpath = Filename.concat test_location fname in
   let cmd = Printf.sprintf "./jsjs.out %s" fpath in
+
+  (* get output filename and path *)
   let output_filename = Str.replace_first (Str.regexp "jsjs") "out" fname in
   let output_path = Filename.concat test_location output_filename in
+
+  (* run command and pattern match on result *)
   let cmd_output, status = run_cmd cmd in
   match test_type, status with
-  | Pass, Pass -> print_endline "all passing"; Pass
-  | Fail, Fail ->
-    (match validate_output cmd_output output_path with
+  (* expected and actual match on test type - both passing *)
+  | Pass, Pass -> begin
+      (* run the generated file with node and diff output *)
+      let node_output, status = run_cmd "node out.js" in
+      (match diff_output node_output output_path with
      | None -> Printf.printf "\027[32m✓ %s\n" fname; Pass
-     | Some(op) -> Printf.printf "\027[31m✖ %s\n." fname;
-       Printf.printf "\n\027[37m %s\n\n" op; Fail)
+     | Some(op) -> begin
+         Printf.printf "\027[31m✖ %s\n." fname;
+         Printf.printf "\n\027[37m %s\n\n" op;
+       end; Fail)
+    end
+
+  (* expected and actual match on test type - both failing *)
+  | Fail, Fail ->
+    (match diff_output cmd_output output_path with
+     | None -> Printf.printf "\027[32m✓ %s\n" fname; Pass
+     | Some(op) -> begin
+         Printf.printf "\027[31m✖ %s\n." fname;
+         Printf.printf "\n\027[37m %s\n\n" op;
+       end; Fail)
+
+  (* expected pass and got failure *)
   | Pass, Fail -> begin
       Printf.printf "\027[31m✖ %s\n" fname;
       Printf.printf "Expected test case to pass, but it failed";
     end; Fail
+
+  (* expected failure but passed *)
   | Fail, Pass -> begin
       Printf.printf "\027[31m✖ %s\n" fname;
       Printf.printf "Expected test case to fail, but it passed";
@@ -108,6 +137,6 @@ let run testcases () =
     (Sys.time() -. t_start)
 ;;
 
-let testcases = ["fail-assign3.jsjs"; "fail-assign1.jsjs"];;
+let testcases = ["fail-assign3.jsjs"; "fail-assign1.jsjs"; "pass-assign2.jsjs"];;
 
 run testcases ()
