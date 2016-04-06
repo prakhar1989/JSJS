@@ -15,7 +15,7 @@ let colorize msg c =
     | Green -> "32"
     | White -> "37" in
   let template = format_of_string "
-    \027[%sm%s" in 
+    \027[%sm%s" in
   printf template pad msg
 ;;
 
@@ -67,7 +67,9 @@ let run_testcase fname =
     match (Str.split (Str.regexp "-") fname) with
     | "fail" :: x :: [] -> Fail, x
     | "pass" :: x :: [] -> Pass, x
-    | _ -> raise (failwith "Invalid file format") in
+    | _ -> raise
+        (let msg = sprintf "Invalid file format - %s. Must have only one '-'" fname in
+        failwith msg) in
 
   (* generate command to run *)
   let fpath = Filename.concat test_location fname in
@@ -124,17 +126,13 @@ let run testcases () =
   in
   let template = format_of_string "\027[37m
 
-
     Test Summary
     -------------------------
-
     All testcases complete.
-
     Total Testcases : %d
     Total Passing   : %d
     Total Failed    : %d
-
-    Execution time: %fs
+    Execution time  : %fs
       \n" in
   Printf.printf template total passing
     (total-passing)
@@ -149,9 +147,7 @@ let get_files dirname =
       let fname = Unix.readdir d in
       files := fname :: !files;
       aux () in
-    try aux ()
-    with End_of_file ->
-      Unix.closedir d; files
+    try aux () with End_of_file -> Unix.closedir d; files
 ;;
 
 let init () =
@@ -161,8 +157,7 @@ let init () =
       (fun f ->
          try ignore (Str.search_forward (Str.regexp ".jsjs") f 0); true
          with Not_found -> false)
-      files
-  in
+      files in
   run testcases ()
 ;;
 
