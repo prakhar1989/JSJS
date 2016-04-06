@@ -1,0 +1,6 @@
+val x : num = 10;
+val y : bool = true;
+val s : string = "hello";
+
+val z = x + y; // Fail: adding incompatible types
+

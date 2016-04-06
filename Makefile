@@ -13,7 +13,8 @@ jsjs:
 
 .PHONY: test
 test:
-	ocamlbuild -j 0 -lib str -lib unix -r test/run.native
+	ocamlbuild -j 0 -lib str -lib unix -r test/run.byte
+	@mv run.byte run-tests.out
 	@#python test/menhir.py
 	@#find examples -name "*.jsjs" -exec /bin/echo "Compiling {}" \; -exec ./jsjs.out {} \;
 

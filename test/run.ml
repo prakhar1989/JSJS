@@ -2,6 +2,18 @@ let test_location = "test/compiler-tests/"
 
 type test_kind = Pass | Fail
 
+type color = Grey | Red | Green | White
+
+(* reference: http://misc.flogisoft.com/bash/tip_colors_and_formatting *)
+let colorize msg c =
+  let pad = match c with
+    | Grey -> "90"
+    | Red -> "31"
+    | Green -> "32"
+    | White -> "37" in
+  Printf.sprintf "\027[%sm %s" pad msg
+;;
+
 let run_cmd cmd =
   let chan = Unix.open_process_in cmd in
   let res = ref ([] : string list) in
@@ -32,10 +44,8 @@ let validate_output output output_fname =
   let diff_output, status = run_cmd cmd in
   begin
     match status with
-    | Pass -> print_endline "diff gave 0"
-    | Fail -> print_endline "diff gave 1"
-    ;
-    print_endline (String.concat "\n" diff_output);
+    | Pass -> None
+    | Fail -> Some(String.concat "\n" diff_output)
   end
 ;;
 
@@ -51,15 +61,49 @@ let run_testcase fname =
   let output_path = Filename.concat test_location output_filename in
   let cmd_output, status = run_cmd cmd in
   match test_type, status with
-  | Pass, Pass -> print_endline "all passing";
-  | Fail, Fail -> validate_output cmd_output output_path;
-  | _ -> print_endline "failing";
+  | Pass, Pass -> print_endline "all passing"; Pass
+  | Fail, Fail ->
+    (match validate_output cmd_output output_path with
+     | None -> Printf.printf "\027[32m✓ %s\n" fname; Pass
+     | Some(op) -> Printf.printf "\027[31m✖ %s\n." fname;
+       Printf.printf "\n\027[37m %s\n\n" op; Fail)
+  | Pass, Fail -> begin
+    Printf.printf "\027[31m✖ Failed.\n";
+    Printf.printf "Expected test case to pass, but it failed";
+    end; Fail
+  | Fail, Pass -> begin
+    Printf.printf "\027[31m✖ Failed.\n";
+    Printf.printf "Expected test case to fail, but it passed";
+    end; Fail
 ;;
 
 let run testcases () =
-  List.iter run_testcase testcases;
+  let total = List.length testcases in
+  let t_start = Sys.time() in
+  let passing = List.fold_left
+      (fun acc t ->
+         acc + (match run_testcase t with Pass -> 1 | Fail -> 0))
+      0 testcases
+  in
+  let template = format_of_string "\027[37m
+
+
+    Test Summary
+    -------------------------
+
+    All testcases complete.
+
+    Total Testcases : %d
+    Total Passing   : %d
+    Total Failed    : %d
+
+    Execution time: %fs
+      \n" in
+  Printf.printf template total passing
+    (total-passing)
+    (Sys.time() -. t_start)
 ;;
 
-let testcases = ["fail-assign1.jsjs"];;
+let testcases = ["fail-assign3.jsjs"; "fail-assign1.jsjs"];;
 
-run testcases ();;
+(*run testcases ();;*)
