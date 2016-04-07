@@ -7,7 +7,7 @@ val gcd = /\(a: num, b: num): num => {
   };
 };
 
-print(gcd(12, 8));
+//print(gcd(12, 8));
 
 val pow = /\(base: num, exp: num): num => {
   val aux = /\(accum: num, e: num): num => {
@@ -19,5 +19,16 @@ val pow = /\(base: num, exp: num): num => {
 
 val chess_squares = pow(8, 2);
 
-print("Total number of squares on a chessboard: ");
-print(chess_squares);
+//print("Total number of squares on a chessboard: ");
+//print(chess_squares);
+
+val countPrimes = /\(n: num): num => {
+  val aux = /\(count: num, xs: list num): num => {
+    if hd(xs) <= n // no sqrt yet :(
+    then aux(count + 1,List.filter_not(/\(y: num): bool => y % hd(xs) == 0, xs))
+    else count + List.length(xs);
+  };
+  aux(0, List.range(2, n));
+};
+
+print(countPrimes(100));
