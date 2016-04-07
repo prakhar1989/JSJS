@@ -1,0 +1,13 @@
+// Sieve of Eratosthenes
+val countPrimes = /\(n: num): num => {
+  val aux = /\(count: num, l: list num): num => {
+    if hd(l) * hd(l) <= n
+    then aux(count + 1, List.filter(/\(x: num): bool => x % hd(l) != 0, l))
+    else count + List.length(l);
+  };
+
+  aux(0, List.range(2, n+1));
+};
+
+print(countPrimes(10));
+print(countPrimes(100));
