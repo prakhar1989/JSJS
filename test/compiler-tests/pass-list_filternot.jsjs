@@ -1,0 +1,7 @@
+val xs = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+
+val odd? = /\(x: num): bool => x % 2 == 1;
+
+val evens = List.filter_not(odd?, xs);
+
+List.print_list(evens);

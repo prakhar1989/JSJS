@@ -66,7 +66,8 @@ let list_definitions = [
   ("length", TFunGeneric(([TList(T('T'))], TNum), ['T']));
   ("rev", TFunGeneric(([TList(T('T'))], TList(T('T'))), ['T']));
   ("nth", TFunGeneric(([TList(T('T')); TNum], T('T')), ['T']));
-  ("filter", TFunGeneric( ([TFun([T('T')], TBool); TList(T('T'))], TList(T('T'))) , ['T']));
+  ("filter", TFunGeneric(([TFun([T('T')], TBool); TList(T('T'))], TList(T('T'))) , ['T']));
+  ("filter_not", TFunGeneric(([TFun([T('T')], TBool); TList(T('T'))], TList(T('T'))) , ['T']));
   ("map", TFunGeneric( ([TFun([T('T')], T('U')); TList(T('T'))], TList(T('U'))) , ['T'; 'U']));
   ("print_list", TFunGeneric(([TList(T('T'))], TUnit), ['T']));
   ("range", TFun([TNum; TNum], TList(TNum)));
