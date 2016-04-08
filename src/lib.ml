@@ -72,6 +72,7 @@ let list_definitions = [
   ("print_list", TFunGeneric(([TList(T('T'))], TUnit), ['T']));
   ("range", TFun([TNum; TNum], TList(TNum)));
   ("concat", TFunGeneric(([TList(T('T')); TList(T('T'))], TList(T('T'))), ['T']));
+  ("reduce", TFunGeneric(([TFun([T('T'); T('U')], T('T')); T('T'); TList(T('U'))], T('T')), ['T'; 'U']));
 ];;
 
 let map_definitions = [
