@@ -1,0 +1,3 @@
+val concat = /\(x: string, y: string): string => x ^ y;
+
+val a: num = concat("hello", "world");

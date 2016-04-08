@@ -1,0 +1,32 @@
+val a: num = 5;
+
+val b: string = "hello world" ^ "!";
+
+val c?: bool = true && !false;
+
+val d: unit = (-);
+
+val fun: (num, num) -> bool = /\(x: num, y: num): bool => {
+  x % y == 0;
+};
+
+val xs1: list string = ["1","2","3","4","5","6","7"];
+
+val xs2: list list num = [[1,2,3],[4,5,6],[7,8,9],[10]];
+
+val map1: <num:string> = {
+  1: "One",
+  2: "Two",
+  3: "Three"
+};
+
+val map2: <num: <num:string>> = {
+  1: {
+    1: "One One",
+    2: "One Two"
+  },
+  2: {
+    1: "Two One",
+    2: "Two Two"
+  }
+};
