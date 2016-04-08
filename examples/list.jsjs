@@ -37,3 +37,5 @@ val join = /\(sep : string, xs : list string): string => {
 val joined = join(" ", ["hello", "world", "Reduce"]);
 
 print(joined);
+
+p(List.insert([1,2,4,5], 3, 6));
