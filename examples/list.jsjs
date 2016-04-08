@@ -38,4 +38,16 @@ val joined = join(" ", ["hello", "world", "Reduce"]);
 
 print(joined);
 
+print("");
 p(List.insert([1,2,4,5], 3, 6));
+
+print("");
+p(List.remove([1,2,4,5], 3));
+
+print("");
+p(List.remove([1,2,4,5], 2));
+
+print("");
+p(List.remove([1,2,4,5], 0));
+
+
