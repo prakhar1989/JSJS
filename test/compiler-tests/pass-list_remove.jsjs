@@ -1,0 +1,10 @@
+List.print_list(List.remove([1,2,4,5], 2));
+
+print("");
+List.print_list(List.remove([1,2,4,5], 0));
+
+print("");
+List.print_list(List.remove([1,2,4,5], 10));
+
+print("");
+List.print_list(List.remove([1,2,4,5], -1));

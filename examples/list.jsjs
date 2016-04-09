@@ -25,7 +25,7 @@ print(sum);
 
 // String module function in future:
 // Testng reduce for string list with a join function
-val join = /\(sep : string, xs : list string): string => {
+val join = /\(sep: string, xs: list string): string => {
   if empty?(xs) then ""
   else List.reduce(
       /\(acc: string, x: string) : string => acc ^ sep ^ x,
@@ -49,5 +49,3 @@ p(List.remove([1,2,4,5], 2));
 
 print("");
 p(List.remove([1,2,4,5], 0));
-
-

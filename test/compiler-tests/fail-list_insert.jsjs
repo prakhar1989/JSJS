@@ -1,0 +1,2 @@
+// fail: adding a string to a list num
+List.print_list(List.insert([1,2,4,5], 3, "number"));
