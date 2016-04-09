@@ -72,7 +72,7 @@ let list_definitions = [
   ("print_list", TFunGeneric(([TList(T('T'))], TUnit), ['T']));
   ("range", TFun([TNum; TNum], TList(TNum)));
   ("concat", TFunGeneric(([TList(T('T')); TList(T('T'))], TList(T('T'))), ['T']));
-  ("reduce", TFunGeneric(([TFun([T('T'); T('U')], T('T')); T('T'); TList(T('U'))], T('T')), ['T'; 'U']));
+  ("fold_left", TFunGeneric(([TFun([T('T'); T('U')], T('T')); T('T'); TList(T('U'))], T('T')), ['T'; 'U']));
   ("insert", TFunGeneric( ([TList(T('T')); T('T'); TNum], TList(T('T'))), ['T']) );
   ("remove", TFunGeneric( ([TList(T('T')); TNum], TList(T('T'))), ['T']) );
 ];;

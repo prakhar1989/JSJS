@@ -1,0 +1,6 @@
+val msg = /\(s: string, b: bool): string => {
+  if b then s else s ^ s;
+};
+
+// fail -> incorrect generic type resolution
+val xs = List.fold_left(msg, true, ["hello", "world"]);
