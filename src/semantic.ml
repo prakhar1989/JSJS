@@ -47,7 +47,8 @@ let rec resolve map ft at =
       | TMap(akt, avt) -> let map = resolve map kt akt in
         resolve map vt avt
       | _ -> raise (MismatchedTypes(ft, at)))
-  | _ -> map
+  | TNum | TString | TBool | TUnit -> if ft = at then map else raise (MismatchedTypes(ft, at))
+  | TAny -> raise (InvalidArgumentType(TAny)) 
 ;;
 
 let rec is_generic_type = function
@@ -326,12 +327,11 @@ let rec type_of_expr (env: typeEnv) = function
 
   | Call(id, es) -> begin
       let t, _ = type_of_expr env (Val(id)) in
+      (* a list of argument types *)
+      let args_type = List.map (fun e -> let t, _ = type_of_expr env e in t) es in
       (match t with
       | TFun(formals_type, return_type) ->
-        let args_type = List.map
-            (fun e -> let t, _ = type_of_expr env e in t) es
-        in
-        (* check if the lengths of the formal and actuals args match *)
+        (* check if the lengths of the formal and actual args match *)
         let l1 = List.length args_type and l2 = List.length formals_type in
         if l1 <> l2 then raise (MismatchedArgCount(l2, l1))
         (* type of each pair of formal and actual args should match *)
@@ -348,10 +348,11 @@ let rec type_of_expr (env: typeEnv) = function
          2. Next type check the body of the function
          3. Return the "resolved" return type of the call expression *)
       | TFunGeneric((formals_type, return_type), generic_types) -> begin
+            (* create an map of all generic types to TAny. Goal is to resolve
+               each of these types uniquely and correctly *)
             let genMap = List.fold_left (fun map t -> GenericMap.add t TAny map)
                 GenericMap.empty generic_types in
-            let args_type = List.map
-                (fun e -> let t, _ = type_of_expr env e in t) es in
+            (* check if the lengths of the formal and actual args match *)
             let l1 = List.length args_type and l2 = List.length formals_type in
             if l1 <> l2 then raise (MismatchedArgCount(l2, l1))
             else

@@ -52,7 +52,7 @@ let diff_output lines filename =
     close_out oc in
 
   let _ = dump_to_file lines "temp.out" in
-  let cmd = sprintf "diff temp.out %s" filename in
+  let cmd = sprintf "diff -B temp.out %s" filename in
   let diff_output, status = run_cmd cmd in
   begin
     match status with
