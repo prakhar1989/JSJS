@@ -6,6 +6,7 @@ exception IllegalCharacter of string * int * int
 
 (* Typechecker *)
 exception Undefined of string
+exception CannotRedefineKeyword of string
 exception InvalidOperation of primitiveType * op
 exception MismatchedTypes of primitiveType * primitiveType
 exception AlreadyDefined of string

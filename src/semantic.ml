@@ -7,9 +7,20 @@ open Stringify
 module NameMap = Map.Make(String);;
 module GenericMap = Map.Make(Char);;
 module ModuleMap = Map.Make(String);;
+module KeywordsSet = Set.Make(String);;
 
 type typesTable = Ast.primitiveType NameMap.t;;
 type typeEnv = typesTable * typesTable;;
+
+(* maintains a set of js keywords *)
+let keywords = ["break"; "case"; "class"; "catch"; "const"; "continue";
+                "debugger"; "default"; "delete"; "do"; "else";
+                "export"; "extends"; "finally"; "for"; "function"; "if";
+                "import"; "in"; "instanceof"; "new"; "return"; "super";
+                "switch"; "this"; "throw"; "try"; "typeof"; "var"; "void";
+                "while"; "with"; "yield" ];;
+let js_keywords_set = List.fold_left (fun acc x -> KeywordsSet.add x acc)
+    KeywordsSet.empty keywords;;
 
 let build_map (formals: (string * primitiveType) list) =
   List.fold_left
@@ -223,6 +234,7 @@ let rec type_of_expr (env: typeEnv) = function
          3. Update locals if all is well.  *)
       let locals, globals = env in
       if NameMap.mem id locals then raise (AlreadyDefined(id))
+      else if KeywordsSet.mem id js_keywords_set then raise (CannotRedefineKeyword(id))
       else
         match e with
         | Assign(s, _, _) -> raise (InvalidReturnExpression(s))
@@ -437,6 +449,8 @@ let type_check (program: Ast.program) =
          raise (TypeError (Printf.sprintf "Error: '%s' cannot be redefined in the current scope" s))
        | UndefinedProperty(module_name, prop) ->
          raise (TypeError (Printf.sprintf "Error: property '%s' is not defined in module '%s'" prop module_name))
+       | CannotRedefineKeyword(keyword) ->
+         raise (TypeError (Printf.sprintf "Error: Cannot define Javascript keyword '%s'" keyword))
        | MismatchedArgCount(l1, l2) ->
          raise (TypeError (Printf.sprintf "Error: Expected number of argument(s): %d, got %d instead." l1 l2))
        | UndefinedType(c) ->
