@@ -7,6 +7,7 @@ open Ast
 %token PLUS MINUS MULTIPLY DIVIDE MODULUS
 %token LT LTE GT GTE EQUALS NEQ
 %token AND OR NOT
+%token TRY CATCH THROW
 %token LPAREN RPAREN LBRACE RBRACE RSQUARE LSQUARE
 %token ASSIGN LAMBDA
 %token CARET CONS
@@ -117,33 +118,38 @@ kv_pair:
     | expr COLON expr                          { $1, $3 }
 
 expr:
-    | literals                                 { $1 }
-    | assigns                                  { $1 }
-    | expr PLUS expr                           { Binop($1, Add, $3) }
-    | expr MINUS expr                          { Binop($1, Sub, $3) }
-    | expr MULTIPLY expr                       { Binop($1, Mul, $3) }
-    | expr DIVIDE expr                         { Binop($1, Div, $3) }
-    | expr MODULUS expr                        { Binop($1, Mod, $3) }
-    | expr CARET expr                          { Binop($1, Caret, $3) }
-    | expr AND expr                            { Binop($1, And, $3) }
-    | expr OR expr                             { Binop($1, Or, $3) }
-    | expr LTE expr                            { Binop($1, Lte, $3) }
-    | expr LT expr                             { Binop($1, Lt, $3) }
-    | expr GTE expr                            { Binop($1, Gte, $3) }
-    | expr GT expr                             { Binop($1, Gt, $3) }
-    | expr EQUALS expr                         { Binop($1, Equals, $3) }
-    | expr NEQ expr                            { Binop($1, Neq, $3) }
-    | expr CONS expr                           { Binop($1, Cons, $3) }
-    | LPAREN expr RPAREN                       { $2 }
-    | NOT expr                                 { Unop(Not, $2) }
-    | MINUS expr %prec NEG                     { Unop(Neg, $2) }
+    | literals                                           { $1 }
+    | assigns                                            { $1 }
+    | expr PLUS expr                                     { Binop($1, Add, $3) }
+    | expr MINUS expr                                    { Binop($1, Sub, $3) }
+    | expr MULTIPLY expr                                 { Binop($1, Mul, $3) }
+    | expr DIVIDE expr                                   { Binop($1, Div, $3) }
+    | expr MODULUS expr                                  { Binop($1, Mod, $3) }
+    | expr CARET expr                                    { Binop($1, Caret, $3) }
+    | expr AND expr                                      { Binop($1, And, $3) }
+    | expr OR expr                                       { Binop($1, Or, $3) }
+    | expr LTE expr                                      { Binop($1, Lte, $3) }
+    | expr LT expr                                       { Binop($1, Lt, $3) }
+    | expr GTE expr                                      { Binop($1, Gte, $3) }
+    | expr GT expr                                       { Binop($1, Gt, $3) }
+    | expr EQUALS expr                                   { Binop($1, Equals, $3) }
+    | expr NEQ expr                                      { Binop($1, Neq, $3) }
+    | expr CONS expr                                     { Binop($1, Cons, $3) }
+    | LPAREN expr RPAREN                                 { $2 }
+    | NOT expr                                           { Unop(Not, $2) }
+    | MINUS expr %prec NEG                               { Unop(Neg, $2) }
+    | THROW expr                                         { Exn($2) }
     /* Yes, we aren't proud of this either */
-    | IF expr THEN expr ELSE expr %prec SINGLE  { If($2, Block([$4]), Block([$6])) }
-    | IF expr THEN block ELSE expr %prec DOUBLE { If($2, Block($4), Block([$6])) }
-    | IF expr THEN expr ELSE block              { If($2, Block([$4]), Block($6)) }
-    | IF expr THEN block ELSE block             { If($2, Block($4), Block($6)) }
-    | ID LPAREN actuals_opt RPAREN              { Call($1, $3) }
-    | MODULE_LIT DOT expr                       { ModuleLit($1, $3)}
+    | TRY expr CATCH LPAREN ID RPAREN expr %prec SINGLE  { TryCatch(Block([$2]), $5, Block([$7])) }
+    | TRY block CATCH LPAREN ID RPAREN expr              { TryCatch(Block($2), $5, Block([$7])) }
+    | TRY expr CATCH LPAREN ID RPAREN block %prec DOUBLE { TryCatch(Block([$2]), $5, Block($7)) }
+    | TRY block CATCH LPAREN ID RPAREN block             { TryCatch(Block($2), $5, Block($7)) }
+    | IF expr THEN expr ELSE expr %prec SINGLE           { If($2, Block([$4]), Block([$6])) }
+    | IF expr THEN block ELSE expr %prec DOUBLE          { If($2, Block($4), Block([$6])) }
+    | IF expr THEN expr ELSE block                       { If($2, Block([$4]), Block($6)) }
+    | IF expr THEN block ELSE block                      { If($2, Block($4), Block($6)) }
+    | ID LPAREN actuals_opt RPAREN                       { Call($1, $3) }
+    | MODULE_LIT DOT expr                                { ModuleLit($1, $3)}
 
 actuals_opt:
     | opts = separated_list(COMMA, expr)       { opts }

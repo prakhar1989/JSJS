@@ -42,6 +42,9 @@ rule token =
     | "||"                      { OR }
     | "//"                      { comment lexbuf; }
     | "val"                     { VAL }
+    | "throw"                   { THROW }
+    | "try"                     { TRY }
+    | "catch"                   { CATCH }
     | "if"                      { IF }
     | "else"                    { ELSE }
     | "then"                    { THEN }
