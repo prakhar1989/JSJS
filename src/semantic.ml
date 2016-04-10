@@ -59,11 +59,11 @@ let rec resolve map ft at =
         resolve map vt avt
       | _ -> raise (MismatchedTypes(ft, at)))
   | TNum | TString | TBool | TUnit -> if ft = at then map else raise (MismatchedTypes(ft, at))
-  | TAny -> raise (InvalidArgumentType(TAny)) 
+  | TAny | TExn -> raise (InvalidArgumentType(ft))
 ;;
 
 let rec is_generic_type = function
-  | TString | TNum | TBool | TUnit | TAny | TFun(_) -> false
+  | TString | TExn | TNum | TBool | TUnit | TAny | TFun(_) -> false
   | T(_) -> true
   | TList(t) -> is_generic_type t
   | TMap(kt, vt) -> is_generic_type kt || is_generic_type vt
@@ -101,6 +101,7 @@ let rec validate_types type1 type2 : (Ast.primitiveType option) =
         | None -> None)
      | None -> None)
   | t1, t2 when t1 = t2 -> Some(t2)
+  | TExn, t | t, TExn -> Some(t)
   | TAny, t | t, TAny -> Some(t)
   | t1, t2 -> None
 ;;
@@ -270,6 +271,28 @@ let rec type_of_expr (env: typeEnv) = function
           (* update the locals environment with the new value *)
           let locals = (NameMap.add id val_type locals) in
           TUnit, (locals, globals)
+    end
+
+  | Throw(e) -> begin
+      let t, _ = type_of_expr env e in
+      match t with
+      | TString -> TExn, env
+      | _ -> raise (failwith "exception")
+    end
+
+  | TryCatch(e1, id, e2) -> begin
+      let t1, _ = type_of_expr env e1 in
+      let locals, globals = env in
+      let merged_globals = NameMap.merge (fun k k1 k2 -> match k1, k2 with
+          | Some k1, Some k2 -> Some k1
+          | None, k2 -> k2
+          | k1, None -> k1)
+          locals globals in
+      let locals = NameMap.add id TString NameMap.empty in
+      let t2, _ = type_of_expr (locals, merged_globals) e2 in
+      (match validate_types t1 t2 with
+       | Some(t) -> t, env
+       | None -> raise (MismatchedTypes(t1, t2)))
     end
 
   | Val(s) -> begin

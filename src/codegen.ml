@@ -37,6 +37,21 @@ let if_template pred e1 e2 =
   Printf.sprintf template name pred name e1 name e2 name
 ;;
 
+let try_catch_template e1 id e2 =
+  let name = "res_" ^ string_of_int(Random.int 1000000)
+  and template = format_of_string "(function() {
+        let %s
+        try {
+            %s = %s
+        } catch(%s) {
+            %s = %s
+        }
+        return %s
+    })()"
+  in
+  Printf.sprintf template name name e1 id name e2 name
+;;
+
 (*
  * removes all ? from string and replaces with __. used for codegen
  * since JS doesnt support ? in var names
@@ -60,6 +75,10 @@ let rec js_of_expr name map = function
       | Cons -> Printf.sprintf "(%s).insert(0, %s)" s3 s2
       | Caret -> Printf.sprintf "(%s + %s)" s2 s3
       | _ -> Printf.sprintf "(%s %s %s)" s2 (string_of_op o) s3)
+  | Throw(e) -> Printf.sprintf "throw %s" (js_of_expr name map e)
+  | TryCatch(e1, s, e2) ->
+    let s1 = js_of_expr name map e1 and s2 = js_of_expr name map e2 in
+    try_catch_template s1 s s2
   | Val(s) ->
     if NameMap.mem s map
     then Printf.sprintf "%s.%s" name (remove_qmark s)

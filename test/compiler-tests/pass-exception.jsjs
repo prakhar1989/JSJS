@@ -1,0 +1,12 @@
+val divide = /\(numer: num, denom: num): num => {
+  if denom == 0 then throw "divide by zero"
+  else numer / denom;
+};
+
+
+val answer = try divide(10, 0) catch(e) {
+  if e == "divide by zero" then {print("non zero pls"); -1;} else {-1;};
+};
+
+print(answer);
+

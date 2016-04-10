@@ -26,6 +26,7 @@ let rec string_of_type = function
   | TString -> "string"
   | TBool   -> "bool"
   | TAny    -> "any"
+  | TExn    -> "exception"
   | TUnit   -> "unit"
   | T(c)    -> Printf.sprintf "%c" c
   | TList(p) -> "list " ^ (string_of_type p)
@@ -47,6 +48,9 @@ let rec string_of_expr = function
   | Unop(o, e1) ->
     String.concat " " [string_of_op o; string_of_expr e1]
   | NumLit(x) -> string_of_float x
+  | Throw(e)  -> let s = string_of_expr e in "throw " ^ s
+  | TryCatch(e1, s, e2) -> let s1 = string_of_expr e1 and s2 = string_of_expr e2 in
+    Printf.sprintf "try %s catch(%s) %s" s1 s s2
   | UnitLit   -> "()"
   | Block(es) -> let ss = String.concat ";\n" (List.map string_of_expr es) in
     "{" ^ ss ^ "}"

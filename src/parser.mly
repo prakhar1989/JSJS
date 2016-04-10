@@ -23,6 +23,7 @@ open Ast
 %token <char>   GENERIC
 
 /* associativity rules */
+%nonassoc THROW
 %nonassoc SINGLE
 %nonassoc DOUBLE
 %nonassoc ANON
@@ -138,11 +139,11 @@ expr:
     | LPAREN expr RPAREN                                 { $2 }
     | NOT expr                                           { Unop(Not, $2) }
     | MINUS expr %prec NEG                               { Unop(Neg, $2) }
-    | THROW expr                                         { Exn($2) }
+    | THROW expr                                         { Throw($2) }
     /* Yes, we aren't proud of this either */
     | TRY expr CATCH LPAREN ID RPAREN expr %prec SINGLE  { TryCatch(Block([$2]), $5, Block([$7])) }
-    | TRY block CATCH LPAREN ID RPAREN expr              { TryCatch(Block($2), $5, Block([$7])) }
-    | TRY expr CATCH LPAREN ID RPAREN block %prec DOUBLE { TryCatch(Block([$2]), $5, Block($7)) }
+    | TRY expr CATCH LPAREN ID RPAREN block              { TryCatch(Block([$2]), $5, Block($7)) }
+    | TRY block CATCH LPAREN ID RPAREN expr %prec DOUBLE { TryCatch(Block($2), $5, Block([$7])) }
     | TRY block CATCH LPAREN ID RPAREN block             { TryCatch(Block($2), $5, Block($7)) }
     | IF expr THEN expr ELSE expr %prec SINGLE           { If($2, Block([$4]), Block([$6])) }
     | IF expr THEN block ELSE expr %prec DOUBLE          { If($2, Block($4), Block([$6])) }
