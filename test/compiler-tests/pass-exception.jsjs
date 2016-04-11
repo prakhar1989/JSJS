@@ -4,9 +4,19 @@ val divide = /\(numer: num, denom: num): num => {
 };
 
 
-val answer = try divide(10, 0) catch(e) {
-  if e == "divide by zero" then {print("non zero pls"); -1;} else {-1;};
+val answer = /\(): unit => {
+  try {divide(10, 0); (-);} catch(e) {
+    if e == "divide by zero"
+    then print("non zero pls")
+    else (-);
+  };
 };
 
-print(answer);
+val something = try {
+  val x = 10 + 10;
+  throw "try throwing an error";
+} catch(e) {
+  print(e);
+};
 
+answer();

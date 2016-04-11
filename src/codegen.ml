@@ -75,7 +75,7 @@ let rec js_of_expr name map = function
       | Cons -> Printf.sprintf "(%s).insert(0, %s)" s3 s2
       | Caret -> Printf.sprintf "(%s + %s)" s2 s3
       | _ -> Printf.sprintf "(%s %s %s)" s2 (string_of_op o) s3)
-  | Throw(e) -> Printf.sprintf "throw %s" (js_of_expr name map e)
+  | Throw(e) -> Printf.sprintf "(function() { throw %s })()" (js_of_expr name map e)
   | TryCatch(e1, s, e2) ->
     let s1 = js_of_expr name map e1 and s2 = js_of_expr name map e2 in
     try_catch_template s1 s s2
