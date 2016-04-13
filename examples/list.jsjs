@@ -19,33 +19,19 @@ val squares = List.map(/\(x:num): num => x * x, List.range(1, 10));
 List.print_list(squares);
 
 
-// testing the reduce function :)
-val sum = List.reduce(/\(acc: num, y : num): num => acc + y, 0, [1,2,3,4]);
+// testing the fold_left function :)
+val sum = List.fold_left(/\(acc: num, y : num): num => acc + y, 0, [1,2,3,4]);
 print(sum);
 
 // String module function in future:
-// Testng reduce for string list with a join function
+// Testng fold_left for string list with a join function
 val join = /\(sep: string, xs: list string): string => {
   if empty?(xs) then ""
-  else List.reduce(
+  else List.fold_left(
       /\(acc: string, x: string) : string => acc ^ sep ^ x,
       hd(xs),
       tl(xs)
   );
 };
 
-val joined = join(" ", ["hello", "world", "Reduce"]);
-
-print(joined);
-
-print("");
-p(List.insert([1,2,4,5], 3, 6));
-
-print("");
-p(List.remove([1,2,4,5], 3));
-
-print("");
-p(List.remove([1,2,4,5], 2));
-
-print("");
-p(List.remove([1,2,4,5], 0));
+List.nth(List.range(1, 10), 20);

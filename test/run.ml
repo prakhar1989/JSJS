@@ -87,9 +87,9 @@ let run_testcase fname =
       (* run the generated file with node and diff output *)
       let node_output, status = run_cmd "node out.js" in
       (match diff_output node_output output_path with
-     | None -> colorize (sprintf "✓ %s\n" fname) Green; Pass
+     | None -> colorize (sprintf "✓ %s" fname) Green; Pass
      | Some(op) -> begin
-         colorize (sprintf "✖ %s\n" fname) Red;
+         colorize (sprintf "✖ %s" fname) Red;
          colorize (sprintf "%s\n\n" op) Red;
        end; Fail)
     end
@@ -97,21 +97,21 @@ let run_testcase fname =
   (* expected and actual match on test type - both failing *)
   | Fail, Fail ->
     (match diff_output cmd_output output_path with
-     | None -> colorize (sprintf "✓ %s\n" fname) Green; Pass
+     | None -> colorize (sprintf "✓ %s" fname) Green; Pass
      | Some(op) -> begin
-         colorize (sprintf "✖ %s\n" fname) Red;
+         colorize (sprintf "✖ %s" fname) Red;
          colorize (sprintf "%s\n\n" op) Red;
        end; Fail)
 
   (* expected pass and got failure *)
   | Pass, Fail -> begin
-      colorize (sprintf "✖ %s\n." fname) Red;
+      colorize (sprintf "✖ %s" fname) Red;
       colorize "Expected test case to pass, but it failed" Red;
     end; Fail
 
   (* expected failure but passed *)
   | Fail, Pass -> begin
-      colorize (sprintf "✖ %s\n." fname) Red;
+      colorize (sprintf "✖ %s" fname) Red;
       colorize "Expected test case to fail, but it passed" Red;
     end; Fail
 ;;
