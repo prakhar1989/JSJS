@@ -1,0 +1,5 @@
+try List.insert(List.range(1, 10), 20, -10) catch(e) {
+  if e == "IndexOutOfBounds"
+  then { print("invalid index"); []; }
+  else [];
+};

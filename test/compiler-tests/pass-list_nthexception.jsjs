@@ -1,0 +1,5 @@
+try List.nth(List.range(1, 10), 20) catch(e) {
+  if e == "IndexOutOfBounds"
+  then { print("n should be less than len"); 0; }
+  else 0;
+};
