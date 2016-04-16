@@ -1,3 +1,5 @@
+type pos = Lexing.position
+
 (* Operators in JSJS *)
 type op =
   (* num operators *)

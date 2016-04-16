@@ -2,6 +2,8 @@
     open Parser
     open Lexing
 
+    let start_pos lexbuf = lexbuf.Lexing.lex_start_p
+
     (* increments the line number *)
     let incr_lineno lexbuf =
         let curr_pos = lexbuf.lex_curr_p in
@@ -23,53 +25,53 @@ rule token =
     parse
     | ws                        { token lexbuf; }
     | '\n'                      { incr_lineno lexbuf; token lexbuf; }
-    | '+'                       { PLUS }
-    | '-'                       { MINUS }
-    | '*'                       { MULTIPLY }
-    | '/'                       { DIVIDE }
-    | '%'                       { MODULUS }
-    | '<'                       { LT }
-    | '>'                       { GT }
-    | '='                       { ASSIGN }
-    | '!'                       { NOT }
-    | '^'                       { CARET }
-    | "/\\"                     { LAMBDA }
-    | "<="                      { LTE }
-    | ">="                      { GTE }
-    | "=="                      { EQUALS }
-    | "!="                      { NEQ }
-    | "&&"                      { AND }
-    | "||"                      { OR }
+    | '+'                       { PLUS (start_pos lexbuf) }
+    | '-'                       { MINUS (start_pos lexbuf) }
+    | '*'                       { MULTIPLY (start_pos lexbuf) }
+    | '/'                       { DIVIDE (start_pos lexbuf) }
+    | '%'                       { MODULUS (start_pos lexbuf) }
+    | '<'                       { LT (start_pos lexbuf) }
+    | '>'                       { GT (start_pos lexbuf) }
+    | '='                       { ASSIGN (start_pos lexbuf) }
+    | '!'                       { NOT (start_pos lexbuf) }
+    | '^'                       { CARET (start_pos lexbuf) }
+    | "/\\"                     { LAMBDA (start_pos lexbuf) }
+    | "<="                      { LTE (start_pos lexbuf) }
+    | ">="                      { GTE (start_pos lexbuf) }
+    | "=="                      { EQUALS (start_pos lexbuf) }
+    | "!="                      { NEQ (start_pos lexbuf) }
+    | "&&"                      { AND (start_pos lexbuf) }
+    | "||"                      { OR (start_pos lexbuf) }
     | "//"                      { comment lexbuf; }
-    | "val"                     { VAL }
-    | "throw"                   { THROW }
-    | "try"                     { TRY }
-    | "catch"                   { CATCH }
-    | "if"                      { IF }
-    | "else"                    { ELSE }
-    | "then"                    { THEN }
-    | "true"                    { TRUE }
-    | "false"                   { FALSE }
-    | "num"                     { NUM }
-    | "bool"                    { BOOL }
-    | "unit"                    { UNIT }
-    | "string"                  { STRING }
-    | "list"                    { LIST }
-    | "(-)"                     { UNIT_LIT }
-    | "::"                      { CONS }
-    | ':'                       { COLON }
-    | '('                       { LPAREN }
-    | ')'                       { RPAREN }
-    | '.'                       { DOT }
-    | '{'                       { LBRACE }
-    | '}'                       { RBRACE }
-    | ';'                       { SEMICOLON }
-    | '['                       { LSQUARE }
-    | ']'                       { RSQUARE }
-    | ','                       { COMMA }
-    | "=>"                      { FATARROW }
-    | "->"                      { THINARROW }
+    | "val"                     { VAL (start_pos lexbuf) }
+    | "throw"                   { THROW (start_pos lexbuf) }
+    | "try"                     { TRY (start_pos lexbuf) }
+    | "catch"                   { CATCH (start_pos lexbuf) }
+    | "if"                      { IF (start_pos lexbuf) }
+    | "else"                    { ELSE (start_pos lexbuf) }
+    | "then"                    { THEN (start_pos lexbuf) }
+    | "true"                    { TRUE (start_pos lexbuf) }
+    | "false"                   { FALSE (start_pos lexbuf) }
+    | "num"                     { NUM (start_pos lexbuf) }
+    | "bool"                    { BOOL (start_pos lexbuf) }
+    | "unit"                    { UNIT (start_pos lexbuf) }
+    | "string"                  { STRING (start_pos lexbuf) }
+    | "list"                    { LIST (start_pos lexbuf) }
+    | "::"                      { CONS (start_pos lexbuf) }
+    | ':'                       { COLON (start_pos lexbuf) }
+    | '('                       { LPAREN (start_pos lexbuf) }
+    | ')'                       { RPAREN (start_pos lexbuf) }
+    | '.'                       { DOT (start_pos lexbuf) }
+    | '{'                       { LBRACE (start_pos lexbuf) }
+    | '}'                       { RBRACE (start_pos lexbuf) }
+    | ';'                       { SEMICOLON (start_pos lexbuf) }
+    | '['                       { LSQUARE (start_pos lexbuf) }
+    | ']'                       { RSQUARE (start_pos lexbuf) }
+    | ','                       { COMMA (start_pos lexbuf) }
+    | "=>"                      { FATARROW (start_pos lexbuf) }
+    | "->"                      { THINARROW (start_pos lexbuf) }
     | ['A'-'Z'] as c            { GENERIC(c) }
+    | "(-)"                     { UNIT_LIT }
     | number as num             { NUM_LIT(float_of_string num); }
     | '"' (string_lit as s) '"' { STR_LIT(s); }
     | id     as ident           { ID(ident); }

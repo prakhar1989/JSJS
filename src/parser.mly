@@ -4,16 +4,16 @@ open Ast
 
 /* Tokens */
 %token EOF
-%token PLUS MINUS MULTIPLY DIVIDE MODULUS
-%token LT LTE GT GTE EQUALS NEQ
-%token AND OR NOT
-%token TRY CATCH THROW
-%token LPAREN RPAREN LBRACE RBRACE RSQUARE LSQUARE
-%token ASSIGN LAMBDA
-%token CARET CONS
-%token VAL IF THEN ELSE TRUE FALSE
-%token NUM LIST BOOL STRING UNIT
-%token COLON SEMICOLON DOT FATARROW COMMA THINARROW
+%token <Lexing.position> PLUS MINUS MULTIPLY DIVIDE MODULUS
+%token <Lexing.position> LT LTE GT GTE EQUALS NEQ
+%token <Lexing.position> AND OR NOT
+%token <Lexing.position> TRY CATCH THROW
+%token <Lexing.position> LPAREN RPAREN LBRACE RBRACE RSQUARE LSQUARE
+%token <Lexing.position> ASSIGN LAMBDA
+%token <Lexing.position> CARET CONS
+%token <Lexing.position> VAL IF THEN ELSE TRUE FALSE
+%token <Lexing.position> NUM LIST BOOL STRING UNIT
+%token <Lexing.position> COLON SEMICOLON DOT FATARROW COMMA THINARROW
 
 %token UNIT_LIT
 %token <float>  NUM_LIT
