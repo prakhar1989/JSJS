@@ -1,0 +1,4 @@
+val m: <string: num> = {
+  "bar": 10,
+  "foo": true // should fail - wrong type
+};

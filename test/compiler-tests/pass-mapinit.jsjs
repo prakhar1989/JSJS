@@ -1,0 +1,2 @@
+val m: <string: num> = {"foo": 10, "bar": 20};
+print(get(m, "foo") == 10);
