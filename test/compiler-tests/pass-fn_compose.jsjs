@@ -1,0 +1,11 @@
+val compose = /\[T, U, V](f: (T) -> U, g: (V) -> T): (V) -> U => {
+  /\[U, V](x: V): U => f(g(x));
+};
+
+val even? = /\(x: num): bool => x % 2 == 0;
+val not = /\(x: bool): bool => !x;
+
+// composing two functions
+val odd? = compose(not, even?);
+
+List.print_list(List.filter(odd?, List.range(1, 10)));
