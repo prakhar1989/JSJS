@@ -68,13 +68,14 @@ let list_definitions = [
   ("nth", TFunGeneric(([TList(T('T')); TNum], T('T')), ['T']));
   ("filter", TFunGeneric(([TFun([T('T')], TBool); TList(T('T'))], TList(T('T'))) , ['T']));
   ("filter_not", TFunGeneric(([TFun([T('T')], TBool); TList(T('T'))], TList(T('T'))) , ['T']));
-  ("map", TFunGeneric( ([TFun([T('T')], T('U')); TList(T('T'))], TList(T('U'))) , ['T'; 'U']));
+  ("map", TFunGeneric(([TFun([T('T')], T('U')); TList(T('T'))], TList(T('U'))) , ['T'; 'U']));
+  ("iter", TFunGeneric(([TFun([T('T')], TUnit); TList(T('T'))], TUnit) , ['T']));
   ("print_list", TFunGeneric(([TList(T('T'))], TUnit), ['T']));
   ("range", TFun([TNum; TNum], TList(TNum)));
   ("concat", TFunGeneric(([TList(T('T')); TList(T('T'))], TList(T('T'))), ['T']));
   ("fold_left", TFunGeneric(([TFun([T('T'); T('U')], T('T')); T('T'); TList(T('U'))], T('T')), ['T'; 'U']));
-  ("insert", TFunGeneric( ([TList(T('T')); T('T'); TNum], TList(T('T'))), ['T']) );
-  ("remove", TFunGeneric( ([TList(T('T')); TNum], TList(T('T'))), ['T']) );
+  ("insert", TFunGeneric(([TList(T('T')); T('T'); TNum], TList(T('T'))), ['T']) );
+  ("remove", TFunGeneric(([TList(T('T')); TNum], TList(T('T'))), ['T']) );
 ];;
 
 let map_definitions = [

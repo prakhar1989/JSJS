@@ -1,0 +1,6 @@
+val print_square = /\(x: num): unit => {
+  print(x * x);
+};
+
+
+List.iter(print_square, List.range(1, 10));
