@@ -1,0 +1,2 @@
+val m = {"foo": 10, "bar": 20};
+print(Map.count(m));
