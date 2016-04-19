@@ -6,6 +6,7 @@ type primitiveType =
   | TNum
   | TBool
   | T of string
+  | TFun of primitiveType * primitiveType
 ;;
 
 module NameMap = Map.Make(String)
@@ -17,6 +18,7 @@ type expr =
   | BoolLit of bool
   | Val of string
   | Binop of expr * op * expr
+  | Fun of id * expr
 ;;
 
 (* annotated expr -> expr with types *)
@@ -25,6 +27,7 @@ type aexpr =
   | ABoolLit of bool * primitiveType
   | AVal of string * primitiveType
   | ABinop of aexpr * op * aexpr * primitiveType
+  | AFun of id * aexpr * primitiveType
 ;;
 
 (* Unknown type,  resolved type. eg.[(T, TNum); (U, TBool)] *)
@@ -40,7 +43,7 @@ let gen_new_type () =
 ;;
 
 (*
-   In this function we take an expression and 
+   In this function we take an expression and
    an environment, and we annotate it with either
    1. A concrete primitive type (e.g bool, num etc)
    2. Or a unique generated type placeholder e.g 'a, 'b
@@ -57,14 +60,18 @@ let rec annotate_expr (e: expr) (env: environment) : aexpr =
     and et2 = annotate_expr e2 env
     and new_type = gen_new_type () in
     ABinop(et1, op, et2, new_type)
-;;
+  | Fun(id, e) ->
+    let ae = annotate_expr e env in
+    let t = NameMap.find id env in
+    AFun(id, ae, TFun(t, gen_new_type ()))
 
 (* returns the type of an annotated expression *)
-let type_of (ae: aexpr): primitiveType =
+and type_of (ae: aexpr): primitiveType =
   match ae with
   | ANumLit(_, t) | ABoolLit(_, t) -> t
   | AVal(_, t) -> t
   | ABinop(_, _, _, t) -> t
+  | AFun(_, _, t) -> t
 ;;
 
 (* Returns constraints as a list of tuples based on valid operations.  *)
@@ -83,15 +90,19 @@ let rec collect_expr (ae: aexpr) : (primitiveType * primitiveType) list =
     in 
     (* opc appended at the rightmost since we apply substitutions right to left *)
     (collect_expr ae1) @ (collect_expr ae2) @ opc
+  | AFun(id, ae, t) -> (match t with
+      | TFun(idt, ret_type) -> (collect_expr ae) @ [(type_of ae, ret_type)]
+      | _ -> raise (failwith "not a function"))
 ;;
 
 (* t -> type to be resolved; 
    (x, u) -> (type placeholder, resolved substitution);
    returns a valid substitution for t if present, else t as it is.  *)
-let substitute (u: primitiveType) (x: id) (t: primitiveType) : primitiveType =
+let rec substitute (u: primitiveType) (x: id) (t: primitiveType) : primitiveType =
   match t with
   | TNum | TBool -> t
   | T(c) -> if c = x then u else t
+  | TFun(t1, t2) -> TFun(substitute u x t1, substitute u x t2)
 ;;
 
 (* takes a list of substitutions and an unresolved type t and returns 
@@ -115,6 +126,7 @@ let rec unify (constraints: (primitiveType * primitiveType) list) : substitution
 and unify_one (t1: primitiveType) (t2: primitiveType) : substitutions =
   match t1, t2 with
   | TNum, TNum | TBool, TBool -> []
+  | TFun(a, b), TFun(x, y) -> unify [(a, x); (b, y)]
   | T(x), z | z, T(x) -> [(x, z)]
   | _ -> raise (failwith "mismatched types")
 ;;
@@ -126,6 +138,7 @@ let rec apply_expr (subs: substitutions) (ae: aexpr): aexpr =
   | ANumLit(n, t) -> ANumLit(n, apply subs t)
   | AVal(s, t) -> AVal(s, apply subs t)
   | ABinop(e1, op, e2, t) -> ABinop(apply_expr subs e1, op, apply_expr subs e2, apply subs t)
+  | AFun(id, e, t) -> AFun(id, apply_expr subs e, apply subs t)
 ;;
 
 (* runs HMTI step-by-step 
@@ -141,9 +154,13 @@ let infer (env: environment) (e: expr) : aexpr =
   apply_expr subs annotated_expr
 ;;
 
-let string_of_type (t: primitiveType): string =
+let rec string_of_type (t: primitiveType): string =
   match t with
-  | TNum -> "num" | TBool -> "bool" | T(x) -> Printf.sprintf "'%s" x
+  | TNum -> "num" | TBool -> "bool"
+  | T(x) -> Printf.sprintf "'%s" x
+  | TFun(t1, t2) -> let st1 = string_of_type t1
+    and st2 = string_of_type t2 in
+    Printf.sprintf "(%s -> %s)" st1 st2
 ;;
 
 let string_of_op (op: op) =
@@ -159,17 +176,23 @@ let rec string_of_aexpr (ae: aexpr): string =
     let s1 = string_of_aexpr e1 in let s2 = string_of_aexpr e2 in
     let sop = string_of_op op in let st = string_of_type t in
     Printf.sprintf "(%s %s %s: %s)" s1 sop s2 st
+  | AFun(id, ae, t) ->
+    let s1 = string_of_aexpr ae in
+    let st = string_of_type t in
+    Printf.sprintf "(fun %s -> %s): %s" id s1 st
 ;;
 
-let rec string_of_expr (e: expr): string = 
+let rec string_of_expr (e: expr): string =
   match e with
   | NumLit(x) -> string_of_int x
   | BoolLit(b) -> string_of_bool b
   | Val(s) -> s
-  | Binop(e1, op, e2) -> 
+  | Binop(e1, op, e2) ->
     let s1 = string_of_expr e1 and s2 = string_of_expr e2 in
-    let sop = string_of_op op in 
+    let sop = string_of_op op in
     Printf.sprintf "(%s %s %s)" s1 sop s2
+  | Fun(id, e) ->
+    let s1 = string_of_expr e in Printf.sprintf "(fun %s -> %s)" id s1
 ;;
 
 (* testing *)
@@ -183,5 +206,7 @@ let debug (e: expr) (vals: string list) =
 let _ = Binop(Binop(Val("x"), Add, Val("y")), Mul, Val("z")) in
 let _ = Binop(Binop(Val("x"), Add, Val("y")), Gte, Val("z")) in
 let _ = Binop(Binop(Val("x"), Gte, Val("y")), Mul, Val("z")) in
-let e1 = Binop(Binop(Val("x"), Gte, Val("y")), Lte, Val("z")) in
-debug e1 ["x"; "y"; "z"] ;;
+let _ = Binop(Binop(Val("x"), Gte, Val("y")), Lte, Val("z")) in
+let _ = Fun("x", Binop(Val("x"), Add, NumLit(10))) in
+let f = Fun("x", Binop(NumLit(20), Gte,Binop(Val("x"), Add, NumLit(10)))) in
+debug f ["x"; "y"] ;;
