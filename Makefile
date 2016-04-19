@@ -11,6 +11,12 @@ jsjs:
 	@echo JSJS is ready to be served! 🍕 🍕 🍕
 	@echo ----------------------------------
 
+
+.PHONY: infer
+infer:
+	ocamlc -o infer.out src/type_infer.ml
+	@rm src/*.cm*
+
 .PHONY: test
 test:
 	ocamlc -o run-tests.out str.cma unix.cma test/run.ml
