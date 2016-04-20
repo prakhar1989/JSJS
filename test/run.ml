@@ -16,7 +16,8 @@ let colorize msg c =
     | White -> "37" in
   let template = format_of_string "
     \027[%sm%s" in
-  printf template pad msg
+  printf template pad msg;
+  flush stdout;
 ;;
 
 (* runs a unix command and returns
