@@ -139,5 +139,25 @@ let rec annotate_expr (e: expr) (env: environment) : (aexpr * environment) =
       in ABlock(List.rev aes, get_new_type ()), env
 
   | _ -> AUnitLit(TUnit), env
+;;
 
-
+let rec type_of (aexpr: aexpr): primitiveType =
+  match aexpr with
+  | AUnitLit(t) -> t
+  | ANumLit(_, t) -> t
+  | ABoolLit(_, t) -> t
+  | AStrLit(_, t) -> t
+  | ABinop(_, _, _, t) -> t
+  | AUnop(_, _, t) -> t
+  | AListLit(_, t) -> t
+  | AMapLit(_, t) -> t
+  | ABlock(_, t) -> t
+  | AAssign(_, _, _, t) -> t
+  | AVal(_, t) -> t
+  | AIf(_, _, _, t) -> t
+  | ACall(_, _, t) -> t
+  | AFunLit(_, _, _, t) -> t
+  | AModuleLit(_, _, t) -> t
+  | AThrow(_, t) -> t
+  | ATryCatch(_, _, _, t) -> t
+;;
