@@ -1,0 +1,11 @@
+val nums = [1, 2, 3, 4, 5];
+
+List.print_list(List.concat(nums, [7]));
+
+val strings = ["one", "two", "three", "four", "five"];
+
+List.print_list(List.concat(strings, ["seven"]));
+
+val bools = [true, false, false, true, false];
+
+List.print_list(List.concat(bools, [false]));

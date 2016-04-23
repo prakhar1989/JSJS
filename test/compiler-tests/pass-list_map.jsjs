@@ -1,0 +1,7 @@
+val a = [1, 2, 3, 4, 5];
+
+List.print_list(List.map(/\(x:num): num => x * x, a));
+
+List.print_list(List.map(/\(x: num): string => if (x%2 == 0) then "EVEN" else "ODD", a));
+
+
