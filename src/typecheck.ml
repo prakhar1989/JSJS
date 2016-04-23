@@ -213,9 +213,60 @@ let rec collect_expr (ae: aexpr): constraints =
       | TList(x) -> x
       | _ -> raise (failwith "unreachable state reached")
     in
-    let elem_conts = List.map (fun a -> (type_of ae, list_type)) aes in
+    let elem_conts = List.map (fun ae -> (list_type, type_of ae)) aes in
     (List.flatten (List.map collect_expr aes)) @ elem_conts
 
+  (* remember to restrict key types to be TNum, TBool and TString, 
+     will require another type check *)
+  | AMapLit(kvpairs, t) ->
+    let kt, vt = match t with 
+      | TMap(kt, vt) -> kt, vt
+      | _ -> raise (failwith "unreachable state reached")
+    in 
+    let klist = List.map fst kvpairs in
+    let vlist = List.map snd kvpairs in
+    let k_conts = List.map (fun k -> (kt, type_of k)) klist in
+    let v_conts = List.map (fun v -> (vt, type_of v)) vlist in
+    (List.flatten (List.map collect_expr klist)) @
+    (List.flatten (List.map collect_expr vlist)) @ k_conts @ v_conts
+
+  | ABlock(aes, t) ->
+    let last_type = (match List.hd (List.rev aes) with 
+    | AAssign(_) -> raise(failwith "can't end block with an assignment")
+    | ae -> type_of ae ) in
+    (List.flatten (List.map collect_expr aes)) @ [(t, last_type)]
+
+  | AAssign(id, t, ae, _) -> (collect_expr ae) @ [(t, type_of ae)]    
+
+  | AFunLit(_, ae, _, t) -> (match t with
+      | TFun(_, ret_type) -> (collect_expr ae) @ [(type_of ae, ret_type)]
+      | _ -> raise (failwith "not a function"))
+
+    (*
+       1. Type constraints for function calls:
+        afn should be 
+        - AVal
+        - AFunLit
+       otherwise raise a 'Not a Function call error'
+
+       2. Type of afn can only be TFun or T(_)
+          If it is a TFun, check explicitly for formal and actual opts
+          If it is T(_), wrap it in a TFun and then compare types
+       *)
+  | ACall(afn , aargs, t) -> 
+    let typ_afn = (match afn with
+        | AVal(_) | AFunLit(_) -> type_of afn
+        | _ -> raise (failwith "not a function call")) in
+    let sign_conts = (match typ_afn with 
+        | TFun(arg_types, ret_type) -> begin
+            if List.length aargs <> List.length arg_types 
+            then raise (failwith "incorrect number of arguments")
+            else let arg_conts = List.map2 (fun ft at -> (ft, type_of at)) arg_types aargs in
+              arg_conts @ [(t, ret_type)]
+          end
+        | T(_) -> [(typ_afn, TFun(List.map type_of aargs, t))]
+        | _ -> raise (failwith "unreachable state reached")) in
+    (collect_expr afn) @ (List.flatten (List.map collect_expr aargs)) @ sign_conts
 
   | _ -> []
 ;;
