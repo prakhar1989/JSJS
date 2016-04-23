@@ -52,7 +52,7 @@ let rec annotate_expr (e: expr) (env: environment) : (aexpr * environment) =
   | NumLit(n) -> ANumLit(n, TNum), env
   | BoolLit(b) -> ABoolLit(b, TBool), env
   | StrLit(s) -> AStrLit(s, TString), env
-  | Binop(e1, op, e2) -> 
+  | Binop(e1, op, e2) ->
     let ae1, _ = annotate_expr e1 env
     and ae2, _= annotate_expr e2 env
     and new_type = get_new_type () in
@@ -61,7 +61,7 @@ let rec annotate_expr (e: expr) (env: environment) : (aexpr * environment) =
     let new_type = get_new_type () in
     AUnop(op, ae, new_type), env
 
-  | Val(id) -> 
+  | Val(id) ->
     let locals, globals = env in
     let typ = if NameMap.mem id locals
       then NameMap.find id locals
@@ -89,10 +89,10 @@ let rec annotate_expr (e: expr) (env: environment) : (aexpr * environment) =
 
         (* augment local scope with fn args *)
         let new_locals = ListLabels.fold_left ~init: locals
-            annotated_args ~f: (fun map (it, at) -> 
+            annotated_args ~f: (fun map (it, at) ->
                 if NameMap.mem it map
                 then raise (failwith "cant reuse arg names")
-                else NameMap.add it at map) in 
+                else NameMap.add it at map) in
 
         (* prepare AFunLit *)
         let ae, _ = annotate_expr e (new_locals, globals) in
@@ -103,9 +103,9 @@ let rec annotate_expr (e: expr) (env: environment) : (aexpr * environment) =
     end
 
   | Call(fn, args) -> begin
-      let afn, _  = annotate_expr fn env in 
+      let afn, _  = annotate_expr fn env in
       let aargs = List.map (fun arg -> fst (annotate_expr arg env)) args in
-      ACall(afn, aargs, get_new_type ()), env 
+      ACall(afn, aargs, get_new_type ()), env
     end
 
   | Assign(id, t, e) -> begin
@@ -119,7 +119,7 @@ let rec annotate_expr (e: expr) (env: environment) : (aexpr * environment) =
       (* annotate t with user-provided type or new placeholder *)
       else let t = if t = TAny then get_new_type () else t in
         let new_locals = NameMap.add id t locals in
-        let ae, _ = match e with 
+        let ae, _ = match e with
           (* to allow recursion, we need to add pass new environment *)
           | FunLit(_) -> annotate_expr e (new_locals, globals)
           | _ -> annotate_expr e env
@@ -131,13 +131,13 @@ let rec annotate_expr (e: expr) (env: environment) : (aexpr * environment) =
     AListLit(aes, TList(get_new_type ())), env
 
   | MapLit(kvpairs) ->
-    let akvpairs = List.map (fun (k, v) -> 
-        let ak = fst (annotate_expr k env) 
-        and av = fst (annotate_expr v env) in ak, av) 
-        kvpairs 
+    let akvpairs = List.map (fun (k, v) ->
+        let ak = fst (annotate_expr k env)
+        and av = fst (annotate_expr v env) in ak, av)
+        kvpairs
     in AMapLit(akvpairs, TMap(get_new_type (), get_new_type ())), env
 
-  | If(p, e1, e2) -> 
+  | If(p, e1, e2) ->
     let ap = fst (annotate_expr p env)
     and ae1 = fst (annotate_expr e1 env)
     and ae2 = fst (annotate_expr e2 env)
@@ -179,7 +179,7 @@ let rec collect_expr (ae: aexpr): constraints =
   match ae with
   | AUnitLit(_) | ANumLit(_) | ABoolLit(_) | AStrLit(_) -> []
   | AVal(_) -> []
-  | ABinop(ae1, op, ae2, t) -> 
+  | ABinop(ae1, op, ae2, t) ->
     let et1 = type_of ae1 and et2 = type_of ae2 in
 
     let opc = match op with
@@ -189,9 +189,9 @@ let rec collect_expr (ae: aexpr): constraints =
       | Lte | Gte | Neq | Equals | Lt | Gt -> [(et1, et2); (t, TBool)]
       | Cons -> (match et2 with
           (* write something here *)
-          | TList(x) -> [(et1, x); (t, et2)] 
+          | TList(x) -> [(et1, x); (t, et2)]
           | T(_) -> [(et2, TList(et1)); (t, TList(et1))]
-          | _ -> raise (failwith "lists have to be same type something")) 
+          | _ -> raise (failwith "lists have to be same type something"))
       | _ -> raise (failwith "not a binary operator") in
     (collect_expr ae1) @ (collect_expr ae2) @ opc
 
@@ -216,13 +216,13 @@ let rec collect_expr (ae: aexpr): constraints =
     let elem_conts = List.map (fun ae -> (list_type, type_of ae)) aes in
     (List.flatten (List.map collect_expr aes)) @ elem_conts
 
-  (* remember to restrict key types to be TNum, TBool and TString, 
+  (* remember to restrict key types to be TNum, TBool and TString,
      will require another type check *)
   | AMapLit(kvpairs, t) ->
-    let kt, vt = match t with 
+    let kt, vt = match t with
       | TMap(kt, vt) -> kt, vt
       | _ -> raise (failwith "unreachable state reached")
-    in 
+    in
     let klist = List.map fst kvpairs in
     let vlist = List.map snd kvpairs in
     let k_conts = List.map (fun k -> (kt, type_of k)) klist in
@@ -231,35 +231,24 @@ let rec collect_expr (ae: aexpr): constraints =
     (List.flatten (List.map collect_expr vlist)) @ k_conts @ v_conts
 
   | ABlock(aes, t) ->
-    let last_type = (match List.hd (List.rev aes) with 
+    let last_type = (match List.hd (List.rev aes) with
     | AAssign(_) -> raise(failwith "can't end block with an assignment")
     | ae -> type_of ae ) in
     (List.flatten (List.map collect_expr aes)) @ [(t, last_type)]
 
-  | AAssign(id, t, ae, _) -> (collect_expr ae) @ [(t, type_of ae)]    
+  | AAssign(id, t, ae, _) -> (collect_expr ae) @ [(t, type_of ae)]
 
   | AFunLit(_, ae, _, t) -> (match t with
       | TFun(_, ret_type) -> (collect_expr ae) @ [(type_of ae, ret_type)]
       | _ -> raise (failwith "not a function"))
 
-    (*
-       1. Type constraints for function calls:
-        afn should be 
-        - AVal
-        - AFunLit
-       otherwise raise a 'Not a Function call error'
-
-       2. Type of afn can only be TFun or T(_)
-          If it is a TFun, check explicitly for formal and actual opts
-          If it is T(_), wrap it in a TFun and then compare types
-       *)
-  | ACall(afn , aargs, t) -> 
+  | ACall(afn , aargs, t) ->
     let typ_afn = (match afn with
         | AVal(_) | AFunLit(_) -> type_of afn
         | _ -> raise (failwith "not a function call")) in
-    let sign_conts = (match typ_afn with 
+    let sign_conts = (match typ_afn with
         | TFun(arg_types, ret_type) -> begin
-            if List.length aargs <> List.length arg_types 
+            if List.length aargs <> List.length arg_types
             then raise (failwith "incorrect number of arguments")
             else let arg_conts = List.map2 (fun ft at -> (ft, type_of at)) arg_types aargs in
               arg_conts @ [(t, ret_type)]
@@ -268,7 +257,7 @@ let rec collect_expr (ae: aexpr): constraints =
         | _ -> raise (failwith "unreachable state reached")) in
     (collect_expr afn) @ (List.flatten (List.map collect_expr aargs)) @ sign_conts
 
-  | _ -> raise (failwith "not yet implemented") 
+  | _ -> raise (failwith "not yet implemented in collect")
 ;;
 
 let rec substitute (u: primitiveType) (x: id) (t: primitiveType) : primitiveType =
@@ -278,7 +267,7 @@ let rec substitute (u: primitiveType) (x: id) (t: primitiveType) : primitiveType
   | TFun(t1, t2) -> TFun(List.map (substitute u x) t1, substitute u x t2)
   | TList(t) -> TList(substitute u x t)
   | TMap(kt, vt) -> TMap(substitute u x kt, substitute u x vt)
-  | _ -> raise(failwith "not yet implemented")
+  | _ -> raise(failwith "not yet implemented in subs")
 ;;
 
 let apply (subs: substitutions) (t: primitiveType) : primitiveType =
@@ -307,21 +296,23 @@ and unify_one (t1: primitiveType) (t2: primitiveType) : substitutions =
 ;;
 
 let rec apply_expr (subs: substitutions) (ae: aexpr): aexpr =
-    match ae with
-        | ABoolLit(b, t) -> ABoolLit(b, apply subs t)
-        | ANumLit(n, t) -> ANumLit(n, apply subs t)
-        | AStrLit(s, t) -> AStrLit(s, apply subs t)
-        | AUnitLit(t) -> AUnitLit(apply subs t)
-        | AVal(s, t) -> AVal(s, apply subs t)
-        | ABinop(ae1, op, ae2, t) -> ABinop(apply_expr subs ae1, op, apply_expr subs ae2, apply subs t)
-        | AUnop(op, ae, t) -> AUnop(op, apply_expr subs ae, apply subs t)
-        | AListLit(aes, t) -> AListLit(List.map (apply_expr subs) aes, apply subs t)
-        | AMapLit(kvpairs, t) -> AMapLit(List.map (fun (k, v) -> (apply_expr subs k, apply_expr subs v)) kvpairs, apply subs t)
-        | AIf(ap, ae1, ae2, t) -> AIf(apply_expr subs ap, apply_expr subs ae1, apply_expr subs ae2, apply subs t)
-        | ABlock(aes, t) -> ABlock(List.map (apply_expr subs) aes, apply subs t)
-        | AFunLit(ids, ae, t1, t2) -> AFunLit(ids, apply_expr subs ae, t1, apply subs t2)
-        | ACall(afn, aargs, t) -> ACall(apply_expr subs afn, List.map (apply_expr subs) aargs, apply subs t)
-        | _ -> raise (failwith "not yet implemented")   
+  match ae with
+  | ABoolLit(b, t) -> ABoolLit(b, apply subs t)
+  | ANumLit(n, t) -> ANumLit(n, apply subs t)
+  | AStrLit(s, t) -> AStrLit(s, apply subs t)
+  | AUnitLit(t) -> AUnitLit(apply subs t)
+  | AVal(s, t) -> AVal(s, apply subs t)
+  | AAssign(id, t, ae, _) -> AAssign(id, apply subs t, apply_expr subs ae, TUnit)
+  | ABinop(ae1, op, ae2, t) -> ABinop(apply_expr subs ae1, op, apply_expr subs ae2, apply subs t)
+  | AUnop(op, ae, t) -> AUnop(op, apply_expr subs ae, apply subs t)
+  | AListLit(aes, t) -> AListLit(List.map (apply_expr subs) aes, apply subs t)
+  | AMapLit(kvpairs, t) -> AMapLit(List.map (fun (k, v) -> (apply_expr subs k, apply_expr subs v)) kvpairs, apply subs t)
+  | AIf(ap, ae1, ae2, t) -> AIf(apply_expr subs ap, apply_expr subs ae1, apply_expr subs ae2, apply subs t)
+  | ABlock(aes, t) -> ABlock(List.map (apply_expr subs) aes, apply subs t)
+  | AFunLit(ids, ae, t1, t2) -> AFunLit(ids, apply_expr subs ae, t1, apply subs t2)
+  | ACall(afn, aargs, t) -> ACall(apply_expr subs afn, List.map (apply_expr subs) aargs, apply subs t)
+  | _ -> raise (failwith "not yet implemented in apply_expr")
+;;
 
 (* runs HMTI step-by-step
       1. annotate expression with placeholder types
@@ -329,21 +320,28 @@ let rec apply_expr (subs: substitutions) (ae: aexpr): aexpr =
       3. unify types based on constraints
       4. run the final set of substitutions on still unresolved types
       5. obtain a final annotated expression with resolved types *)
-let infer (env: environment) (e: expr): aexpr * environment =
+let infer (env: environment) (e: expr): aexpr =
   let annotated_expr, env = annotate_expr e env in
   let constraints = collect_expr annotated_expr in
   let subs = unify constraints in
   (* reset the type counter after completing inference *)
-  type_variable := Char.code 'A'; 
-  apply_expr subs annotated_expr, env
+  type_variable := Char.code 'A';
+  apply_expr subs annotated_expr
+;;
+
+let collect_program program =
+  List.flatten (List.map collect_expr program)
 ;;
 
 let type_check (program: program) : unit =
   let env: environment = (NameMap.empty, NameMap.empty) in
-  let _ = ListLabels.fold_left ~init: env
-    program ~f: (fun acc_env expr ->
-        let inferred, new_env = infer acc_env expr in
-        print_endline (Stringify.string_of_aexpr inferred); 
-        new_env) in
-  ();
+  let annotated_program, _ = ListLabels.fold_left ~init: ([], env)
+      program ~f: (fun (aacc, env) aexpr ->
+          let ae, env = annotate_expr aexpr env in (ae :: aacc, env))
+  in
+  let annotated_program = List.rev annotated_program in
+  let constraints = collect_program annotated_program in
+  let subs = unify constraints in
+  let inferred_program = List.map (fun t -> (apply_expr subs t)) annotated_program in
+  List.iter (fun t -> print_endline (Stringify.string_of_aexpr t)) inferred_program;
 ;;

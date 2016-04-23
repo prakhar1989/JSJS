@@ -88,15 +88,17 @@ let rec string_of_aexpr (ae: aexpr) : string =
   | AStrLit(s, t) -> Printf.sprintf "(%s: %s)" s (string_of_type t)
   | AUnitLit(t) -> Printf.sprintf "()"
   | AVal(s, t) -> Printf.sprintf "(%s: %s)" s (string_of_type t)
-  | ABinop(e1, op, e2, t) -> 
+  | ABinop(e1, op, e2, t) ->
     let s1 = string_of_aexpr e1 in let s2 = string_of_aexpr e2 in
     let sop = string_of_op op in let st = string_of_type t in
     Printf.sprintf "(%s %s %s: %s)" s1 sop s2 st
-  | AUnop(op, e, t) -> 
+  | AUnop(op, e, t) ->
     let s = string_of_aexpr e in
     let sop = string_of_op op in let st = string_of_type t in
     Printf.sprintf "(%s %s: %s)" s sop st
-  | AListLit(aes, t) -> 
+  | AAssign(id, t1, e, t2) ->
+    Printf.sprintf "val %s: %s = %s : %s" id (string_of_type t1) (string_of_aexpr e) (string_of_type t2)
+  | AListLit(aes, t) ->
     let s = String.concat "," (List.map string_of_aexpr aes) in
     Printf.sprintf "[%s]:%s" s (string_of_type t)
   | AMapLit(kvpairs, t) ->  "map < >"
@@ -111,11 +113,11 @@ let rec string_of_aexpr (ae: aexpr) : string =
       let fsig = "(" ^ fargs ^ ")" ^ " : " ^ (string_of_type ret_type) in
       let fbody = string_of_aexpr body in
       String.concat " " ["/\\"; fsig; "="; "{"; fbody; "}"]
-    end 
-  | ACall(afn, aargs, t) -> 
+    end
+  | ACall(afn, aargs, t) ->
     let sfn = string_of_aexpr afn
     and sargs = String.concat "," (List.map string_of_aexpr aargs) in
     Printf.sprintf "%s(%s) : %s" sfn sargs (string_of_type t)
 
-  | _ -> raise (failwith "not yet implemented")   
+  | _ -> raise (failwith "not yet implemented in stringify")
 ;;
