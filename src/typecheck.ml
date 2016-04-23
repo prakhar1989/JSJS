@@ -1,5 +1,6 @@
 open Ast
 open Lexing
+open Exceptions
 open Parsing
 
 module NameMap = Map.Make(String)
@@ -35,6 +36,8 @@ let get_new_type () =
   incr type_variable;
   T(Char.escaped (Char.chr c))
 ;;
+
+let modules = Lib.modules;;
 
 let merge_env (env: environment) : environment =
   let locals, globals = env in
@@ -143,15 +146,28 @@ let rec annotate_expr (e: expr) (env: environment) : (aexpr * environment) =
     and ae2 = fst (annotate_expr e2 env)
     in AIf(ap, ae1, ae2, get_new_type ()), env
 
-  | Block(es) ->
+  | Block(es) -> begin
       let new_env = merge_env env in
       let aes, new_env = ListLabels.fold_left ~init: ([], new_env) es
           ~f: (fun (aes, env) e -> let ae, env = annotate_expr e env in (ae :: aes, env))
       in ABlock(List.rev aes, get_new_type ()), env
+    end 
 
+  | Throw(e) -> AThrow(fst (annotate_expr e env), TExn), env
 
-  | _ -> AUnitLit(TUnit), env
+  | TryCatch(t, s, c) -> 
+    let at, _ = annotate_expr t env in
+    let locals, globals = merge_env env in
+    let new_locals = NameMap.add s TString locals in
+    let ct, _ = annotate_expr c (new_locals, globals) in
+    ATryCatch(at, s, ct, get_new_type ()), env
+
+  | ModuleLit(id, e) -> 
+    if ModuleMap.mem id modules
+    then AModuleLit(id, fst (annotate_expr e env), get_new_type ()), env
+    else raise (failwith "module not found") 
 ;;
+
 
 let rec type_of (aexpr: aexpr): primitiveType =
   match aexpr with
@@ -257,17 +273,42 @@ let rec collect_expr (ae: aexpr): constraints =
         | _ -> raise (failwith "unreachable state reached")) in
     (collect_expr afn) @ (List.flatten (List.map collect_expr aargs)) @ sign_conts
 
-  | _ -> raise (failwith "not yet implemented in collect")
+  | AModuleLit(id, ae, t) ->
+    let definitions = ModuleMap.find id modules in
+    (match ae with
+     | AVal(prop, ts) -> let prop_type = if NameMap.mem prop definitions
+       then NameMap.find prop definitions
+       else raise (failwith "undefined property") in
+       (collect_expr ae) @ [(t, prop_type)]
+     | ACall(afn, aargs, call_t) ->
+       let prop = (match afn with
+           | AVal(s, _) -> s
+           |  _ -> raise (failwith "unreachable state")) in
+       let prop_type = if NameMap.mem prop definitions
+       then NameMap.find prop definitions
+       else raise (failwith "undefined property") in
+       (match prop_type with
+       | TFun(_, ret_type) -> let new_call = ACall(afn, aargs, ret_type) in
+         (collect_expr new_call) @ [(t, ret_type)]
+       | _ -> raise(failwith "unreachable state"))
+     | _ -> raise (failwith "undefined property"))
+
+  | AThrow(ae, t) -> collect_expr ae @ [(t, TExn)]
+
+  | ATryCatch(atry, id, acatch, t) ->
+    let ttry = type_of atry and tcatch = type_of acatch in
+    if tcatch = TExn then raise (failwith "Can't throw in a catch block") else 
+    (collect_expr atry) @ (collect_expr acatch) @ [(ttry, tcatch); (t, tcatch)]
+
 ;;
 
 let rec substitute (u: primitiveType) (x: id) (t: primitiveType) : primitiveType =
   match t with
-  | TNum | TBool | TString | TUnit | TAny -> t
+  | TNum | TBool | TString | TUnit | TAny | TExn -> t
   | T(c) -> if c = x then u else t
   | TFun(t1, t2) -> TFun(List.map (substitute u x) t1, substitute u x t2)
   | TList(t) -> TList(substitute u x t)
   | TMap(kt, vt) -> TMap(substitute u x kt, substitute u x vt)
-  | _ -> raise(failwith "not yet implemented in subs")
 ;;
 
 let apply (subs: substitutions) (t: primitiveType) : primitiveType =
@@ -287,6 +328,7 @@ let rec unify (constraints: constraints) : substitutions =
 and unify_one (t1: primitiveType) (t2: primitiveType) : substitutions =
   match t1, t2 with
   | TNum, TNum | TBool, TBool | TString, TString | TUnit, TUnit -> []
+  | TExn, _ | _, TExn -> []
   | T(x), z | z, T(x) -> [(x, z)]
   | TList(t1), TList(t2) -> unify_one t1 t2
   | TMap(kt1, vt1), TMap(kt2, vt2) -> unify [(kt1, kt2) ; (vt1, vt2)]
@@ -311,25 +353,12 @@ let rec apply_expr (subs: substitutions) (ae: aexpr): aexpr =
   | ABlock(aes, t) -> ABlock(List.map (apply_expr subs) aes, apply subs t)
   | AFunLit(ids, ae, t1, t2) -> AFunLit(ids, apply_expr subs ae, t1, apply subs t2)
   | ACall(afn, aargs, t) -> ACall(apply_expr subs afn, List.map (apply_expr subs) aargs, apply subs t)
-  | _ -> raise (failwith "not yet implemented in apply_expr")
+  | AModuleLit(id, ae, t) -> AModuleLit(id, apply_expr subs ae, apply subs t)
+  | AThrow(ae, t) -> AThrow(apply_expr subs ae, apply subs t)
+  | ATryCatch(atry, s, acatch, t) -> ATryCatch(apply_expr subs atry, s, apply_expr subs acatch, apply subs t)
 ;;
 
-(* runs HMTI step-by-step
-      1. annotate expression with placeholder types
-      2. generate constraints with environment
-      3. unify types based on constraints
-      4. run the final set of substitutions on still unresolved types
-      5. obtain a final annotated expression with resolved types *)
-let infer (env: environment) (e: expr): aexpr =
-  let annotated_expr, env = annotate_expr e env in
-  let constraints = collect_expr annotated_expr in
-  let subs = unify constraints in
-  (* reset the type counter after completing inference *)
-  type_variable := Char.code 'A';
-  apply_expr subs annotated_expr
-;;
-
-let collect_program program =
+let collect_program (program: aexpr list) : constraints =
   List.flatten (List.map collect_expr program)
 ;;
 
