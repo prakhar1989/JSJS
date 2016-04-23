@@ -77,17 +77,21 @@ args:
 fun_literals:
     /* Return type not annotated */
     | LAMBDA LPAREN formals_opt RPAREN FATARROW expr %prec ANON {
-        FunLit({ formals = $3; return_type = TAny; body = Block([$6]); })
+        let formal_types = List.map snd $3 and ids = List.map fst $3 in
+        FunLit(ids, Block([$6]), TFun(formal_types, TAny))
     }
     | LAMBDA LPAREN formals_opt RPAREN FATARROW block {
-        FunLit({ formals = $3; return_type = TAny; body = Block($6); })
+        let formal_types = List.map snd $3 and ids = List.map fst $3 in
+        FunLit(ids, Block($6), TFun(formal_types, TAny))
     }
     /* Return type annotated */
     | LAMBDA LPAREN formals_opt RPAREN COLON primitive FATARROW expr %prec ANON {
-        FunLit({ formals = $3; return_type = $6; body = Block([$8]); })
+        let formal_types = List.map snd $3 and ids = List.map fst $3 in
+        FunLit(ids, Block([$8]), TFun(formal_types, $6))
     }
     | LAMBDA LPAREN formals_opt RPAREN COLON primitive FATARROW block {
-        FunLit({ formals = $3; return_type = $6; body = Block($8); })
+        let formal_types = List.map snd $3 and ids = List.map fst $3 in
+        FunLit(ids, Block($8), TFun(formal_types, $6))
     }
 
 literals:
@@ -111,7 +115,7 @@ expr:
     | literals                                           { $1 }
     | assigns                                            { $1 }
     | LPAREN fun_literals SEMICOLON 
-      RPAREN LPAREN actuals_opt RPAREN                   { Call($2, $5) }
+      RPAREN LPAREN actuals_opt RPAREN                   { Call($2, $6) }
     | expr PLUS expr                                     { Binop($1, Add, $3) }
     | expr MINUS expr                                    { Binop($1, Sub, $3) }
     | expr MULTIPLY expr                                 { Binop($1, Mul, $3) }
