@@ -329,11 +329,21 @@ let rec apply_expr (subs: substitutions) (ae: aexpr): aexpr =
       3. unify types based on constraints
       4. run the final set of substitutions on still unresolved types
       5. obtain a final annotated expression with resolved types *)
-let infer (env: environment) (e: expr) : aexpr =
-  let annotated_expr, _ = annotate_expr e env in
+let infer (env: environment) (e: expr): aexpr * environment =
+  let annotated_expr, env = annotate_expr e env in
   let constraints = collect_expr annotated_expr in
   let subs = unify constraints in
   (* reset the type counter after completing inference *)
   type_variable := Char.code 'A'; 
-  apply_expr subs annotated_expr
+  apply_expr subs annotated_expr, env
+;;
+
+let type_check (program: program) : unit =
+  let env: environment = (NameMap.empty, NameMap.empty) in
+  let _ = ListLabels.fold_left ~init: env
+    program ~f: (fun acc_env expr ->
+        let inferred, new_env = infer acc_env expr in
+        print_endline (Stringify.string_of_aexpr inferred); 
+        new_env) in
+  ();
 ;;

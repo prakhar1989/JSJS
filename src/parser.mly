@@ -20,7 +20,7 @@ open Ast
 %token <string> STR_LIT
 %token <string> MODULE_LIT
 %token <string> ID
-%token <char>   GENERIC
+%token <string>   GENERIC
 
 /* associativity rules */
 %nonassoc THROW
