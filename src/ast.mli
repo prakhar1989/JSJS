@@ -26,9 +26,6 @@ type primitiveType =
   | TUnit
   (* type of exception associated with a message *)
   | TExn
-  (* a generic function if of type function
-     plus a list of char literals e.g T, U *)
-  | TFunGeneric of funcType * char list
   | TFun of funcType
   (* list type - a list of primitive types *)
   | TList of primitiveType
@@ -64,7 +61,7 @@ type expr =
      then expr and else expr *)
   | If of expr * expr * expr
   (* a function call takes fn name and a list of arguments (exprs) *)
-  | Call of string * expr list
+  | Call of expr * expr list
   (* a fn literal is of func_decl record *)
   | FunLit of func_decl
   (* a module literal is a module name and expression *)
@@ -80,15 +77,11 @@ and
 (* a record defining a function declaration
    that contains the following
    1. a list of formals i.e a tuple of (name, type of formal)
-   2. return type of the function
-   3. a boolean indicating whether the function is generic
-   4. list of generic types (e.g. T, U, A, B) *)
+   2. return type of the function *)
 func_decl = {
   formals       : (string * primitiveType) list;
   return_type   : primitiveType;
   body          : expr;
-  is_generic    : bool;
-  generic_types : char list;
 };;
 
 (* a JSJS program is a list of expressions *)

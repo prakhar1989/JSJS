@@ -36,7 +36,6 @@ open Ast
 %left PLUS MINUS
 %left MULTIPLY DIVIDE MODULUS
 %left NEG
-
 /* entry point */
 %start program
 %type <Ast.program> program
@@ -59,7 +58,8 @@ formals_opt:
     | opts = separated_list(COMMA, opt)       { opts }
 
 opt:
-    | ID COLON primitive                      { $1, $3 }
+    | ID                                      { ($1, TAny) }
+    | ID COLON primitive                      { ($1, $3) }
 
 primitive:
     | NUM                                     { TNum }
@@ -67,7 +67,6 @@ primitive:
     | STRING                                  { TString }
     | UNIT                                    { TUnit }
     | LPAREN args RPAREN THINARROW primitive  { TFun($2, $5) }
-    | LSQUARE generic_types RSQUARE LPAREN args RPAREN THINARROW primitive  { TFunGeneric(($5, $8), $2) }
     | LIST primitive                          { TList($2) }
     | LT primitive COLON primitive GT         { TMap($2, $4) }
     | GENERIC                                 { T($1) }
@@ -75,52 +74,44 @@ primitive:
 args:
     | args = separated_list(COMMA, primitive) { args }
 
-literals:
-    | NUM_LIT                                  { NumLit($1) }
-    | TRUE                                     { BoolLit(true) }
-    | FALSE                                    { BoolLit(false) }
-    | STR_LIT                                  { StrLit($1) }
-    | ID                                       { Val($1) }
-    | UNIT_LIT                                 { UnitLit }
+fun_literals:
+    /* Return type not annotated */
+    | LAMBDA LPAREN formals_opt RPAREN FATARROW expr %prec ANON {
+        FunLit({ formals = $3; return_type = TAny; body = Block([$6]); })
+    }
+    | LAMBDA LPAREN formals_opt RPAREN FATARROW block {
+        FunLit({ formals = $3; return_type = TAny; body = Block($6); })
+    }
+    /* Return type annotated */
     | LAMBDA LPAREN formals_opt RPAREN COLON primitive FATARROW expr %prec ANON {
-        FunLit({
-            formals = $3; return_type = $6; body = Block([$8]);
-            is_generic = false; generic_types = [];
-        })
+        FunLit({ formals = $3; return_type = $6; body = Block([$8]); })
     }
     | LAMBDA LPAREN formals_opt RPAREN COLON primitive FATARROW block {
-        FunLit({
-            formals = $3; return_type = $6; body = Block($8);
-            is_generic = false; generic_types = [];
-        })
+        FunLit({ formals = $3; return_type = $6; body = Block($8); })
     }
-    | LAMBDA LSQUARE generic_types RSQUARE LPAREN formals_opt RPAREN COLON primitive FATARROW expr %prec ANON {
-        FunLit({
-            formals = $6; return_type = $9; body = Block([$11]);
-            is_generic = true; generic_types = $3;
-        })
-    }
-    | LAMBDA LSQUARE generic_types RSQUARE LPAREN formals_opt RPAREN COLON primitive FATARROW block {
-        FunLit({
-            formals = $6; return_type = $9; body = Block($11);
-            is_generic = true; generic_types = $3;
-        })
-    }
-    | LSQUARE actuals_opt RSQUARE              { ListLit($2) }
-    | LBRACE kv_pairs RBRACE                   { MapLit($2) }
 
-generic_types:
-    | gt = separated_nonempty_list(COMMA, GENERIC)  { gt }
+literals:
+    | NUM_LIT                                            { NumLit($1) }
+    | TRUE                                               { BoolLit(true) }
+    | FALSE                                              { BoolLit(false) }
+    | STR_LIT                                            { StrLit($1) }
+    | ID                                                 { Val($1) }
+    | UNIT_LIT                                           { UnitLit }
+    | LSQUARE actuals_opt RSQUARE                        { ListLit($2) }
+    | LBRACE kv_pairs RBRACE                             { MapLit($2) }
+    | fun_literals                                       { $1 }
 
 kv_pairs:
-    | kv = separated_list(COMMA, kv_pair)      { kv }
+    | kv = separated_list(COMMA, kv_pair)                { kv }
 
 kv_pair:
-    | expr COLON expr                          { $1, $3 }
+    | expr COLON expr                                    { $1, $3 }
 
 expr:
     | literals                                           { $1 }
     | assigns                                            { $1 }
+    | LPAREN fun_literals SEMICOLON 
+      RPAREN LPAREN actuals_opt RPAREN                   { Call($2, $5) }
     | expr PLUS expr                                     { Binop($1, Add, $3) }
     | expr MINUS expr                                    { Binop($1, Sub, $3) }
     | expr MULTIPLY expr                                 { Binop($1, Mul, $3) }
@@ -136,7 +127,7 @@ expr:
     | expr EQUALS expr                                   { Binop($1, Equals, $3) }
     | expr NEQ expr                                      { Binop($1, Neq, $3) }
     | expr CONS expr                                     { Binop($1, Cons, $3) }
-    | LPAREN expr RPAREN                                 { $2 }
+    | LPAREN expr RPAREN { $2 }
     | NOT expr                                           { Unop(Not, $2) }
     | MINUS expr %prec NEG                               { Unop(Neg, $2) }
     | THROW expr                                         { Throw($2) }
@@ -149,7 +140,7 @@ expr:
     | IF expr THEN block ELSE expr %prec DOUBLE          { If($2, Block($4), Block([$6])) }
     | IF expr THEN expr ELSE block                       { If($2, Block([$4]), Block($6)) }
     | IF expr THEN block ELSE block                      { If($2, Block($4), Block($6)) }
-    | ID LPAREN actuals_opt RPAREN                       { Call($1, $3) }
+    | ID LPAREN actuals_opt RPAREN                       { Call(Val($1), $3) }
     | MODULE_LIT DOT expr                                { ModuleLit($1, $3)}
 
 actuals_opt:
