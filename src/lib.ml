@@ -43,18 +43,18 @@ sn.__toJS=sn.toArray,sn.__toStringMapper=er,sn.inspect=sn.toSource=function(){re
 " ;;
 
 let top_level_definitions = [
-  ("print", TFunGeneric(([T('T')], TUnit), ['T']));
-  ("num_to_string", TFun([TNum], TString));
-  (* top-level functions for lists *)
-  ("hd", TFunGeneric(([TList(T('T'))], T('T')), ['T']));
-  ("empty?", TFunGeneric(([TList(T('T'))], TBool), ['T']));
-  ("tl", TFunGeneric(([TList(T('T'))], TList(T('T'))), ['T']));
-  (* top-level functions for maps *)
-  ("get", TFunGeneric(([TMap(T('T'), T('U')); T('T')], T('U')), ['T'; 'U']));
-  ("set", TFunGeneric(([TMap(T('T'), T('U')); T('T'); T('U')], TMap(T('T'), T('U'))), ['T'; 'U']));
-  ("del", TFunGeneric(([TMap(T('T'), T('U')); T('T');], TMap(T('T'), T('U'))), ['T'; 'U']));
-  ("has?", TFunGeneric(([TMap(T('T'), T('U')); T('T')], TBool), ['T'; 'U']));
-  ("keys", TFunGeneric(([TMap(T('T'), T('U'));], TList(TString)), ['T'; 'U']));
+  (*("print", TFunGeneric(([T('T')], TUnit), ['T']));*)
+  (*("num_to_string", TFun([TNum], TString));*)
+  (*[> top-level functions for lists <]*)
+  (*("hd", TFunGeneric(([TList(T('T'))], T('T')), ['T']));*)
+  (*("empty?", TFunGeneric(([TList(T('T'))], TBool), ['T']));*)
+  (*("tl", TFunGeneric(([TList(T('T'))], TList(T('T'))), ['T']));*)
+  (*[> top-level functions for maps <]*)
+  (*("get", TFunGeneric(([TMap(T('T'), T('U')); T('T')], T('U')), ['T'; 'U']));*)
+  (*("set", TFunGeneric(([TMap(T('T'), T('U')); T('T'); T('U')], TMap(T('T'), T('U'))), ['T'; 'U']));*)
+  (*("del", TFunGeneric(([TMap(T('T'), T('U')); T('T');], TMap(T('T'), T('U'))), ['T'; 'U']));*)
+  (*("has?", TFunGeneric(([TMap(T('T'), T('U')); T('T')], TBool), ['T'; 'U']));*)
+  (*("keys", TFunGeneric(([TMap(T('T'), T('U'));], TList(TString)), ['T'; 'U']));*)
 ];;
 
 let predefined = List.fold_left
@@ -63,26 +63,27 @@ let predefined = List.fold_left
 ;;
 
 let list_definitions = [
-  ("length", TFunGeneric(([TList(T('T'))], TNum), ['T']));
-  ("rev", TFunGeneric(([TList(T('T'))], TList(T('T'))), ['T']));
-  ("nth", TFunGeneric(([TList(T('T')); TNum], T('T')), ['T']));
-  ("filter", TFunGeneric(([TFun([T('T')], TBool); TList(T('T'))], TList(T('T'))) , ['T']));
-  ("filter_not", TFunGeneric(([TFun([T('T')], TBool); TList(T('T'))], TList(T('T'))) , ['T']));
-  ("map", TFunGeneric(([TFun([T('T')], T('U')); TList(T('T'))], TList(T('U'))) , ['T'; 'U']));
-  ("iter", TFunGeneric(([TFun([T('T')], TUnit); TList(T('T'))], TUnit) , ['T']));
-  ("print_list", TFunGeneric(([TList(T('T'))], TUnit), ['T']));
-  ("range", TFun([TNum; TNum], TList(TNum)));
-  ("concat", TFunGeneric(([TList(T('T')); TList(T('T'))], TList(T('T'))), ['T']));
-  ("fold_left", TFunGeneric(([TFun([T('T'); T('U')], T('T')); T('T'); TList(T('U'))], T('T')), ['T'; 'U']));
-  ("insert", TFunGeneric(([TList(T('T')); T('T'); TNum], TList(T('T'))), ['T']) );
-  ("remove", TFunGeneric(([TList(T('T')); TNum], TList(T('T'))), ['T']) );
+  (*("length", TFunGeneric(([TList(T('T'))], TNum), ['T']));*)
+  (*("rev", TFunGeneric(([TList(T('T'))], TList(T('T'))), ['T']));*)
+  (*("nth", TFunGeneric(([TList(T('T')); TNum], T('T')), ['T']));*)
+  (*("filter", TFunGeneric(([TFun([T('T')], TBool); TList(T('T'))], TList(T('T'))) , ['T']));*)
+  (*("filter_not", TFunGeneric(([TFun([T('T')], TBool); TList(T('T'))], TList(T('T'))) , ['T']));*)
+  (*("map", TFunGeneric(([TFun([T('T')], T('U')); TList(T('T'))], TList(T('U'))) , ['T'; 'U']));*)
+  (*("iter", TFunGeneric(([TFun([T('T')], TUnit); TList(T('T'))], TUnit) , ['T']));*)
+  (*("print_list", TFunGeneric(([TList(T('T'))], TUnit), ['T']));*)
+  (*("range", TFun([TNum; TNum], TList(TNum)));*)
+  (*("concat", TFunGeneric(([TList(T('T')); TList(T('T'))], TList(T('T'))), ['T']));*)
+  (*("fold_left", TFunGeneric(([TFun([T('T'); T('U')], T('T')); T('T'); TList(T('U'))], T('T')), ['T'; 'U']));*)
+  (*("insert", TFunGeneric(([TList(T('T')); T('T'); TNum], TList(T('T'))), ['T']) );*)
+  (*("remove", TFunGeneric(([TList(T('T')); TNum], TList(T('T'))), ['T']) );*)
 ];;
 
 let map_definitions = [
-  ("count", TFunGeneric(([TMap(T('T'), T('U'));], TNum), ['T'; 'U']));
-  ("values", TFunGeneric(([TMap(T('T'), T('U'));], TList(T('U'))), ['T'; 'U']));
-  ("merge", TFunGeneric(([TMap(T('T'), T('U')); TMap(T('T'), T('U'));], TMap(T('T'), T('U'))), ['T'; 'U']));
+  (*("count", TFunGeneric(([TMap(T('T'), T('U'));], TNum), ['T'; 'U']));*)
+  (*("values", TFunGeneric(([TMap(T('T'), T('U'));], TList(T('U'))), ['T'; 'U']));*)
+  (*("merge", TFunGeneric(([TMap(T('T'), T('U')); TMap(T('T'), T('U'));], TMap(T('T'), T('U'))), ['T'; 'U']));*)
 ];;
+
 
 let modules =
   (* a function that takes a module map and adds definitions as value

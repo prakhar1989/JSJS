@@ -28,12 +28,8 @@ let rec string_of_type = function
   | TAny    -> "any"
   | TExn    -> "exception"
   | TUnit   -> "unit"
-  | T(c)    -> Printf.sprintf "%c" c
+  | T(c)    -> Printf.sprintf "%s" c
   | TList(p) -> "list " ^ (string_of_type p)
-  | TFunGeneric(f, _) ->
-    let args, t = f in
-    let s = String.concat  " -> " ((List.map string_of_type args) @ [string_of_type t]) in
-    "/\\ []" ^ s
   | TFun(f) ->
     let args, t = f in
     String.concat  " -> " ((List.map string_of_type args) @ [string_of_type t])
@@ -71,12 +67,55 @@ let rec string_of_expr = function
   | MapLit(l) ->
     let pairs = List.map (fun (k, v) -> string_of_expr k ^ ":" ^ string_of_expr v) l in
     "{" ^ (String.concat ",\n" pairs) ^ "}"
-  | Call(s, args) -> let ss = List.map string_of_expr args in
-    String.concat " " [s; "("; (String.concat ", " ss); ")"]
+  | Call(e, args) -> let ss = List.map string_of_expr args in
+    String.concat " " [string_of_expr e; "("; (String.concat ", " ss); ")"]
   | ModuleLit(s, e) -> s ^ "." ^ (string_of_expr e)
-  | FunLit(decl) ->
-    let fargs = String.concat ", " (List.map (fun (id, typ) -> id ^ " : " ^ string_of_type typ) decl.formals) in
-    let fsig = "(" ^ fargs ^ ")" ^ " : " ^ (string_of_type decl.return_type) in
-    let fbody = string_of_expr decl.body in
-    String.concat " " ["/\\"; fsig; "="; "{"; fbody; "}"]
+  | FunLit(ids, body, t) -> begin
+      let args_with_types, ret_type = (match t with
+          | TFun(args_type, ret_type) -> List.combine ids args_type, ret_type
+          | _ -> raise (failwith "not a valid function")) in
+      let fargs = String.concat ", " (List.map (fun (id, typ) -> id ^ " : " ^ string_of_type typ) args_with_types) in
+      let fsig = "(" ^ fargs ^ ")" ^ " : " ^ (string_of_type ret_type) in
+      let fbody = string_of_expr body in
+      String.concat " " ["/\\"; fsig; "="; "{"; fbody; "}"]
+    end
+;;
+
+let rec string_of_aexpr (ae: aexpr) : string =
+  match ae with
+  | ABoolLit(b, t) -> Printf.sprintf "(%s: %s)" (string_of_bool b) (string_of_type t)
+  | ANumLit(x, t) -> Printf.sprintf "(%s: %s)" (string_of_float x) (string_of_type t)
+  | AStrLit(s, t) -> Printf.sprintf "(%s: %s)" s (string_of_type t)
+  | AUnitLit(t) -> Printf.sprintf "()"
+  | AVal(s, t) -> Printf.sprintf "(%s: %s)" s (string_of_type t)
+  | ABinop(e1, op, e2, t) -> 
+    let s1 = string_of_aexpr e1 in let s2 = string_of_aexpr e2 in
+    let sop = string_of_op op in let st = string_of_type t in
+    Printf.sprintf "(%s %s %s: %s)" s1 sop s2 st
+  | AUnop(op, e, t) -> 
+    let s = string_of_aexpr e in
+    let sop = string_of_op op in let st = string_of_type t in
+    Printf.sprintf "(%s %s: %s)" s sop st
+  | AListLit(aes, t) -> 
+    let s = String.concat "," (List.map string_of_aexpr aes) in
+    Printf.sprintf "[%s]:%s" s (string_of_type t)
+  | AMapLit(kvpairs, t) ->  "map < >"
+  | AIf(ap, ae1, ae2, t) ->  "if"
+  | ABlock(aes, t) -> let ss = List.map string_of_aexpr aes in
+    Printf.sprintf "{ %s }" (String.concat "\n" ss)
+  | AFunLit(ids, body, _, t) -> begin
+      let args_with_types, ret_type = (match t with
+          | TFun(args_type, ret_type) -> List.combine ids args_type, ret_type
+          | _ -> raise (failwith "not a valid function")) in
+      let fargs = String.concat ", " (List.map (fun (id, typ) -> id ^ " : " ^ string_of_type typ) args_with_types) in
+      let fsig = "(" ^ fargs ^ ")" ^ " : " ^ (string_of_type ret_type) in
+      let fbody = string_of_aexpr body in
+      String.concat " " ["/\\"; fsig; "="; "{"; fbody; "}"]
+    end 
+  | ACall(afn, aargs, t) -> 
+    let sfn = string_of_aexpr afn
+    and sargs = String.concat "," (List.map string_of_aexpr aargs) in
+    Printf.sprintf "%s(%s) : %s" sfn sargs (string_of_type t)
+
+  | _ -> raise (failwith "not yet implemented")   
 ;;

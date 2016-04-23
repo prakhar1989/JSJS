@@ -18,7 +18,7 @@ type op =
    defined in a mutually recursive fashion *)
 type primitiveType =
   (* a generic type *)
-  | T of char
+  | T of string 
   (* a general type. used to define
      empty lists or empty maps *)
   | TAny

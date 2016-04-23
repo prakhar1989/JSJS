@@ -33,7 +33,7 @@ let js_keywords_set = List.fold_left (fun acc x -> KeywordsSet.add x acc)
 let get_new_type () =
   let c = !type_variable in
   incr type_variable;
-  T(Char.chr c)
+  T(Char.escaped (Char.chr c))
 ;;
 
 let merge_env (env: environment) : environment =
@@ -188,9 +188,9 @@ let rec collect_expr (ae: aexpr): constraints =
       | And | Or  -> [(et1, TBool); (et2, TBool); (t, TBool)]
       | Lte | Gte | Neq | Equals | Lt | Gt -> [(et1, et2); (t, TBool)]
       | Cons -> (match et2 with
-          (* write somethign here *)
+          (* write something here *)
           | TList(x) -> [(et1, x); (t, et2)] 
-          | T(_) -> [(et2, t); (et2, TList(et1)); (t, TList(et1))]
+          | T(_) -> [(et2, TList(et1)); (t, TList(et1))]
           | _ -> raise (failwith "lists have to be same type something")) 
       | _ -> raise (failwith "not a binary operator") in
     (collect_expr ae1) @ (collect_expr ae2) @ opc
@@ -200,7 +200,7 @@ let rec collect_expr (ae: aexpr): constraints =
     let opc = (match op with
         | Not -> [(et, TBool); (t, TBool)]
         | Neg -> [(et, TNum); (t, TNum)]
-        | _ -> raise (failwith "not a binary operator")) in
+        | _ -> raise (failwith "not a unary operator")) in
     (collect_expr ae) @ opc
 
   | AIf(ap, ae1, ae2, t) ->
@@ -268,5 +268,72 @@ let rec collect_expr (ae: aexpr): constraints =
         | _ -> raise (failwith "unreachable state reached")) in
     (collect_expr afn) @ (List.flatten (List.map collect_expr aargs)) @ sign_conts
 
-  | _ -> []
+  | _ -> raise (failwith "not yet implemented") 
+;;
+
+let rec substitute (u: primitiveType) (x: id) (t: primitiveType) : primitiveType =
+  match t with
+  | TNum | TBool | TString | TUnit | TAny -> t
+  | T(c) -> if c = x then u else t
+  | TFun(t1, t2) -> TFun(List.map (substitute u x) t1, substitute u x t2)
+  | TList(t) -> TList(substitute u x t)
+  | TMap(kt, vt) -> TMap(substitute u x kt, substitute u x vt)
+  | _ -> raise(failwith "not yet implemented")
+;;
+
+let apply (subs: substitutions) (t: primitiveType) : primitiveType =
+    List.fold_right (fun (x, u) t -> substitute u x t) subs t
+;;
+
+let rec unify (constraints: constraints) : substitutions =
+  match constraints with
+  | [] -> []
+  | (x, y) :: xs ->
+    (* generate substitutions of the rest of the list *)
+    let t2 = unify xs in
+    (* resolve the LHS and RHS of the constraints from the previous substitutions *)
+    let t1 = unify_one (apply t2 x) (apply t2 y) in
+    t1 @ t2
+
+and unify_one (t1: primitiveType) (t2: primitiveType) : substitutions =
+  match t1, t2 with
+  | TNum, TNum | TBool, TBool | TString, TString | TUnit, TUnit -> []
+  | T(x), z | z, T(x) -> [(x, z)]
+  | TList(t1), TList(t2) -> unify_one t1 t2
+  | TMap(kt1, vt1), TMap(kt2, vt2) -> unify [(kt1, kt2) ; (vt1, vt2)]
+  (* This case is particularly useful when you are calling a function that returns a function *)
+  | TFun(a, b), TFun(x, y) -> unify ((List.combine a x) @ [(b, y)])
+  | _ -> raise (failwith "mismatched types")
+;;
+
+let rec apply_expr (subs: substitutions) (ae: aexpr): aexpr =
+    match ae with
+        | ABoolLit(b, t) -> ABoolLit(b, apply subs t)
+        | ANumLit(n, t) -> ANumLit(n, apply subs t)
+        | AStrLit(s, t) -> AStrLit(s, apply subs t)
+        | AUnitLit(t) -> AUnitLit(apply subs t)
+        | AVal(s, t) -> AVal(s, apply subs t)
+        | ABinop(ae1, op, ae2, t) -> ABinop(apply_expr subs ae1, op, apply_expr subs ae2, apply subs t)
+        | AUnop(op, ae, t) -> AUnop(op, apply_expr subs ae, apply subs t)
+        | AListLit(aes, t) -> AListLit(List.map (apply_expr subs) aes, apply subs t)
+        | AMapLit(kvpairs, t) -> AMapLit(List.map (fun (k, v) -> (apply_expr subs k, apply_expr subs v)) kvpairs, apply subs t)
+        | AIf(ap, ae1, ae2, t) -> AIf(apply_expr subs ap, apply_expr subs ae1, apply_expr subs ae2, apply subs t)
+        | ABlock(aes, t) -> ABlock(List.map (apply_expr subs) aes, apply subs t)
+        | AFunLit(ids, ae, t1, t2) -> AFunLit(ids, apply_expr subs ae, t1, apply subs t2)
+        | ACall(afn, aargs, t) -> ACall(apply_expr subs afn, List.map (apply_expr subs) aargs, apply subs t)
+        | _ -> raise (failwith "not yet implemented")   
+
+(* runs HMTI step-by-step
+      1. annotate expression with placeholder types
+      2. generate constraints with environment
+      3. unify types based on constraints
+      4. run the final set of substitutions on still unresolved types
+      5. obtain a final annotated expression with resolved types *)
+let infer (env: environment) (e: expr) : aexpr =
+  let annotated_expr, _ = annotate_expr e env in
+  let constraints = collect_expr annotated_expr in
+  let subs = unify constraints in
+  (* reset the type counter after completing inference *)
+  type_variable := Char.code 'A'; 
+  apply_expr subs annotated_expr
 ;;
