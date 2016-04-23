@@ -7,9 +7,18 @@ module GenericMap = Map.Make(Char)
 module ModuleMap = Map.Make(String)
 module KeywordsSet = Set.Make(String)
 
+
+(* types *)
+
 type typesTable = Ast.primitiveType NameMap.t
-type id = string
 type environment = typesTable * typesTable
+
+type substitutions = (id * primitiveType) list
+type constraints = (primitiveType * primitiveType) list
+
+
+(* mutable state *)
+let type_variable = ref (Char.code 'A')
 
 (* maintains a set of js keywords *)
 let keywords = ["break"; "case"; "class"; "catch"; "const"; "continue";
@@ -20,10 +29,6 @@ let keywords = ["break"; "case"; "class"; "catch"; "const"; "continue";
                 "while"; "with"; "yield" ];;
 let js_keywords_set = List.fold_left (fun acc x -> KeywordsSet.add x acc)
     KeywordsSet.empty keywords;;
-
-type substitutions = (id * primitiveType) list
-
-let type_variable = ref (Char.code 'A')
 
 let get_new_type () =
   let c = !type_variable in
@@ -66,6 +71,11 @@ let rec annotate_expr (e: expr) (env: environment) : (aexpr * environment) =
     AVal(id, typ), env
 
   | FunLit(ids, e, t) -> begin
+
+      (* check if JS keywords are passed as arguments *)
+      List.iter (fun i -> if KeywordsSet.mem i js_keywords_set
+                  then raise (failwith "cannot define keywords") else ()) ids;
+
       match t with
       | TFun(arg_types, ret_type) ->
 
@@ -104,7 +114,8 @@ let rec annotate_expr (e: expr) (env: environment) : (aexpr * environment) =
       (* do not allow reassignment *)
       if NameMap.mem id locals
       then raise (failwith "cannot redefine existing variable")
-
+      else if KeywordsSet.mem id js_keywords_set
+      then raise (failwith "cannot define keywords")
       (* annotate t with user-provided type or new placeholder *)
       else let t = if t = TAny then get_new_type () else t in
         let new_locals = NameMap.add id t locals in
@@ -138,6 +149,7 @@ let rec annotate_expr (e: expr) (env: environment) : (aexpr * environment) =
           ~f: (fun (aes, env) e -> let ae, env = annotate_expr e env in (ae :: aes, env))
       in ABlock(List.rev aes, get_new_type ()), env
 
+
   | _ -> AUnitLit(TUnit), env
 ;;
 
@@ -160,4 +172,50 @@ let rec type_of (aexpr: aexpr): primitiveType =
   | AModuleLit(_, _, t) -> t
   | AThrow(_, t) -> t
   | ATryCatch(_, _, _, t) -> t
+;;
+
+
+let rec collect_expr (ae: aexpr): constraints =
+  match ae with
+  | AUnitLit(_) | ANumLit(_) | ABoolLit(_) | AStrLit(_) -> []
+  | AVal(_) -> []
+  | ABinop(ae1, op, ae2, t) -> 
+    let et1 = type_of ae1 and et2 = type_of ae2 in
+
+    let opc = match op with
+      | Add | Sub | Mul | Div | Mod -> [(et1, TNum); (et2, TNum); (t, TNum)]
+      | Caret -> [(et1, TString); (et2, TString); (t, TString)]
+      | And | Or  -> [(et1, TBool); (et2, TBool); (t, TBool)]
+      | Lte | Gte | Neq | Equals | Lt | Gt -> [(et1, et2); (t, TBool)]
+      | Cons -> (match et2 with
+          (* write somethign here *)
+          | TList(x) -> [(et1, x); (t, et2)] 
+          | T(_) -> [(et2, t); (et2, TList(et1)); (t, TList(et1))]
+          | _ -> raise (failwith "lists have to be same type something")) 
+      | _ -> raise (failwith "not a binary operator") in
+    (collect_expr ae1) @ (collect_expr ae2) @ opc
+
+  | AUnop(op, ae, t) ->
+    let et = type_of ae in 
+    let opc = (match op with
+        | Not -> [(et, TBool); (t, TBool)]
+        | Neg -> [(et, TNum); (t, TNum)]
+        | _ -> raise (failwith "not a binary operator")) in
+    (collect_expr ae) @ opc
+
+  | AIf(ap, ae1, ae2, t) ->
+    let pt = type_of ap and et1 = type_of ae1 and  et2 = type_of ae2 in
+    let cons = [(pt, TBool); (et1, et2); (t, et1)] in
+    (collect_expr ap) @ (collect_expr ae1) @ (collect_expr ae2) @ cons
+
+  | AListLit(aes, t) ->
+    let list_type = match t with
+      | TList(x) -> x
+      | _ -> raise (failwith "unreachable state reached")
+    in
+    let elem_conts = List.map (fun a -> (type_of ae, list_type)) aes in
+    (List.flatten (List.map collect_expr aes)) @ elem_conts
+
+
+  | _ -> []
 ;;
