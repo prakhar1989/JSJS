@@ -1,4 +1,4 @@
-val gcd = /\(a: num, b: num): num => {
+val gcd = /\(a, b) => {
   if a == b then a
   else {
     if a > b
@@ -19,5 +19,5 @@ val pow = /\(base: num, exp: num): num => {
 
 val chess_squares = pow(8, 2);
 
-print("Total number of squares on a chessboard: ");
-print(chess_squares);
+//print("Total number of squares on a chessboard: ");
+//print(chess_squares);

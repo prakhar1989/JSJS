@@ -18,7 +18,7 @@ type op =
    defined in a mutually recursive fashion *)
 type primitiveType =
   (* a generic type *)
-  | T of string 
+  | T of string
   (* a general type. used to define
      empty lists or empty maps *)
   | TAny
@@ -72,7 +72,7 @@ type expr =
   | Throw of expr
   (* a try catch block has two exprs and an identifier that acts as
      a placeholder for the message *)
-  | TryCatch of expr * string * expr
+  | TryCatch of expr * id * expr
 ;;
 
 (* annotated expression *)
@@ -86,14 +86,14 @@ type aexpr =
   | AListLit of aexpr list * primitiveType
   | AMapLit of (aexpr * aexpr) list * primitiveType
   | ABlock of aexpr list * primitiveType
-  | AAssign of string * primitiveType * aexpr * primitiveType
-  | AVal of string * primitiveType
+  | AAssign of id * primitiveType * aexpr * primitiveType
+  | AVal of id * primitiveType
   | AIf of aexpr * aexpr * aexpr * primitiveType
   | ACall of aexpr * aexpr list * primitiveType
   | AFunLit of id list * aexpr * primitiveType * primitiveType
-  | AModuleLit of string * aexpr * primitiveType
+  | AModuleLit of id * aexpr * primitiveType
   | AThrow of aexpr * primitiveType
-  | ATryCatch of aexpr * string * aexpr * primitiveType
+  | ATryCatch of aexpr * id * aexpr * primitiveType
 ;;
 
 

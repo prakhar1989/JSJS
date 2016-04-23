@@ -2,4 +2,6 @@ val x = 10 + 20;
 //val sq = /\(x) => x * x;
 //val max = /\(a, b) => if a > b then a else b;
 
-val compose = /\(f, g) => /\(x) => f(g(x));
+//val compose = /\(f, g) => /\(x) => f(g(x));
+val xs = [];
+val sumlist = /\() => 10 :: xs;
