@@ -42,19 +42,24 @@ sn.__toJS=sn.toArray,sn.__toStringMapper=er,sn.inspect=sn.toSource=function(){re
 },get:function(t,e){return t=l(this,t),0>t||this.size===1/0||void 0!==this.size&&t>this.size?e:this.find(function(e,r){return r===t},void 0,e)},has:function(t){return t=l(this,t),t>=0&&(void 0!==this.size?this.size===1/0||this.size>t:-1!==this.indexOf(t))},interpose:function(t){return be(this,ge(this,t))},interleave:function(){var t=[this].concat(p(arguments)),e=Ie(this.toSeq(),k.of,t),r=e.flatten(!0);return e.size&&(r.size=e.size*t.length),be(this,r)},last:function(){return this.get(-1)},skipWhile:function(t,e){return be(this,le(this,t,e,!1))},zip:function(){var t=[this].concat(p(arguments));return be(this,Ie(this,rr,t))},zipWith:function(t){var e=p(arguments);return e[0]=this,be(this,Ie(this,t,e))}}),n.prototype[fr]=!0,n.prototype[cr]=!0,Fe(i,{get:function(t,e){return this.has(t)?t:e},includes:function(t){return this.has(t)},keySeq:function(){return this.valueSeq()}}),i.prototype.has=sn.includes,i.prototype.contains=i.prototype.includes,Fe(x,r.prototype),Fe(k,n.prototype),Fe(A,i.prototype),Fe(et,r.prototype),Fe(rt,n.prototype),Fe(nt,i.prototype);var hn={Iterable:e,Seq:O,Collection:tt,Map:ct,OrderedMap:Zt,List:Wt,Stack:Ve,Set:Le,OrderedSet:Je,Record:Ae,Range:$,Repeat:G,is:X,fromJS:H};return hn})();
 " ;;
 
+let generic_list = TList(T("A"))
+and generic_map = TMap(T("A"), T("B"))
+and generic_arg1 = T("A")
+and generic_arg2 = T("B");;
+
 let top_level_definitions = [
   ("print_string", TFun([TString], TUnit));
   ("print_num", TFun([TNum], TUnit));
   ("print_bool", TFun([TBool], TUnit));
   ("num_to_string", TFun([TNum], TString));
-  ("hd", TFun([TList(T("a"))], T("a")));
-  ("empty?", TFun([TList(T("a"))], TBool));
-  ("tl", TFun([TList(T("a"))], TList(T("a"))));
-  ("get", TFun([TMap(T("a"), T("b")); T("a")], T("b")));
-  ("set", TFun([TMap(T("a"), T("b")); T("a"); T("b")], TMap(T("a"), T("b"))));
-  ("has?", TFun([TMap(T("a"), T("b")); T("a")], TBool));
-  ("del", TFun([TMap(T("a"), T("b")); T("a");], TMap(T("a"), T("b"))));
-  ("keys", TFun([TMap(T("a"), T("b"));], TList(T("a"))));
+  ("hd", TFun([generic_list], generic_arg1));
+  ("empty?", TFun([generic_list], TBool));
+  ("tl", TFun([generic_list], generic_list));
+  ("get", TFun([generic_map; generic_arg1], generic_arg2));
+  ("set", TFun([generic_map; generic_arg1; generic_arg2], generic_map));
+  ("has?", TFun([generic_map; generic_arg1], TBool));
+  ("del", TFun([generic_map; generic_arg1;], generic_map));
+  ("keys", TFun([generic_map;], generic_list));
 ];;
 
 let predefined = List.fold_left
@@ -63,25 +68,24 @@ let predefined = List.fold_left
 ;;
 
 let list_definitions = [
-  (*("length", TFunGeneric(([TList(T('T'))], TNum), ['T']));*)
-  (*("rev", TFunGeneric(([TList(T('T'))], TList(T('T'))), ['T']));*)
-  (*("nth", TFunGeneric(([TList(T('T')); TNum], T('T')), ['T']));*)
-  (*("filter", TFunGeneric(([TFun([T('T')], TBool); TList(T('T'))], TList(T('T'))) , ['T']));*)
-  (*("filter_not", TFunGeneric(([TFun([T('T')], TBool); TList(T('T'))], TList(T('T'))) , ['T']));*)
-  (*("map", TFunGeneric(([TFun([T('T')], T('U')); TList(T('T'))], TList(T('U'))) , ['T'; 'U']));*)
-  (*("iter", TFunGeneric(([TFun([T('T')], TUnit); TList(T('T'))], TUnit) , ['T']));*)
-  (*("print_list", TFunGeneric(([TList(T('T'))], TUnit), ['T']));*)
-  (*("range", TFun([TNum; TNum], TList(TNum)));*)
-  (*("concat", TFunGeneric(([TList(T('T')); TList(T('T'))], TList(T('T'))), ['T']));*)
-  (*("fold_left", TFunGeneric(([TFun([T('T'); T('U')], T('T')); T('T'); TList(T('U'))], T('T')), ['T'; 'U']));*)
-  (*("insert", TFunGeneric(([TList(T('T')); T('T'); TNum], TList(T('T'))), ['T']) );*)
-  (*("remove", TFunGeneric(([TList(T('T')); TNum], TList(T('T'))), ['T']) );*)
+  ("length", TFun([generic_list], TNum));
+  ("rev", TFun([generic_list], generic_list));
+  ("nth", TFun([generic_list; TNum], generic_arg1));
+  ("filter", TFun([TFun([generic_arg1],TBool);generic_list;], generic_list));
+  ("map", TFun([TFun([generic_arg1],generic_arg2); generic_list;], TList(generic_arg2)));
+  ("iter", TFun([TFun([generic_arg1], TUnit); generic_list;], TUnit));
+  ("print", TFun([generic_list;], TUnit));
+  ("range", TFun([TNum; TNum], TList(TNum)));
+  ("concat", TFun([generic_list; generic_list], generic_list));
+  ("fold_left", TFun([TFun([generic_arg1; generic_arg2], generic_arg1); generic_arg1; TList(T("B"))], generic_arg1));
+  ("insert", TFun([generic_arg1; TNum], generic_list));
+  ("remove", TFun([generic_arg1; TNum], generic_list));
 ];;
 
 let map_definitions = [
-  (*("count", TFunGeneric(([TMap(T('T'), T('U'));], TNum), ['T'; 'U']));*)
-  (*("values", TFunGeneric(([TMap(T('T'), T('U'));], TList(T('U'))), ['T'; 'U']));*)
-  (*("merge", TFunGeneric(([TMap(T('T'), T('U')); TMap(T('T'), T('U'));], TMap(T('T'), T('U'))), ['T'; 'U']));*)
+  ("count", TFun([generic_map], TNum));
+  ("values", TFun([generic_map], TList(T("B"))));
+  ("merge", TFun([generic_map; generic_map], generic_map));
 ];;
 
 
