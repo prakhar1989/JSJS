@@ -363,7 +363,8 @@ let collect_program (program: aexpr list) : constraints =
 ;;
 
 let type_check (program: program) : (aexpr list) =
-  let env: environment = (NameMap.empty, NameMap.empty) in
+  let predefined = Lib.predefined in
+  let env = (predefined, NameMap.empty) in
   let annotated_program, _ = ListLabels.fold_left ~init: ([], env)
       program ~f: (fun (aacc, env) aexpr ->
           let ae, env = annotate_expr aexpr env in (ae :: aacc, env))

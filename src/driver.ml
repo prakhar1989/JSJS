@@ -63,7 +63,7 @@ let driver filename axn =
 
   (* JS -> AST -> JS *)
   let print_ast () =
-    List.iter inferred_program 
+    List.iter inferred_program
       ~f:(fun t -> print_endline (Stringify.string_of_aexpr t));
   in
 
