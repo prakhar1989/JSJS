@@ -19,7 +19,7 @@ type constraints = (primitiveType * primitiveType) list
 
 
 (* mutable state *)
-let type_variable = ref (Char.code 'A')
+let type_variable = (ref ['A']);;
 
 (* maintains a set of js keywords *)
 let keywords = ["break"; "case"; "class"; "catch"; "const"; "continue";
@@ -32,9 +32,16 @@ let js_keywords_set = List.fold_left (fun acc x -> KeywordsSet.add x acc)
     KeywordsSet.empty keywords;;
 
 let get_new_type () =
-  let c = !type_variable in
-  incr type_variable;
-  T(Char.escaped (Char.chr c))
+  let rec aux (cs: char list): char list =
+    let ys = match List.rev cs with
+      | [] -> ['A']
+      | 'Z' :: xs -> 'A' :: List.rev (aux (List.rev xs))
+      | x :: xs -> (Char.chr ((Char.code x) + 1)) :: xs
+    in List.rev ys 
+  in 
+  let curr_type_var = !type_variable in
+  type_variable := aux (curr_type_var);
+  T(String.concat "" (List.map Char.escaped curr_type_var))
 ;;
 
 let modules = Lib.modules;;
@@ -55,11 +62,13 @@ let rec annotate_expr (e: expr) (env: environment) : (aexpr * environment) =
   | NumLit(n) -> ANumLit(n, TNum), env
   | BoolLit(b) -> ABoolLit(b, TBool), env
   | StrLit(s) -> AStrLit(s, TString), env
+
   | Binop(e1, op, e2) ->
     let ae1, _ = annotate_expr e1 env
     and ae2, _= annotate_expr e2 env
     and new_type = get_new_type () in
     ABinop(ae1, op, ae2, new_type), env
+
   | Unop(op, e) -> let ae, _ = annotate_expr e env in
     let new_type = get_new_type () in
     AUnop(op, ae, new_type), env
@@ -70,7 +79,7 @@ let rec annotate_expr (e: expr) (env: environment) : (aexpr * environment) =
       then NameMap.find id locals
       else if NameMap.mem id globals
       then NameMap.find id globals
-      else raise (failwith "undefined") in
+      else raise (failwith (Printf.sprintf "%s undefined" id)) in
     AVal(id, typ), env
 
   | FunLit(ids, e, t) -> begin
@@ -151,21 +160,21 @@ let rec annotate_expr (e: expr) (env: environment) : (aexpr * environment) =
       let aes, new_env = ListLabels.fold_left ~init: ([], new_env) es
           ~f: (fun (aes, env) e -> let ae, env = annotate_expr e env in (ae :: aes, env))
       in ABlock(List.rev aes, get_new_type ()), env
-    end 
+    end
 
   | Throw(e) -> AThrow(fst (annotate_expr e env), TExn), env
 
-  | TryCatch(t, s, c) -> 
+  | TryCatch(t, s, c) ->
     let at, _ = annotate_expr t env in
     let locals, globals = merge_env env in
     let new_locals = NameMap.add s TString locals in
     let ct, _ = annotate_expr c (new_locals, globals) in
     ATryCatch(at, s, ct, get_new_type ()), env
 
-  | ModuleLit(id, e) -> 
+  | ModuleLit(id, e) ->
     if ModuleMap.mem id modules
     then AModuleLit(id, fst (annotate_expr e env), get_new_type ()), env
-    else raise (failwith "module not found") 
+    else raise (failwith "module not found")
 ;;
 
 
@@ -212,7 +221,7 @@ let rec collect_expr (ae: aexpr): constraints =
     (collect_expr ae1) @ (collect_expr ae2) @ opc
 
   | AUnop(op, ae, t) ->
-    let et = type_of ae in 
+    let et = type_of ae in
     let opc = (match op with
         | Not -> [(et, TBool); (t, TBool)]
         | Neg -> [(et, TNum); (t, TNum)]
