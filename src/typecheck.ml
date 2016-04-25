@@ -362,7 +362,7 @@ let collect_program (program: aexpr list) : constraints =
   List.flatten (List.map collect_expr program)
 ;;
 
-let type_check (program: program) : unit =
+let type_check (program: program) : (aexpr list) =
   let env: environment = (NameMap.empty, NameMap.empty) in
   let annotated_program, _ = ListLabels.fold_left ~init: ([], env)
       program ~f: (fun (aacc, env) aexpr ->
@@ -372,5 +372,5 @@ let type_check (program: program) : unit =
   let constraints = collect_program annotated_program in
   let subs = unify constraints in
   let inferred_program = List.map (fun t -> (apply_expr subs t)) annotated_program in
-  List.iter (fun t -> print_endline (Stringify.string_of_aexpr t)) inferred_program;
+  inferred_program
 ;;

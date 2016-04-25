@@ -56,9 +56,9 @@ let remove_qmark (s: string) =
   Str.global_replace (Str.regexp_string "?") "__" s
 ;;
 
-(* generates a js version of an expression 
+(* generates a js version of an expression
    takes the name of the module and a module map along with the expression *)
-let rec js_of_expr (module_name: string) (map: string NameMap.t) (expr: expr) =
+let rec js_of_expr (module_name: string) (map:'a NameMap.t) (expr: expr) =
   match expr with
   | NumLit(x) -> Printf.sprintf "%s" (string_of_float x)
   | StrLit(s) -> Printf.sprintf "\"%s\"" s
