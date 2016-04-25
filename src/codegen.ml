@@ -56,7 +56,7 @@ let try_catch_template e1 id e2 =
  * removes all ? from string and replaces with __. used for codegen
  * since JS doesnt support ? in var names
  *)
-let remove_qmark s =
+let remove_qmark (s: string) =
   Str.global_replace (Str.regexp_string "?") "__" s
 ;;
 
@@ -100,16 +100,19 @@ let rec js_of_expr name map = function
     and s1 = js_of_expr name map e1
     and s2 = js_of_expr name map e2 in
     if_template pred_s s1 s2
-  | FunLit(fdecl) ->
-    let formals = List.map (fun (x, _) -> x) fdecl.formals in
-    let string_forms = String.concat "," formals in
-    let string_body = js_of_expr name map fdecl.body in
+  | FunLit(ids, body, t) ->
+    let string_forms = String.concat "," ids in
+    let string_body = js_of_expr name map body in
     let template = format_of_string "(function(%s) { return (%s) })" in
     Printf.sprintf template string_forms string_body
-  | Call(id, es) ->
-    let id = if NameMap.mem id map
-    then Printf.sprintf "%s.%s" name (remove_qmark id)
-    else (remove_qmark id) in
+  | Call(e, es) ->
+    let id = match e with
+      | Val(s) -> if NameMap.mem s map
+        then Printf.sprintf "%s.%s" name (remove_qmark s)
+        else (remove_qmark s)
+      | FunLit(_) -> js_of_expr name map e
+      | _ -> raise (failwith "not a function call") 
+    in 
     let es = List.map (fun e -> js_of_expr name map e) es in
     (match id with
      | "print" -> Printf.sprintf "console.log(%s)" (String.concat "," es)
