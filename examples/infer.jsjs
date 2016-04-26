@@ -10,3 +10,6 @@ val comp3 = /\(f, g) => /\(x) => f(g(x));
 val comp4 = /\(f, g) => /\(x) => f(g(x));
 
 print_num(x);
+
+hd([]);
+List.length(xs);

@@ -118,6 +118,8 @@ let rec string_of_aexpr (ae: aexpr) : string =
     let sfn = string_of_aexpr afn
     and sargs = String.concat "," (List.map string_of_aexpr aargs) in
     Printf.sprintf "%s(%s) : %s" sfn sargs (string_of_type t)
-
+  | AModuleLit(id, e, t) ->
+    let se = string_of_aexpr e in
+    Printf.sprintf "%s.(%s) : %s" id se (string_of_type t)
   | _ -> raise (failwith "not yet implemented in stringify")
 ;;

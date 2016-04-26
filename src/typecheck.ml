@@ -173,10 +173,13 @@ let rec annotate_expr (e: expr) (env: environment) : (aexpr * environment) =
 
   | ModuleLit(id, e) ->
     if ModuleMap.mem id modules
-    then AModuleLit(id, fst (annotate_expr e env), get_new_type ()), env
+    then 
+      let locals, globals = merge_env env in
+      let new_locals = ModuleMap.find id modules in
+      let new_env = (new_locals, globals) in
+      AModuleLit(id, fst (annotate_expr e new_env), get_new_type ()), env
     else raise (failwith "module not found")
 ;;
-
 
 let rec type_of (aexpr: aexpr): primitiveType =
   match aexpr with
@@ -306,7 +309,7 @@ let rec collect_expr (ae: aexpr): constraints =
 
   | ATryCatch(atry, id, acatch, t) ->
     let ttry = type_of atry and tcatch = type_of acatch in
-    if tcatch = TExn then raise (failwith "Can't throw in a catch block") else 
+    if tcatch = TExn then raise (failwith "Can't throw in a catch block") else
     (collect_expr atry) @ (collect_expr acatch) @ [(ttry, tcatch); (t, tcatch)]
 
 ;;
@@ -378,6 +381,8 @@ let type_check (program: program) : (aexpr list) =
       ~init: ([], env) ~f: (fun (aacc, env) expr ->
           let ae, env = annotate_expr expr env in (ae :: aacc, env)) in
   let annotated_program = List.rev annotated_program in
+
+  print_endline "building constraints";
 
   (* gather program wide constraints *)
   let constraints = List.flatten (List.map collect_expr annotated_program) in
