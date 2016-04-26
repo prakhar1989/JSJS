@@ -48,6 +48,7 @@ and generic_arg1 = T("A")
 and generic_arg2 = T("B");;
 
 let top_level_definitions = [
+  ("print", TFun([generic_arg1], TUnit));
   ("print_string", TFun([TString], TUnit));
   ("print_num", TFun([TNum], TUnit));
   ("print_bool", TFun([TBool], TUnit));

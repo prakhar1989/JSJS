@@ -122,7 +122,7 @@ let rec js_of_expr (module_name: string) (map:'a NameMap.t) (expr: expr) =
       | _ -> raise (failwith "not a function call") in
     let es = List.map (fun e -> js_of_expr module_name map e) es in
     (match id with
-     | "print_num" | "print_bool"
+     | "print_num" | "print_bool" | "print"
      | "print_string" -> Printf.sprintf "console.log(%s)" (String.concat "," es)
      | "hd" -> Printf.sprintf "(%s).get(0)" (List.hd es)
      | "tl" -> Printf.sprintf "(%s).delete(0)" (List.hd es)
