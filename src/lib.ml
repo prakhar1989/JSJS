@@ -74,7 +74,6 @@ let list_definitions = [
   ("filter", TFun([TFun([generic_arg1],TBool);generic_list;], generic_list));
   ("map", TFun([TFun([generic_arg1],generic_arg2); generic_list;], TList(generic_arg2)));
   ("iter", TFun([TFun([generic_arg1], TUnit); generic_list;], TUnit));
-  ("print", TFun([generic_list;], TUnit));
   ("range", TFun([TNum; TNum], TList(TNum)));
   ("concat", TFun([generic_list; generic_list], generic_list));
   ("fold_left", TFun([TFun([generic_arg1; generic_arg2], generic_arg1); generic_arg1; TList(T("B"))], generic_arg1));

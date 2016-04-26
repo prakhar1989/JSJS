@@ -10,13 +10,24 @@ val comp = /\(f, g) => /\(x) => f(g(x));
 
 print_num(x);
 
-hd(sumlist);
-hd(slist);
+val h1 = hd(sumlist);
+val h2 = hd(slist);
 
-List.length(xs);
+val l1 = List.length(xs);
 
 val compare = /\(x: A, y: A) => x > y;
 val compare2 = /\(x: B, y: B) => x < y;
 
 val t1 = compare(10, 4);
 val t2 = compare2("asd", "gasd");
+
+val sqs = List.map(sq, [1, 2, 3, 4]);
+List.iter(/\(x) => print_num(x), sqs);
+
+val maxinlist = List.fold_left(max, -1, [1, 2, 3, 4]);
+print_string("max in list");
+print_num(maxinlist);
+
+
+val ages = {"prakhar": 26, "gau": 10};
+print_num(get(ages, "gau"));

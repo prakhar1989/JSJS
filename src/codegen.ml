@@ -20,8 +20,7 @@ let block_template (return_expr: string) (body: string option) : string =
 
 let if_template (pred_expr: string) (if_expr: string) (else_expr: string): string =
   let id = "res_" ^ string_of_int(Random.int 1000000)
-  and template = format_of_string "
-    (function() {
+  and template = format_of_string "(function() {
         let %s
         if (%s) {
             %s = %s
@@ -123,7 +122,8 @@ let rec js_of_expr (module_name: string) (map:'a NameMap.t) (expr: expr) =
       | _ -> raise (failwith "not a function call") in
     let es = List.map (fun e -> js_of_expr module_name map e) es in
     (match id with
-     | "print" -> Printf.sprintf "console.log(%s)" (String.concat "," es)
+     | "print_num" | "print_bool"
+     | "print_string" -> Printf.sprintf "console.log(%s)" (String.concat "," es)
      | "hd" -> Printf.sprintf "(%s).get(0)" (List.hd es)
      | "tl" -> Printf.sprintf "(%s).delete(0)" (List.hd es)
      | "empty__" -> Printf.sprintf "(%s).isEmpty()" (List.hd es)
