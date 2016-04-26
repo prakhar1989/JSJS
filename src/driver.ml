@@ -1,15 +1,15 @@
 open Ast
 open Lexing
 open Parsing
-open Codegen
 open Core.Std
+open Codegen
 
 type action = Compile | GenAST
 
 let generate_stdlib file_path module_name =
   let lexbuf = Lexing.from_channel (open_in file_path) in
   let program = Parser.program Scanner.token lexbuf in
-  let _ = try Semantic.type_check program
+  let _ = try Typecheck.type_check program
     with
     | Exceptions.TypeError(s) -> print_endline s; exit 1
     | e -> Printf.printf "%s" (Exn.to_string e); exit 1
@@ -54,7 +54,7 @@ let driver filename axn =
     | Sys_error(s) -> Printf.printf "Error: %s" s; exit 1
   in
   (* TODO: Fix this error catching *)
-  let _ = try Semantic.type_check program
+  let inferred_program = try Typecheck.type_check program
     with
     | Exceptions.TypeError(s) -> Printf.printf "%s" s; exit 1
     | e -> Printf.printf "Error: %s" (Exn.to_string e); exit 1
@@ -62,8 +62,8 @@ let driver filename axn =
 
   (* JS -> AST -> JS *)
   let print_ast () =
-    let exps = List.map program ~f:Stringify.string_of_expr in
-    List.iter exps ~f:(fun x -> print_endline (x ^ ";"));
+    List.iter inferred_program
+      ~f:(fun t -> print_endline (Stringify.string_of_aexpr t));
   in
 
   (* Compile *)

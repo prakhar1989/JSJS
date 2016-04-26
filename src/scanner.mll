@@ -69,7 +69,7 @@ rule token =
     | ','                       { COMMA }
     | "=>"                      { FATARROW }
     | "->"                      { THINARROW }
-    | ['A'-'Z'] as c            { GENERIC(c) }
+    | ['A'-'Z'] as c            { GENERIC(Char.escaped c) }
     | number as num             { NUM_LIT(float_of_string num); }
     | '"' (string_lit as s) '"' { STR_LIT(s); }
     | id     as ident           { ID(ident); }

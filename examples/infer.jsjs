@@ -1,0 +1,47 @@
+val x = 10 + 20;
+val sq = /\(x) => x * x;
+val max = /\(a, b) => if a > b then a else b;
+val xs = [];
+
+val sumlist = 10 :: xs;
+val slist = "asda" :: xs;
+
+val comp = /\(f, g) => /\(x) => f(g(x));
+
+print(x);
+print("hello world");
+
+val h1 = hd(sumlist);
+val h2 = hd(slist);
+
+val l1 = List.length(xs);
+
+val compare = /\(x: A, y: A) => x > y;
+val compare2 = /\(x: B, y: B) => x < y;
+
+val t1 = compare(10, 4);
+val t2 = compare2("asd", "gasd");
+
+val sqs = List.map(sq, [1, 2, 3, 4]);
+List.iter(/\(x) => print(x), sqs);
+
+val maxinlist = List.fold_left(max, -1, [1, 2, 3, 4]);
+print("max in list");
+print(maxinlist);
+
+
+val xmap = {"prakhar": 26, "gau": 10};
+val xinmap = get(xmap, "gau");
+
+val ys = {"lol": "bye", "gol": "asd"};
+val y = get(ys, "lol");
+
+val zs = {10: 20, 20: 30};
+val z = get(zs, 10);
+
+print(xinmap);
+print(y);
+print(z);
+
+val sum = List.fold_left(/\(acc, x) => acc + x, 0, [1,2,3,4]);
+print(sum);
