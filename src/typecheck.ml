@@ -37,8 +37,8 @@ let get_new_type () =
       | [] -> ['A']
       | 'Z' :: xs -> 'A' :: List.rev (aux (List.rev xs))
       | x :: xs -> (Char.chr ((Char.code x) + 1)) :: xs
-    in List.rev ys 
-  in 
+    in List.rev ys
+  in
   let curr_type_var = !type_variable in
   type_variable := aux (curr_type_var);
   T(String.concat "" (List.map Char.escaped curr_type_var))
@@ -367,20 +367,28 @@ let rec apply_expr (subs: substitutions) (ae: aexpr): aexpr =
   | ATryCatch(atry, s, acatch, t) -> ATryCatch(apply_expr subs atry, s, apply_expr subs acatch, apply subs t)
 ;;
 
-let collect_program (program: aexpr list) : constraints =
-  List.flatten (List.map collect_expr program)
-;;
-
 let type_check (program: program) : (aexpr list) =
+
+  (* setting the predefined environment *)
   let predefined = Lib.predefined in
   let env = (predefined, NameMap.empty) in
-  let annotated_program, _ = ListLabels.fold_left ~init: ([], env)
-      program ~f: (fun (aacc, env) aexpr ->
-          let ae, env = annotate_expr aexpr env in (ae :: aacc, env))
-  in
+
+  (* build an annotated version of the program *)
+  let annotated_program, _ = ListLabels.fold_left program
+      ~init: ([], env) ~f: (fun (aacc, env) expr ->
+          let ae, env = annotate_expr expr env in (ae :: aacc, env)) in
   let annotated_program = List.rev annotated_program in
-  let constraints = collect_program annotated_program in
-  let subs = unify constraints in
-  let inferred_program = List.map (fun t -> (apply_expr subs t)) annotated_program in
+
+  (* gather program wide constraints *)
+  let constraints = List.flatten (List.map collect_expr annotated_program) in
+
+  (* running the unification algorithm on the constraints *)
+  let substituions = unify constraints in
+
+  (* applying the substitutions on the program *)
+  let inferred_program = ListLabels.map annotated_program
+      ~f:(fun t -> (apply_expr substituions t)) in
+
+  (* returning the inferred program *)
   inferred_program
 ;;

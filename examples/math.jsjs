@@ -7,10 +7,11 @@ val gcd = /\(a, b) => {
   };
 };
 
-//print(gcd(12, 8));
+print_num(gcd(12, 8));
 
-val pow = /\(base: num, exp: num): num => {
-  val aux = /\(accum: num, e: num): num => {
+// support for optional types
+val pow = /\(base, exp) => {
+  val aux = /\(accum, e): num => {
     if (e == 1) then accum
     else aux (accum * base, e - 1);
   };
@@ -19,5 +20,5 @@ val pow = /\(base: num, exp: num): num => {
 
 val chess_squares = pow(8, 2);
 
-//print("Total number of squares on a chessboard: ");
-//print(chess_squares);
+print_string("Total number of squares on a chessboard: ");
+print_num(chess_squares);
