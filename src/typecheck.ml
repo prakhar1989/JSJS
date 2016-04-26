@@ -173,7 +173,7 @@ let rec annotate_expr (e: expr) (env: environment) : (aexpr * environment) =
 
   | ModuleLit(id, e) ->
     if ModuleMap.mem id modules
-    then 
+    then
       let locals, globals = merge_env env in
       let new_locals = ModuleMap.find id modules in
       let new_env = (new_locals, globals) in
@@ -370,30 +370,34 @@ let rec apply_expr (subs: substitutions) (ae: aexpr): aexpr =
   | ATryCatch(atry, s, acatch, t) -> ATryCatch(apply_expr subs atry, s, apply_expr subs acatch, apply subs t)
 ;;
 
+
+let infer (expr: expr) (env: environment) : aexpr * environment =
+  let aexpr, env = annotate_expr expr env in
+  let constraints = collect_expr aexpr in
+  let subs = unify constraints in
+  let inferred_expr = apply_expr subs aexpr in
+  inferred_expr, env
+;;
+
 let type_check (program: program) : (aexpr list) =
 
   (* setting the predefined environment *)
   let predefined = Lib.predefined in
   let env = (predefined, NameMap.empty) in
 
-  (* build an annotated version of the program *)
-  let annotated_program, _ = ListLabels.fold_left program
-      ~init: ([], env) ~f: (fun (aacc, env) expr ->
-          let ae, env = annotate_expr expr env in (ae :: aacc, env)) in
-  let annotated_program = List.rev annotated_program in
-
-  print_endline "building constraints";
-
-  (* gather program wide constraints *)
-  let constraints = List.flatten (List.map collect_expr annotated_program) in
-
-  (* running the unification algorithm on the constraints *)
-  let substituions = unify constraints in
-
-  (* applying the substitutions on the program *)
-  let inferred_program = ListLabels.map annotated_program
-      ~f:(fun t -> (apply_expr substituions t)) in
+  let inferred_program, _ = ListLabels.fold_left program ~init: ([], env)
+    ~f: (fun (acc, env) expr ->
+          let inferred_expr, new_env = infer expr env in
+          let new_env = match inferred_expr with
+            | AAssign(id, _, ae, _) -> 
+              let locals, globals = new_env in
+              let aet = type_of ae in
+              let new_locals = NameMap.add id aet locals in
+              (new_locals, globals)
+            | _ -> new_env in
+          (inferred_expr :: acc, new_env))
+  in
 
   (* returning the inferred program *)
-  inferred_program
+  List.rev inferred_program
 ;;
