@@ -32,7 +32,11 @@ let dump_javascript filename str =
 %s
 %s
 %s
-let num_to_string = function (x) { return x.toString(); };
+var num_to_string = function (x) { return x.toString(); };
+var print_string = console.log;
+var print_num = console.log;
+var print_bool = console.log;
+var print = console.log;
 // generated code follows
 %s" in
   let stdlib = [("List", "lib/list.jsjs"); ("Map", "lib/map.jsjs")] in
