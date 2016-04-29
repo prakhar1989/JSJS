@@ -45,3 +45,5 @@ print(z);
 
 val sum = List.fold_left(/\(acc, x) => acc + x, 0, [1,2,3,4]);
 print(sum);
+
+print((/\(x) => x * x;)(20));

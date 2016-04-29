@@ -79,14 +79,14 @@ let rec annotate_expr (e: expr) (env: environment) : (aexpr * environment) =
       then NameMap.find id locals
       else if NameMap.mem id globals
       then NameMap.find id globals
-      else raise (failwith (Printf.sprintf "%s undefined" id)) in
+      else raise (Undefined(id)) in
     AVal(id, typ), env
 
   | FunLit(ids, e, t) -> begin
 
       (* check if JS keywords are passed as arguments *)
       List.iter (fun i -> if KeywordsSet.mem i js_keywords_set
-                  then raise (failwith "cannot define keywords") else ()) ids;
+                  then raise (CannotRedefineKeyword(i)) else ()) ids;
 
       match t with
       | TFun(arg_types, ret_type) ->
@@ -103,7 +103,7 @@ let rec annotate_expr (e: expr) (env: environment) : (aexpr * environment) =
         let new_locals = ListLabels.fold_left ~init: locals
             annotated_args ~f: (fun map (it, at) ->
                 if NameMap.mem it map
-                then raise (failwith "cant reuse arg names")
+                then raise (AlreadyDefined(it))
                 else NameMap.add it at map) in
 
         (* prepare AFunLit *)
@@ -125,9 +125,9 @@ let rec annotate_expr (e: expr) (env: environment) : (aexpr * environment) =
 
       (* do not allow reassignment *)
       if NameMap.mem id locals
-      then raise (failwith "cannot redefine existing variable")
+      then raise (AlreadyDefined(id))
       else if KeywordsSet.mem id js_keywords_set
-      then raise (failwith "cannot define keywords")
+      then raise (CannotRedefineKeyword(id))
       (* annotate t with user-provided type or new placeholder *)
       else let t = if t = TAny then get_new_type () else t in
         let new_locals = NameMap.add id t locals in
@@ -178,7 +178,7 @@ let rec annotate_expr (e: expr) (env: environment) : (aexpr * environment) =
       let new_locals = ModuleMap.find id modules in
       let new_env = (new_locals, globals) in
       AModuleLit(id, fst (annotate_expr e new_env), get_new_type ()), env
-    else raise (failwith "module not found")
+    else raise (ModuleNotFound(id))
 ;;
 
 let rec type_of (aexpr: aexpr): primitiveType =
@@ -219,8 +219,8 @@ let rec collect_expr (ae: aexpr): constraints =
           (* write something here *)
           | TList(x) -> [(et1, x); (t, et2)]
           | T(_) -> [(et2, TList(et1)); (t, TList(et1))]
-          | _ -> raise (failwith "lists have to be same type something"))
-      | _ -> raise (failwith "not a binary operator") in
+          | _ -> raise (NonUniformTypeContainer(et1, et2)))
+      | _ -> raise (InvalidOperation(et1, op)) in
     (collect_expr ae1) @ (collect_expr ae2) @ opc
 
   | AUnop(op, ae, t) ->
@@ -228,7 +228,7 @@ let rec collect_expr (ae: aexpr): constraints =
     let opc = (match op with
         | Not -> [(et, TBool); (t, TBool)]
         | Neg -> [(et, TNum); (t, TNum)]
-        | _ -> raise (failwith "not a unary operator")) in
+        | _ -> raise (InvalidOperation(et, op))) in
     (collect_expr ae) @ opc
 
   | AIf(ap, ae1, ae2, t) ->
@@ -260,7 +260,7 @@ let rec collect_expr (ae: aexpr): constraints =
 
   | ABlock(aes, t) ->
     let last_type = (match List.hd (List.rev aes) with
-    | AAssign(_) -> raise(failwith "can't end block with an assignment")
+    | AAssign(id, _, _, _) -> raise (InvalidReturnExpression(id))
     | ae -> type_of ae ) in
     (List.flatten (List.map collect_expr aes)) @ [(t, last_type)]
 
@@ -268,16 +268,17 @@ let rec collect_expr (ae: aexpr): constraints =
 
   | AFunLit(_, ae, _, t) -> (match t with
       | TFun(_, ret_type) -> (collect_expr ae) @ [(type_of ae, ret_type)]
-      | _ -> raise (failwith "not a function"))
+      | _ -> raise (failwith "unreachable state reached"))
 
   | ACall(afn , aargs, t) ->
     let typ_afn = (match afn with
         | AVal(_) | AFunLit(_) -> type_of afn
-        | _ -> raise (failwith "not a function call")) in
+        | _ -> raise (failwith "unreachable state reached")) in
     let sign_conts = (match typ_afn with
         | TFun(arg_types, ret_type) -> begin
-            if List.length aargs <> List.length arg_types
-            then raise (failwith "incorrect number of arguments")
+            let l1 = List.length aargs and l2 = List.length arg_types in
+            if l1 <> l2
+            then raise (MismatchedArgCount(l1, l2))
             else let arg_conts = List.map2 (fun ft at -> (ft, type_of at)) arg_types aargs in
               arg_conts @ [(t, ret_type)]
           end
@@ -290,7 +291,7 @@ let rec collect_expr (ae: aexpr): constraints =
     (match ae with
      | AVal(prop, ts) -> let prop_type = if NameMap.mem prop definitions
        then NameMap.find prop definitions
-       else raise (failwith "undefined property") in
+       else raise (UndefinedProperty(id, prop)) in
        (collect_expr ae) @ [(t, prop_type)]
      | ACall(afn, aargs, call_t) ->
        let prop = (match afn with
@@ -298,12 +299,12 @@ let rec collect_expr (ae: aexpr): constraints =
            |  _ -> raise (failwith "unreachable state")) in
        let prop_type = if NameMap.mem prop definitions
        then NameMap.find prop definitions
-       else raise (failwith "undefined property") in
+       else raise (UndefinedProperty(id, prop)) in
        (match prop_type with
        | TFun(_, ret_type) -> let new_call = ACall(afn, aargs, ret_type) in
          (collect_expr new_call) @ [(t, ret_type)]
        | _ -> raise(failwith "unreachable state"))
-     | _ -> raise (failwith "undefined property"))
+     | _ -> raise (failwith "unreachable state"))
 
   | AThrow(ae, t) -> collect_expr ae @ [(t, TExn)]
 
@@ -346,7 +347,7 @@ and unify_one (t1: primitiveType) (t2: primitiveType) : substitutions =
   | TMap(kt1, vt1), TMap(kt2, vt2) -> unify [(kt1, kt2) ; (vt1, vt2)]
   (* This case is particularly useful when you are calling a function that returns a function *)
   | TFun(a, b), TFun(x, y) -> unify ((List.combine a x) @ [(b, y)])
-  | _ -> raise (failwith "mismatched types")
+  | _ -> raise (MismatchedTypes(t1, t2))
 ;;
 
 let rec apply_expr (subs: substitutions) (ae: aexpr): aexpr =
@@ -385,17 +386,23 @@ let type_check (program: program) : (aexpr list) =
   let predefined = Lib.predefined in
   let env = (predefined, NameMap.empty) in
 
+  (* build the inferred program by inferred each expression one by one
+     and updating the environment as we go along *)
   let inferred_program, _ = ListLabels.fold_left program ~init: ([], env)
     ~f: (fun (acc, env) expr ->
-          let inferred_expr, new_env = infer expr env in
-          let new_env = match inferred_expr with
+          (* get the inferred expression and the updated environment *)
+          let inferred_expr, env = infer expr env in
+
+          (* if expression is assignment, update the environment *)
+          let env = match inferred_expr with
             | AAssign(id, _, ae, _) -> 
-              let locals, globals = new_env in
-              let aet = type_of ae in
-              let new_locals = NameMap.add id aet locals in
-              (new_locals, globals)
-            | _ -> new_env in
-          (inferred_expr :: acc, new_env))
+              let locals, globals = env and aet = type_of ae in
+              let locals = NameMap.add id aet locals in
+              (locals, globals)
+            | _ -> env in
+
+          (* save the inferred_expr and return it alongwith the env *)
+          (inferred_expr :: acc, env))
   in
 
   (* returning the inferred program *)
