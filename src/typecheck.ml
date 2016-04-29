@@ -94,7 +94,9 @@ let rec annotate_expr (e: expr) (env: environment) : (aexpr * environment) =
 
         (* annotates arguments with user-defined or new placeholders *)
         let annotated_args = List.map (fun (it, at) ->
-            if at = TAny then (it, get_new_type ()) else (it, at))
+            match at with
+            | TAny | T(_) -> (it, get_new_type ())
+            | _ -> (it, at))
             (List.combine ids arg_types) in
 
         (* merge locals and globals *)
@@ -176,7 +178,7 @@ let rec annotate_expr (e: expr) (env: environment) : (aexpr * environment) =
     if ModuleMap.mem id modules
     then
       let locals, globals = env in
-      (* user defintions that use the same name 
+      (* user defintions that use the same name
          as module definitions should be local scope
          whereas module defs should be in global scope *)
       let _, new_globals = merge_env (globals, ModuleMap.find id modules) in

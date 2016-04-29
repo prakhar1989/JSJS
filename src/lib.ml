@@ -42,10 +42,10 @@ sn.__toJS=sn.toArray,sn.__toStringMapper=er,sn.inspect=sn.toSource=function(){re
 },get:function(t,e){return t=l(this,t),0>t||this.size===1/0||void 0!==this.size&&t>this.size?e:this.find(function(e,r){return r===t},void 0,e)},has:function(t){return t=l(this,t),t>=0&&(void 0!==this.size?this.size===1/0||this.size>t:-1!==this.indexOf(t))},interpose:function(t){return be(this,ge(this,t))},interleave:function(){var t=[this].concat(p(arguments)),e=Ie(this.toSeq(),k.of,t),r=e.flatten(!0);return e.size&&(r.size=e.size*t.length),be(this,r)},last:function(){return this.get(-1)},skipWhile:function(t,e){return be(this,le(this,t,e,!1))},zip:function(){var t=[this].concat(p(arguments));return be(this,Ie(this,rr,t))},zipWith:function(t){var e=p(arguments);return e[0]=this,be(this,Ie(this,t,e))}}),n.prototype[fr]=!0,n.prototype[cr]=!0,Fe(i,{get:function(t,e){return this.has(t)?t:e},includes:function(t){return this.has(t)},keySeq:function(){return this.valueSeq()}}),i.prototype.has=sn.includes,i.prototype.contains=i.prototype.includes,Fe(x,r.prototype),Fe(k,n.prototype),Fe(A,i.prototype),Fe(et,r.prototype),Fe(rt,n.prototype),Fe(nt,i.prototype);var hn={Iterable:e,Seq:O,Collection:tt,Map:ct,OrderedMap:Zt,List:Wt,Stack:Ve,Set:Le,OrderedSet:Je,Record:Ae,Range:$,Repeat:G,is:X,fromJS:H};return hn})();
 " ;;
 
-let generic_list = TList(T("A"))
-and generic_map = TMap(T("A"), T("B"))
-and generic_arg1 = T("A")
-and generic_arg2 = T("B");;
+let generic_arg1 = T("A") and generic_arg2 = T("B");;
+
+let generic_list = TList(generic_arg1)
+and generic_map = TMap(T("A"), T("B"));;
 
 let top_level_definitions = [
   ("print", TFun([generic_arg1], TUnit));
@@ -84,7 +84,7 @@ let list_definitions = [
 
 let map_definitions = [
   ("count", TFun([generic_map], TNum));
-  ("values", TFun([generic_map], TList(T("B"))));
+  ("values", TFun([generic_map], TList(generic_arg2)));
   ("merge", TFun([generic_map; generic_map], generic_map));
 ];;
 
