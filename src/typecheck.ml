@@ -390,8 +390,12 @@ let type_check (program: program) : (aexpr list) =
      and updating the environment as we go along *)
   let inferred_program, _ = ListLabels.fold_left program ~init: ([], env)
     ~f: (fun (acc, env) expr ->
+
           (* get the inferred expression and the updated environment *)
-          let inferred_expr, env = infer expr env in
+          let inferred_expr, env = 
+            try infer expr env
+            with e -> handle_error e
+          in
 
           (* if expression is assignment, update the environment *)
           let env = match inferred_expr with
