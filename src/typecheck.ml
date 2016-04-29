@@ -92,6 +92,16 @@ let rec annotate_expr (e: expr) (env: environment) : (aexpr * environment) =
       match t with
       | TFun(arg_types, ret_type) ->
 
+        let generified_args = List.map (fun t ->
+            match t with
+            | TAny -> get_new_type ()
+            | _ -> t
+          ) arg_types in
+        let generified_ret_type = match ret_type with
+          | TAny -> get_new_type ()
+          | _ -> ret_type in
+        let user_fun_lit_type = TFun(generified_args, generified_ret_type) in
+
         (* annotates arguments with user-defined or new placeholders *)
         let annotated_args = List.map (fun (it, at) ->
             match at with
@@ -114,7 +124,7 @@ let rec annotate_expr (e: expr) (env: environment) : (aexpr * environment) =
         let ret_type = if ret_type = TAny then get_new_type () else ret_type in
         let arg_types = List.map snd annotated_args in
         let fun_type = TFun(arg_types, ret_type) in
-        AFunLit(ids, ae, fun_type, fun_type), env
+        AFunLit(ids, ae, user_fun_lit_type, fun_type), env
       | _ -> raise (failwith "unreachable state")
     end
 
