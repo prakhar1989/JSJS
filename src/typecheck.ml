@@ -175,9 +175,12 @@ let rec annotate_expr (e: expr) (env: environment) : (aexpr * environment) =
   | ModuleLit(id, e) ->
     if ModuleMap.mem id modules
     then
-      let locals, globals = merge_env env in
-      let new_locals = ModuleMap.find id modules in
-      let new_env = (new_locals, globals) in
+      let locals, globals = env in
+      (* user defintions that use the same name 
+         as module definitions should be local scope
+         whereas module defs should be in global scope *)
+      let _, new_globals = merge_env (globals, ModuleMap.find id modules) in
+      let new_env = (locals, new_globals) in
       AModuleLit(id, fst (annotate_expr e new_env), get_new_type ()), env
     else raise (ModuleNotFound(id))
 ;;

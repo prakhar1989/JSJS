@@ -1,6 +1,6 @@
 // string join
 val join = /\(sep: string, xs: list string): string => {
-  val concat = /\(x: string, y: string): string => x ^ sep ^ y;
+  val concat = /\(x, y) => x ^ sep ^ y;
   if empty?(xs) then ""
   else List.fold_left(concat, hd(xs), tl(xs));
 };

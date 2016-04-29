@@ -1,3 +1,6 @@
-val s = 10 + 10;
 val xs = List.remove([1,2,4,5], 2);
 val ys = List.remove([1,2,4,5], 0);
+
+List.iter(/\(x) => print_num(x), xs);
+print("");
+List.iter(/\(x) => print_num(x), ys);
