@@ -1,4 +1,2 @@
 val gen1 = /\(x: A, y: B): A => y;
 val gen2 = /\(x: string): A => x;
-
-print(gen2(gen1(10, "hello")));

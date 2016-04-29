@@ -113,7 +113,8 @@ let rec annotate_expr (e: expr) (env: environment) : (aexpr * environment) =
         let ae, _ = annotate_expr e (new_locals, globals) in
         let ret_type = if ret_type = TAny then get_new_type () else ret_type in
         let arg_types = List.map snd annotated_args in
-        AFunLit(ids, ae, t, TFun(arg_types, ret_type)), env
+        let fun_type = TFun(arg_types, ret_type) in
+        AFunLit(ids, ae, fun_type, fun_type), env
       | _ -> raise (failwith "unreachable state")
     end
 
@@ -405,12 +406,36 @@ let type_check (program: program) : (aexpr list) =
           in
 
           (* if expression is assignment, update the environment *)
-          let env = match inferred_expr with
-            | AAssign(id, _, ae, _) ->
+          let inferred_expr, env = match inferred_expr with
+            | AAssign(id, t, ae, _) ->
+              let ae, subs = (match ae with
+                  (* in this step, we check if the inferred types for a function
+                     literal matches the user annotation. *)
+                  | AFunLit(id, body, user_type, inferred_type) -> 
+                    (* get substitutions for user annotated and inferred type *)
+                    let subs = unify_one user_type inferred_type in
+
+                    (* apply the substitutions on the user provided type *)
+                    let user_unified_t = apply subs user_type in
+
+                    (* apply the substitutions in function body*)
+                    let unified_ae = apply_expr subs body in
+
+                    (* return the annotated expression *)
+                    AFunLit(id, unified_ae, user_type, user_unified_t), subs
+
+                  | _ -> ae, []) in
+
+              (* since this is an assignment statement, we
+                 update the environment with the type of ae *)
               let locals, globals = env and aet = type_of ae in
               let locals = NameMap.add id aet locals in
-              (locals, globals)
-            | _ -> env in
+
+              (* build the original assign expression with new aexpr 
+                 and applied substitutions *)
+              let ret_ae = AAssign(id, apply subs t, ae, TUnit) in
+              ret_ae, (locals, globals)
+            | _ -> inferred_expr, env in
 
           (* save the inferred_expr and return it alongwith the env *)
           (inferred_expr :: acc, env))
