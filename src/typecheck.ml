@@ -19,7 +19,7 @@ type constraints = (primitiveType * primitiveType) list
 
 
 (* mutable state *)
-let type_variable = (ref ['A']);;
+let type_variable = (ref ['D']);;
 
 (* maintains a set of js keywords *)
 let keywords = ["break"; "case"; "class"; "catch"; "const"; "continue";
@@ -27,7 +27,8 @@ let keywords = ["break"; "case"; "class"; "catch"; "const"; "continue";
                 "export"; "extends"; "finally"; "for"; "function"; "if";
                 "import"; "in"; "instanceof"; "new"; "return"; "super";
                 "switch"; "this"; "throw"; "try"; "typeof"; "var"; "void";
-                "while"; "with"; "yield" ];;
+                "while"; "with"; "yield"; "val"; ];;
+
 let js_keywords_set = List.fold_left (fun acc x -> KeywordsSet.add x acc)
     KeywordsSet.empty keywords;;
 
@@ -183,22 +184,22 @@ let rec annotate_expr (e: expr) (env: environment) : (aexpr * environment) =
 
 let rec type_of (aexpr: aexpr): primitiveType =
   match aexpr with
-  | AUnitLit(t) -> t
-  | ANumLit(_, t) -> t
-  | ABoolLit(_, t) -> t
-  | AStrLit(_, t) -> t
-  | ABinop(_, _, _, t) -> t
-  | AUnop(_, _, t) -> t
-  | AListLit(_, t) -> t
-  | AMapLit(_, t) -> t
-  | ABlock(_, t) -> t
-  | AAssign(_, _, _, t) -> t
-  | AVal(_, t) -> t
-  | AIf(_, _, _, t) -> t
-  | ACall(_, _, t) -> t
-  | AFunLit(_, _, _, t) -> t
-  | AModuleLit(_, _, t) -> t
-  | AThrow(_, t) -> t
+  | AUnitLit(t)           -> t
+  | ANumLit(_, t)         -> t
+  | ABoolLit(_, t)        -> t
+  | AStrLit(_, t)         -> t
+  | ABinop(_, _, _, t)    -> t
+  | AUnop(_, _, t)        -> t
+  | AListLit(_, t)        -> t
+  | AMapLit(_, t)         -> t
+  | ABlock(_, t)          -> t
+  | AAssign(_, _, _, t)   -> t
+  | AVal(_, t)            -> t
+  | AIf(_, _, _, t)       -> t
+  | ACall(_, _, t)        -> t
+  | AFunLit(_, _, _, t)   -> t
+  | AModuleLit(_, _, t)   -> t
+  | AThrow(_, t)          -> t
   | ATryCatch(_, _, _, t) -> t
 ;;
 
@@ -352,22 +353,22 @@ and unify_one (t1: primitiveType) (t2: primitiveType) : substitutions =
 
 let rec apply_expr (subs: substitutions) (ae: aexpr): aexpr =
   match ae with
-  | ABoolLit(b, t) -> ABoolLit(b, apply subs t)
-  | ANumLit(n, t) -> ANumLit(n, apply subs t)
-  | AStrLit(s, t) -> AStrLit(s, apply subs t)
-  | AUnitLit(t) -> AUnitLit(apply subs t)
-  | AVal(s, t) -> AVal(s, apply subs t)
-  | AAssign(id, t, ae, _) -> AAssign(id, apply subs t, apply_expr subs ae, TUnit)
-  | ABinop(ae1, op, ae2, t) -> ABinop(apply_expr subs ae1, op, apply_expr subs ae2, apply subs t)
-  | AUnop(op, ae, t) -> AUnop(op, apply_expr subs ae, apply subs t)
-  | AListLit(aes, t) -> AListLit(List.map (apply_expr subs) aes, apply subs t)
-  | AMapLit(kvpairs, t) -> AMapLit(List.map (fun (k, v) -> (apply_expr subs k, apply_expr subs v)) kvpairs, apply subs t)
-  | AIf(ap, ae1, ae2, t) -> AIf(apply_expr subs ap, apply_expr subs ae1, apply_expr subs ae2, apply subs t)
-  | ABlock(aes, t) -> ABlock(List.map (apply_expr subs) aes, apply subs t)
-  | AFunLit(ids, ae, t1, t2) -> AFunLit(ids, apply_expr subs ae, t1, apply subs t2)
-  | ACall(afn, aargs, t) -> ACall(apply_expr subs afn, List.map (apply_expr subs) aargs, apply subs t)
-  | AModuleLit(id, ae, t) -> AModuleLit(id, apply_expr subs ae, apply subs t)
-  | AThrow(ae, t) -> AThrow(apply_expr subs ae, apply subs t)
+  | ABoolLit(b, t)                -> ABoolLit(b, apply subs t)
+  | ANumLit(n, t)                 -> ANumLit(n, apply subs t)
+  | AStrLit(s, t)                 -> AStrLit(s, apply subs t)
+  | AUnitLit(t)                   -> AUnitLit(apply subs t)
+  | AVal(s, t)                    -> AVal(s, apply subs t)
+  | AAssign(id, t, ae, _)         -> AAssign(id, apply subs t, apply_expr subs ae, TUnit)
+  | ABinop(ae1, op, ae2, t)       -> ABinop(apply_expr subs ae1, op, apply_expr subs ae2, apply subs t)
+  | AUnop(op, ae, t)              -> AUnop(op, apply_expr subs ae, apply subs t)
+  | AListLit(aes, t)              -> AListLit(List.map (apply_expr subs) aes, apply subs t)
+  | AMapLit(kvpairs, t)           -> AMapLit(List.map (fun (k, v) -> (apply_expr subs k, apply_expr subs v)) kvpairs, apply subs t)
+  | AIf(ap, ae1, ae2, t)          -> AIf(apply_expr subs ap, apply_expr subs ae1, apply_expr subs ae2, apply subs t)
+  | ABlock(aes, t)                -> ABlock(List.map (apply_expr subs) aes, apply subs t)
+  | AFunLit(ids, ae, t1, t2)      -> AFunLit(ids, apply_expr subs ae, t1, apply subs t2)
+  | ACall(afn, aargs, t)          -> ACall(apply_expr subs afn, List.map (apply_expr subs) aargs, apply subs t)
+  | AModuleLit(id, ae, t)         -> AModuleLit(id, apply_expr subs ae, apply subs t)
+  | AThrow(ae, t)                 -> AThrow(apply_expr subs ae, apply subs t)
   | ATryCatch(atry, s, acatch, t) -> ATryCatch(apply_expr subs atry, s, apply_expr subs acatch, apply subs t)
 ;;
 
@@ -389,17 +390,18 @@ let type_check (program: program) : (aexpr list) =
   (* build the inferred program by inferred each expression one by one
      and updating the environment as we go along *)
   let inferred_program, _ = ListLabels.fold_left program ~init: ([], env)
+
     ~f: (fun (acc, env) expr ->
 
           (* get the inferred expression and the updated environment *)
-          let inferred_expr, env = 
+          let inferred_expr, env =
             try infer expr env
             with e -> handle_error e
           in
 
           (* if expression is assignment, update the environment *)
           let env = match inferred_expr with
-            | AAssign(id, _, ae, _) -> 
+            | AAssign(id, _, ae, _) ->
               let locals, globals = env and aet = type_of ae in
               let locals = NameMap.add id aet locals in
               (locals, globals)

@@ -1,5 +1,5 @@
-List.print_list(List.insert([1,2,4,5], 3, 2));
+val xs = List.insert([1,2,4,5], 3, 2);
+val ys = List.insert([1,2,4,5], -1, 0);
 
-print("");
-
-List.print_list(List.insert([1,2,4,5], -1, 0));
+List.iter(/\(x) => print_num(x), xs);
+List.iter(/\(x) => print_num(x), ys);

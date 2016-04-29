@@ -1,6 +1,3 @@
-val print_square = /\(x: num): unit => {
-  print(x * x);
-};
-
+val print_square = /\(x: num): unit => print_num(x * x);
 
 List.iter(print_square, List.range(1, 10));

@@ -78,8 +78,8 @@ let list_definitions = [
   ("range", TFun([TNum; TNum], TList(TNum)));
   ("concat", TFun([generic_list; generic_list], generic_list));
   ("fold_left", TFun([TFun([generic_arg1; generic_arg2], generic_arg1); generic_arg1; TList(T("B"))], generic_arg1));
-  ("insert", TFun([generic_arg1; TNum], generic_list));
-  ("remove", TFun([generic_arg1; TNum], generic_list));
+  ("insert", TFun([generic_list; generic_arg1; TNum], generic_list));
+  ("remove", TFun([generic_list; TNum], generic_list));
 ];;
 
 let map_definitions = [
