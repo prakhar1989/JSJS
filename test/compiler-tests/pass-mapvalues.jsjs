@@ -1,2 +1,2 @@
 val m = {"foo": 10, "bar": 20, "baz": 30};
-List.print_list(Map.values(m));
+List.iter(/\(x) => print_num(x), Map.values(m));

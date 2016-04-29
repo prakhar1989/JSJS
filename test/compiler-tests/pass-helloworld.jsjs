@@ -1,1 +1,1 @@
-print("hello world");
+print_string("hello world");

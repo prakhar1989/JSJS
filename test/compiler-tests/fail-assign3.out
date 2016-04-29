@@ -1,1 +1,2 @@
-Type error: Cannot have types 'num' and 'bool' for operator '+'
+Type error: expected value of type 'bool', got a value of type 'num' instead
+
