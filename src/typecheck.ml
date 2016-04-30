@@ -19,7 +19,9 @@ type constraints = (primitiveType * primitiveType) list
 
 
 (* mutable state *)
-let type_variable = (ref ['D']);;
+let type_variable = (ref ['A'; 'A']);;
+
+let modules = Lib.modules;;
 
 (* maintains a set of js keywords *)
 let keywords = ["break"; "case"; "class"; "catch"; "const"; "continue";
@@ -44,8 +46,6 @@ let get_new_type () =
   type_variable := aux (curr_type_var);
   T(String.concat "" (List.map Char.escaped curr_type_var))
 ;;
-
-let modules = Lib.modules;;
 
 let merge_env (env: environment) : environment =
   let locals, globals = env in
@@ -401,7 +401,7 @@ let type_check (program: program) : (aexpr list) =
 
   (* setting the predefined environment *)
   let predefined = Lib.predefined in
-  let env = (predefined, NameMap.empty) in
+  let env = (NameMap.empty, predefined) in
 
   (* build the inferred program by inferred each expression one by one
      and updating the environment as we go along *)
@@ -421,7 +421,7 @@ let type_check (program: program) : (aexpr list) =
               let ae, subs = (match ae with
                   (* in this step, we check if the inferred types for a function
                      literal matches the user annotation. *)
-                  | AFunLit(id, body, user_type, inferred_type) -> 
+                  | AFunLit(id, body, user_type, inferred_type) ->
                     (* get substitutions for user annotated and inferred type *)
                     let subs = unify_one user_type inferred_type in
 
@@ -441,7 +441,7 @@ let type_check (program: program) : (aexpr list) =
               let locals, globals = env and aet = type_of ae in
               let locals = NameMap.add id aet locals in
 
-              (* build the original assign expression with new aexpr 
+              (* build the original assign expression with new aexpr
                  and applied substitutions *)
               let ret_ae = AAssign(id, apply subs t, ae, TUnit) in
               ret_ae, (locals, globals)

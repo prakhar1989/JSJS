@@ -1,0 +1,7 @@
+val f = /\(x) => 10;
+
+val map = /\(fn, xs): list B => {
+  if empty?(xs) then xs
+  else fn(hd(xs)) :: map(fn, tl(xs));
+};
+

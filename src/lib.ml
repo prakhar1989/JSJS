@@ -68,8 +68,9 @@ let predefined = List.fold_left
     NameMap.empty top_level_definitions
 ;;
 
+type definition = string * Ast.primitiveType
+
 let list_definitions = [
-  ("length", TFun([generic_list], TNum));
   ("rev", TFun([generic_list], generic_list));
   ("nth", TFun([generic_list; TNum], generic_arg1));
   ("filter", TFun([TFun([generic_arg1],TBool);generic_list;], generic_list));
@@ -89,6 +90,23 @@ let map_definitions = [
 ];;
 
 
+(*
+let generate_module_defn (module_name: string) : definition list  =
+  let file_path = Printf.sprintf "lib/%s.jsjs" module_name in
+  let lexbuf = Lexing.from_channel (open_in file_path) in
+  let program = Parser.program Scanner.token lexbuf in
+  (* infer the program and create the definitions by top level expressions *)
+  let inferred_program  = Typecheck.type_check program in
+  List.fold_left
+    (fun defs ae ->
+       let def = (match ae with
+        | AAssign(id, t, _, _) -> (id, t)
+        | _ -> raise (failwith "top level expressions in modules must be named")) in
+       def :: defs)
+    [] inferred_program
+;;
+*)
+
 let modules =
   (* a function that takes a module map and adds definitions as value
      and module name as key *)
@@ -99,7 +117,7 @@ let modules =
     ModuleMap.add name definitions map in
 
   (* generate the map for all definitions *)
-  let module_defs = [("List", list_definitions); ("Map", map_definitions)] in
-    List.fold_left (fun acc (name, defs) -> update_module_map acc name defs)
+  let module_defs = [("List", list_definitions); ("Map", map_definitions)]
+  in List.fold_left (fun acc (name, defs) -> update_module_map acc name defs)
     ModuleMap.empty module_defs
 ;;
