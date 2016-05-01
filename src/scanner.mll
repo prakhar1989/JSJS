@@ -13,7 +13,7 @@
 }
 
 let digit = ['0'-'9']
-let id = ['a'-'z'] ['a'-'z' 'A'-'Z' '0'-'9' '_']* ['?']?
+let id = ['a'-'z'] ['a'-'z' 'A'-'Z' '0'-'9' '_']* ['?']? | "_"
 let ws = [' ' '\r' '\t']
 let number = digit+ '.'? digit*
 let module_lit = ['A'-'Z'] ['a'-'z' 'A'-'Z']+
@@ -72,7 +72,7 @@ rule token =
     | ['A'-'Z'] as c            { GENERIC(Char.escaped c) }
     | number as num             { NUM_LIT(float_of_string num); }
     | '"' (string_lit as s) '"' { STR_LIT(s); }
-    | id     as ident           { ID(ident); }
+    | id as ident               { ID(ident); }
     | module_lit  as m_lit      { MODULE_LIT(m_lit); }
     | _ as c                    { let line_no = lexbuf.lex_curr_p.pos_lnum + 1 in
                                   let char_no = lexbuf.lex_curr_p.pos_cnum - lexbuf.lex_curr_p.pos_bol in

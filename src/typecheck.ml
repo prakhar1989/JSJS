@@ -8,12 +8,9 @@ module GenericMap = Map.Make(Char)
 module ModuleMap = Map.Make(String)
 module KeywordsSet = Set.Make(String)
 
-
 (* types *)
-
 type typesTable = Ast.primitiveType NameMap.t
 type environment = typesTable * typesTable
-
 type substitutions = (id * primitiveType) list
 type constraints = (primitiveType * primitiveType) list
 
@@ -144,7 +141,7 @@ let rec annotate_expr (e: expr) (env: environment) : (aexpr * environment) =
       then raise (CannotRedefineKeyword(id))
       (* annotate t with user-provided type or new placeholder *)
       else let t = if t = TAny then get_new_type () else t in
-        let new_locals = NameMap.add id t locals in
+        let new_locals = if id = "_" then locals else NameMap.add id t locals in
         let ae, _ = match e with
           (* to allow recursion, we need to add pass new environment *)
           | FunLit(_) -> annotate_expr e (new_locals, globals)
@@ -459,10 +456,11 @@ let type_check (program: program) : (aexpr list) =
               (* since this is an assignment statement, we
                  update the environment with the type of ae *)
               let locals, globals = env and aet = type_of ae in
-              let locals = NameMap.add id aet locals in
 
-              (* build the original assign expression with new aexpr
-                 and applied substitutions *)
+              (* if id is "_", then don't store the result *)
+              let locals = if id = "_" then locals else NameMap.add id aet locals in
+
+              (* build the original assign expression with new aexpr and applied substitutions *)
               let ret_ae = AAssign(id, apply subs t, ae, TUnit) in
               ret_ae, (locals, globals)
             | _ -> inferred_expr, env in

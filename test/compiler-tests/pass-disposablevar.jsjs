@@ -1,0 +1,5 @@
+val _ = 10 :: [20];
+val _ = 10;
+val _ = "hello";
+
+print("this works");

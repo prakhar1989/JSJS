@@ -51,6 +51,7 @@ let try_catch_template (try_expr: string) (msg: string) (catch_expr: string) =
 (* removes all ? from string and replaces with __. used for codegen
  * since JS doesnt support ? in var names *)
 let remove_qmark (s: string) =
+  let s = if s = "_" then s ^ string_of_int (Random.int 100000) else s in
   Str.global_replace (Str.regexp_string "?") "__" s
 ;;
 

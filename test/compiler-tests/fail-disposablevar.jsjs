@@ -1,0 +1,2 @@
+val _ = "a string";
+print(_); // should fail since _ is not persisted
