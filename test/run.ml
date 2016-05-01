@@ -117,7 +117,7 @@ let run_testcase fname =
     end; Fail
 ;;
 
-let run testcases () =
+let run testcases () : test_kind =
   let total = List.length testcases in
   let t_start = Sys.time() in
   let passing = List.fold_left
@@ -135,9 +135,10 @@ let run testcases () =
     Total Failed    : %d
     Execution time  : %fs
       \n" in
-  Printf.printf template total passing
-    (total-passing)
-    (Sys.time() -. t_start)
+  let failures = total - passing in
+  Printf.printf template total passing failures
+    (Sys.time() -. t_start);
+  if failures = 0 then Pass else Fail
 ;;
 
 (* returns a list of file names in a directory *)
@@ -159,7 +160,9 @@ let init () =
          try ignore (Str.search_forward (Str.regexp ".jsjs") f 0); true
          with Not_found -> false)
       files in
-  run testcases ()
+  match (run testcases ()) with 
+  | Pass -> exit 0
+  | Fail -> exit 1
 ;;
 
 init ();

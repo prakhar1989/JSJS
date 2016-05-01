@@ -25,7 +25,7 @@ test:
 .PHONY: run-test
 run-test:
 	@#python test/parser-tests/menhir.py
-	@find examples -name "*.jsjs" -exec /bin/echo "Compiling {}" \; -exec ./jsjs.out {} \;
+	@#find examples -name "*.jsjs" -exec /bin/echo "Compiling {}" \; -exec ./jsjs.out {} \;
 	@./run-tests.out
 
 .PHONY : clean
