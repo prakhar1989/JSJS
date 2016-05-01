@@ -187,14 +187,25 @@ let rec annotate_expr (e: expr) (env: environment) : (aexpr * environment) =
 
   | ModuleLit(id, e) ->
     if ModuleMap.mem id modules
-    then
-      let locals, globals = env in
-      (* user defintions that use the same name
-         as module definitions should be local scope
-         whereas module defs should be in global scope *)
-      let _, new_globals = merge_env (globals, ModuleMap.find id modules) in
-      let new_env = (locals, new_globals) in
-      AModuleLit(id, fst (annotate_expr e new_env), get_new_type ()), env
+    then 
+      let definitions = ModuleMap.find id modules in
+      let ae = (match e with
+          | Val(prop) -> 
+            let prop_type = if NameMap.mem prop definitions
+              then NameMap.find prop definitions
+              else raise (UndefinedProperty(id, prop)) in
+            AVal(prop, prop_type)
+          | Call(fn, args) -> let afn = (match fn with
+              | Val(prop) ->
+                let prop_type = if NameMap.mem prop definitions
+                  then NameMap.find prop definitions
+                  else raise (UndefinedProperty(id, prop)) in
+                AVal(prop, prop_type)
+              | _ -> raise (failwith "unreachable state reached")) in
+            let aargs = List.map (fun arg -> fst (annotate_expr arg env)) args in
+            ACall(afn, aargs, get_new_type ())
+          | _ -> raise (failwith "unreachable state reached")) in 
+      AModuleLit(id, ae, get_new_type ()), env
     else raise (ModuleNotFound(id))
 ;;
 
@@ -306,7 +317,8 @@ let rec collect_expr (ae: aexpr): constraints =
   | AModuleLit(id, ae, t) ->
     let definitions = ModuleMap.find id modules in
     (match ae with
-     | AVal(prop, ts) -> let prop_type = if NameMap.mem prop definitions
+     | AVal(prop, ts) -> 
+       let prop_type = if NameMap.mem prop definitions
        then NameMap.find prop definitions
        else raise (UndefinedProperty(id, prop)) in
        (collect_expr ae) @ [(t, prop_type)]
@@ -318,8 +330,16 @@ let rec collect_expr (ae: aexpr): constraints =
        then NameMap.find prop definitions
        else raise (UndefinedProperty(id, prop)) in
        (match prop_type with
-       | TFun(_, ret_type) -> let new_call = ACall(afn, aargs, ret_type) in
-         (collect_expr new_call) @ [(t, ret_type)]
+        | TFun(arg_types, ret_type) -> 
+          let sign_conts = 
+            let l1 = List.length aargs and l2 = List.length arg_types in
+            if l1 <> l2 then raise (MismatchedArgCount(l1, l2))
+            else 
+              let arg_conts = List.map2 
+                  (fun ft at -> (ft, type_of at)) arg_types aargs in
+              arg_conts 
+          in 
+          sign_conts @ [(t, call_t); (t, ret_type)]
        | _ -> raise(failwith "unreachable state"))
      | _ -> raise (failwith "unreachable state"))
 

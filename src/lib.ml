@@ -71,6 +71,7 @@ let predefined = List.fold_left
 type definition = string * Ast.primitiveType
 
 let list_definitions = [
+  ("length", TFun([generic_list], TNum));
   ("rev", TFun([generic_list], generic_list));
   ("nth", TFun([generic_list; TNum], generic_arg1));
   ("filter", TFun([TFun([generic_arg1],TBool);generic_list;], generic_list));
