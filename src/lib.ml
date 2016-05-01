@@ -42,25 +42,20 @@ sn.__toJS=sn.toArray,sn.__toStringMapper=er,sn.inspect=sn.toSource=function(){re
 },get:function(t,e){return t=l(this,t),0>t||this.size===1/0||void 0!==this.size&&t>this.size?e:this.find(function(e,r){return r===t},void 0,e)},has:function(t){return t=l(this,t),t>=0&&(void 0!==this.size?this.size===1/0||this.size>t:-1!==this.indexOf(t))},interpose:function(t){return be(this,ge(this,t))},interleave:function(){var t=[this].concat(p(arguments)),e=Ie(this.toSeq(),k.of,t),r=e.flatten(!0);return e.size&&(r.size=e.size*t.length),be(this,r)},last:function(){return this.get(-1)},skipWhile:function(t,e){return be(this,le(this,t,e,!1))},zip:function(){var t=[this].concat(p(arguments));return be(this,Ie(this,rr,t))},zipWith:function(t){var e=p(arguments);return e[0]=this,be(this,Ie(this,t,e))}}),n.prototype[fr]=!0,n.prototype[cr]=!0,Fe(i,{get:function(t,e){return this.has(t)?t:e},includes:function(t){return this.has(t)},keySeq:function(){return this.valueSeq()}}),i.prototype.has=sn.includes,i.prototype.contains=i.prototype.includes,Fe(x,r.prototype),Fe(k,n.prototype),Fe(A,i.prototype),Fe(et,r.prototype),Fe(rt,n.prototype),Fe(nt,i.prototype);var hn={Iterable:e,Seq:O,Collection:tt,Map:ct,OrderedMap:Zt,List:Wt,Stack:Ve,Set:Le,OrderedSet:Je,Record:Ae,Range:$,Repeat:G,is:X,fromJS:H};return hn})();
 " ;;
 
-let generic_arg1 = T("A") and generic_arg2 = T("B");;
-
-let generic_list = TList(generic_arg1)
-and generic_map = TMap(T("A"), T("B"));;
-
 let top_level_definitions = [
-  ("print", TFun([generic_arg1], TUnit));
+  ("print", TFun([T("A")], TUnit));
   ("print_string", TFun([TString], TUnit));
   ("print_num", TFun([TNum], TUnit));
   ("print_bool", TFun([TBool], TUnit));
   ("num_to_string", TFun([TNum], TString));
-  ("hd", TFun([generic_list], generic_arg1));
-  ("empty?", TFun([generic_list], TBool));
-  ("tl", TFun([generic_list], generic_list));
-  ("get", TFun([generic_map; generic_arg1], generic_arg2));
-  ("set", TFun([generic_map; generic_arg1; generic_arg2], generic_map));
-  ("has?", TFun([generic_map; generic_arg1], TBool));
-  ("del", TFun([generic_map; generic_arg1;], generic_map));
-  ("keys", TFun([generic_map;], generic_list));
+  ("hd", TFun([TList(T("B"))], T("B")));
+  ("empty?", TFun([TList(T("C"))], TBool));
+  ("tl", TFun([TList(T("D"))], TList(T("D"))));
+  ("get", TFun([TMap(T("E"), T("F")); T("E")], T("F")));
+  ("set", TFun([TMap(T("G"), T("H")); T("G"); T("H")], TMap(T("G"), T("H"))));
+  ("has?", TFun([TMap(T("I"), T("J")); T("I")], TBool));
+  ("del", TFun([TMap(T("K"), T("L")); T("K");], TMap(T("K"), T("L"))));
+  ("keys", TFun([TMap(T("M"), T("N"));], TList(T("M"))));
 ];;
 
 let predefined = List.fold_left
@@ -68,36 +63,37 @@ let predefined = List.fold_left
     NameMap.empty top_level_definitions
 ;;
 
-type definition = string * Ast.primitiveType
-
 let list_definitions = [
-  ("length", TFun([generic_list], TNum));
-  ("rev", TFun([generic_list], generic_list));
-  ("nth", TFun([generic_list; TNum], generic_arg1));
-  ("filter", TFun([TFun([generic_arg1],TBool);generic_list;], generic_list));
-  ("map", TFun([TFun([generic_arg1],generic_arg2); generic_list;], TList(generic_arg2)));
-  ("iter", TFun([TFun([generic_arg1], TUnit); generic_list;], TUnit));
+  ("length", TFun([TList(T("P"))], TNum));
+  ("rev", TFun([TList(T("Q"))], TList(T("Q"))));
+  ("nth", TFun([TList(T("R")); TNum], T("R")));
+  ("filter", TFun([TFun([T("S")],TBool); TList(T("S"));], TList(T("S"))));
+  ("map", TFun([TFun([T("T")],T("U")); TList(T("T"));], TList(T("U"))));
+  ("iter", TFun([TFun([T("V")], TUnit); TList(T("V"));], TUnit));
   ("range", TFun([TNum; TNum], TList(TNum)));
-  ("concat", TFun([generic_list; generic_list], generic_list));
-  ("fold_left", TFun([TFun([generic_arg1; generic_arg2], generic_arg1); generic_arg1; TList(T("B"))], generic_arg1));
-  ("insert", TFun([generic_list; generic_arg1; TNum], generic_list));
-  ("remove", TFun([generic_list; TNum], generic_list));
+  ("concat", TFun([TList(T("W")); TList(T("W"))], TList(T("W"))));
+  ("fold_left", TFun([TFun([T("X"); T("Y")], T("X")); T("X"); TList(T("Y"))], T("X")));
+  ("insert", TFun([TList(T("Z")); T("Z"); TNum], TList(T("Z"))));
+  ("remove", TFun([TList(T("AA")); TNum], TList(T("AA"))));
 ];;
 
 let map_definitions = [
-  ("count", TFun([generic_map], TNum));
-  ("values", TFun([generic_map], TList(generic_arg2)));
-  ("merge", TFun([generic_map; generic_map], generic_map));
+  ("count", TFun([TMap(T("AB"), T("AC"))], TNum));
+  ("values", TFun([TMap(T("AD"), T("AE"))], TList(T("AE"))));
+  ("merge", TFun([TMap(T("AF"), T("AG")); TMap(T("AF"), T("AG"))], TMap(T("AF"), T("AG"))));
 ];;
 
 
-(*
-let generate_module_defn (module_name: string) : definition list  =
+type definition = string * Ast.primitiveType
+
+(* generates a list of module definitions, given a file and a type-checker
+not being used at the moment *)
+let generate_module_defn (module_name: string) (type_checker: program -> aexpr list) definition list  =
   let file_path = Printf.sprintf "lib/%s.jsjs" module_name in
   let lexbuf = Lexing.from_channel (open_in file_path) in
   let program = Parser.program Scanner.token lexbuf in
   (* infer the program and create the definitions by top level expressions *)
-  let inferred_program  = Typecheck.type_check program in
+  let inferred_program = type_checker program in
   List.fold_left
     (fun defs ae ->
        let def = (match ae with
@@ -106,7 +102,6 @@ let generate_module_defn (module_name: string) : definition list  =
        def :: defs)
     [] inferred_program
 ;;
-*)
 
 let modules =
   (* a function that takes a module map and adds definitions as value
