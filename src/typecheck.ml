@@ -19,7 +19,7 @@ type constraints = (primitiveType * primitiveType) list
 
 
 (* mutable state *)
-let type_variable = (ref ['A'; 'A']);;
+let type_variable = (ref ['A'; 'A'; 'A']);;
 
 let modules = Lib.modules;;
 

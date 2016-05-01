@@ -35,8 +35,7 @@ let if_template (pred_expr: string) (if_expr: string) (else_expr: string): strin
 
 let try_catch_template (try_expr: string) (msg: string) (catch_expr: string) =
   let id = "res_" ^ string_of_int(Random.int 1000000)
-  and template = format_of_string "
-    (function() {
+  and template = format_of_string "(function() {
         let %s
         try {
             %s = %s

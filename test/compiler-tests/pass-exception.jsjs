@@ -3,9 +3,7 @@ val divide = /\(numer: num, denom: num): num => {
   else numer / denom;
 };
 
-
 val answer = /\(): unit => {
-  print_string("ello");
   try {divide(10, 0); (-);} catch(e) {
     if e == "divide by zero"
     then print("non zero pls")
