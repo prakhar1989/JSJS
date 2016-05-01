@@ -22,7 +22,7 @@ exception InvalidKeyType of primitiveType
 exception TypeError of string
 
 let handle_error (e: exn) =
-  match e with 
+  match e with
   | ModuleNotFound(s) ->
     raise (TypeError (Printf.sprintf "Type error: Module '%s' not defined" s))
   | InvalidReturnExpression(s) ->

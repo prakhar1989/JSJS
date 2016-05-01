@@ -362,6 +362,19 @@ let apply (subs: substitutions) (t: primitiveType) : primitiveType =
     List.fold_right (fun (x, u) t -> substitute u x t) subs t
 ;;
 
+(* this function check if a placeholder (x) occurs within another
+   type t. this is used to produce errors such as (fun z -> z z)*)
+let rec resolve_type (x: id) (t: primitiveType) : bool =
+  match t with
+  | T(c) when x = c -> false
+  | TList(tlist) -> resolve_type x tlist
+  | TMap(kt, vt) -> (resolve_type x kt) && (resolve_type x vt)
+  | TFun(argst, ret_t) -> 
+    List.map (resolve_type x) (ret_t :: argst)
+    |> List.fold_left ( && ) true
+  | _ -> true
+;;
+
 let rec unify (constraints: constraints) : substitutions =
   match constraints with
   | [] -> []
@@ -376,7 +389,10 @@ and unify_one (t1: primitiveType) (t2: primitiveType) : substitutions =
   match t1, t2 with
   | TNum, TNum | TBool, TBool | TString, TString | TUnit, TUnit -> []
   | TExn, _ | _, TExn -> []
-  | T(x), z | z, T(x) -> [(x, z)]
+  | T(x), z | z, T(x) -> 
+    if (t1 = t2 || resolve_type x z)
+    then [(x, z)]
+    else raise (MismatchedTypes(t1, t2))
   | TList(t1), TList(t2) -> unify_one t1 t2
   | TMap(kt1, vt1), TMap(kt2, vt2) -> unify [(kt1, kt2) ; (vt1, vt2)]
   (* This case is particularly useful when you are calling a function that returns a function *)
