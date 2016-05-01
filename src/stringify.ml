@@ -101,8 +101,8 @@ let rec string_of_aexpr (ae: aexpr) : string =
   | AListLit(aes, t) ->
     let s = String.concat "," (List.map string_of_aexpr aes) in
     Printf.sprintf "[%s]:%s" s (string_of_type t)
-  | AMapLit(kvpairs, t) ->  "map < >"
-  | AIf(ap, ae1, ae2, t) ->  "if"
+  | AMapLit(kvpairs, t) ->  Printf.sprintf "map < >: %s" (string_of_type t)
+  | AIf(ap, ae1, ae2, t) ->  Printf.sprintf "if {} then {} else {}: %s" (string_of_type t)
   | ABlock(aes, t) -> let ss = List.map string_of_aexpr aes in
     Printf.sprintf "{ %s }" (String.concat "\n" ss)
   | AFunLit(ids, body, _, t) -> begin
@@ -121,5 +121,11 @@ let rec string_of_aexpr (ae: aexpr) : string =
   | AModuleLit(id, e, t) ->
     let se = string_of_aexpr e in
     Printf.sprintf "%s.(%s) : %s" id se (string_of_type t)
-  | _ -> raise (failwith "not yet implemented in stringify")
+  | AThrow(ae, t) ->
+    let se = string_of_aexpr ae in
+    Printf.sprintf "throw %s: %s" se (string_of_type t)
+  | ATryCatch(aetry, id, aecatch, t) ->
+    let stry = string_of_aexpr aetry
+    and scatch = string_of_aexpr aecatch in
+    Printf.sprintf "try%s catch(%s)%s" stry id scatch
 ;;
