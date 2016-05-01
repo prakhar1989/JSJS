@@ -1,0 +1,9 @@
+// an example from the slides
+
+val child2 = /\() => throw "an exception";
+
+val child = /\() => child2();
+
+val top = /\() => try child() catch(e) print("oops");
+
+top();
