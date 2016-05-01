@@ -1,0 +1,21 @@
+val map1: A = {
+  1: {
+    1: "One One",
+    2: "One Two"
+  },
+  2: {
+    1: "Two One",
+    2: "Two Two"
+  }
+};
+
+val map2: <A: B> = {
+  1: {
+    1: "One One",
+    2: "One Two"
+  },
+  2: {
+    1: "Two One",
+    2: "Two Two"
+  }
+};

@@ -1,0 +1,3 @@
+val fun: (num, A) -> B = /\(x:num, y): bool => {
+  x % y == 0;
+};

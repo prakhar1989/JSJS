@@ -1,6 +1,32 @@
-val x : num = 10;
-val y : bool = true;
-val s : string = "hello";
+val a = 5;
 
-val z : num = x + 10;
-print(z);
+val b = "hello world" ^ "!";
+
+val c? = true && !false;
+
+val d = (-);
+
+val fun = /\(x, y) => {
+  x % y == 0;
+};
+
+val xs1 = ["1","2","3","4","5","6","7"];
+
+val xs2 = [[1,2,3],[4,5,6],[7,8,9],[10]];
+
+val map1 = {
+  1: "One",
+  2: "Two",
+  3: "Three"
+};
+
+val map2 = {
+  1: {
+    1: "One One",
+    2: "One Two"
+  },
+  2: {
+    1: "Two One",
+    2: "Two Two"
+  }
+};

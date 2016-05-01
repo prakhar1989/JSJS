@@ -1,0 +1,10 @@
+val map2: <num: A> = {
+  1: {
+    1: "One One",
+    2: "One Two"
+  },
+  2: {
+    1: "Two One",
+    2: "Two Two"
+  }
+};
