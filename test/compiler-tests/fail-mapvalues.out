@@ -1,2 +1,2 @@
-Type error: expected value of type 'string', got a value of type 'num' instead
+Type error: expected value of type 'string', got a value of type 'list string' instead
 

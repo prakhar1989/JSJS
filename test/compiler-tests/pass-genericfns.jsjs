@@ -1,2 +1,0 @@
-val gen1 = /\(x: A, y: B): A => y;
-val gen2 = /\(x: string): A => x;

@@ -1,0 +1,5 @@
+val gen1 = /\(x: A, y: B): A => y;
+
+// val gen1: AB -> AB -> AB = /\ (x : AB, y : AB) : AB = { { (y: AB) } } : unit
+// mismatched arguments should fail as these are different types
+gen1("hello", 10);
