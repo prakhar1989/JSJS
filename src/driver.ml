@@ -52,16 +52,16 @@ var print = console.log;
 
 let driver filename axn =
   let lexbuf = try Lexing.from_channel (open_in filename) with
-    | Sys_error(s) -> Printf.printf "Error: %s" s; exit 1
+    | Sys_error(s) -> Printf.printf "Error: %s\n" s; exit 1
   in
   let program = try Parser.program Scanner.token lexbuf with
-    | Sys_error(s) -> Printf.printf "Error: %s" s; exit 1
+    | Sys_error(s) -> Printf.printf "Error: %s\n" s; exit 1
   in
   (* TODO: Fix this error catching *)
   let inferred_program = try Typecheck.type_check program
     with
-    | Exceptions.TypeError(s) -> Printf.printf "%s" s; exit 1
-    | e -> Printf.printf "Error: %s" (Exn.to_string e); exit 1
+    | Exceptions.TypeError(s) -> Printf.printf "%s\n" s; exit 1
+    | e -> Printf.printf "Error: %s\n" (Exn.to_string e); exit 1
   in
 
   (* JS -> AST -> JS *)
