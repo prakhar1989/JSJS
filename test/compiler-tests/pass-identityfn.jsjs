@@ -1,0 +1,5 @@
+val identity = /\(x) => x;
+
+print(identity(10));
+print(identity(true));
+print(identity("hello"));
