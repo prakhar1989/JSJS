@@ -184,10 +184,10 @@ let rec annotate_expr (e: expr) (env: environment) : (aexpr * environment) =
 
   | ModuleLit(id, e) ->
     if ModuleMap.mem id modules
-    then 
+    then
       let definitions = ModuleMap.find id modules in
       let ae = (match e with
-          | Val(prop) -> 
+          | Val(prop) ->
             let prop_type = if NameMap.mem prop definitions
               then NameMap.find prop definitions
               else raise (UndefinedProperty(id, prop)) in
@@ -201,7 +201,7 @@ let rec annotate_expr (e: expr) (env: environment) : (aexpr * environment) =
               | _ -> raise (failwith "unreachable state reached")) in
             let aargs = List.map (fun arg -> fst (annotate_expr arg env)) args in
             ACall(afn, aargs, get_new_type ())
-          | _ -> raise (failwith "unreachable state reached")) in 
+          | _ -> raise (failwith "unreachable state reached")) in
       AModuleLit(id, ae, get_new_type ()), env
     else raise (ModuleNotFound(id))
 ;;
@@ -314,7 +314,7 @@ let rec collect_expr (ae: aexpr): constraints =
   | AModuleLit(id, ae, t) ->
     let definitions = ModuleMap.find id modules in
     (match ae with
-     | AVal(prop, ts) -> 
+     | AVal(prop, ts) ->
        let prop_type = if NameMap.mem prop definitions
        then NameMap.find prop definitions
        else raise (UndefinedProperty(id, prop)) in
@@ -327,15 +327,15 @@ let rec collect_expr (ae: aexpr): constraints =
        then NameMap.find prop definitions
        else raise (UndefinedProperty(id, prop)) in
        (match prop_type with
-        | TFun(arg_types, ret_type) -> 
-          let sign_conts = 
+        | TFun(arg_types, ret_type) ->
+          let sign_conts =
             let l1 = List.length aargs and l2 = List.length arg_types in
             if l1 <> l2 then raise (MismatchedArgCount(l1, l2))
-            else 
-              let arg_conts = List.map2 
+            else
+              let arg_conts = List.map2
                   (fun ft at -> (ft, type_of at)) arg_types aargs in
-              arg_conts 
-          in 
+              arg_conts
+          in
           sign_conts @ [(t, call_t); (t, ret_type)]
        | _ -> raise(failwith "unreachable state"))
      | _ -> raise (failwith "unreachable state"))
@@ -369,7 +369,7 @@ let rec resolve_type (x: id) (t: primitiveType) : bool =
   | T(c) when x = c -> false
   | TList(tlist) -> resolve_type x tlist
   | TMap(kt, vt) -> (resolve_type x kt) && (resolve_type x vt)
-  | TFun(argst, ret_t) -> 
+  | TFun(argst, ret_t) ->
     List.map (resolve_type x) (ret_t :: argst)
     |> List.fold_left ( && ) true
   | _ -> true
@@ -389,14 +389,18 @@ and unify_one (t1: primitiveType) (t2: primitiveType) : substitutions =
   match t1, t2 with
   | TNum, TNum | TBool, TBool | TString, TString | TUnit, TUnit -> []
   | TExn, _ | _, TExn -> []
-  | T(x), z | z, T(x) -> 
+  | T(x), z | z, T(x) ->
     if (t1 = t2 || resolve_type x z)
     then [(x, z)]
     else raise (MismatchedTypes(t1, t2))
   | TList(t1), TList(t2) -> unify_one t1 t2
   | TMap(kt1, vt1), TMap(kt2, vt2) -> unify [(kt1, kt2) ; (vt1, vt2)]
   (* This case is particularly useful when you are calling a function that returns a function *)
-  | TFun(a, b), TFun(x, y) -> unify ((List.combine a x) @ [(b, y)])
+  | TFun(a, b), TFun(x, y) ->
+      let l1 = List.length a and l2 = List.length x in
+      if l1 = l2
+      then unify ((List.combine a x) @ [(b, y)])
+      else raise (MismatchedArgCount(l1, l2))
   | _ -> raise (MismatchedTypes(t1, t2))
 ;;
 
