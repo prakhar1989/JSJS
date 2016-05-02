@@ -55,45 +55,45 @@ let remove_qmark (s: string) =
   Str.global_replace (Str.regexp_string "?") "__" s
 ;;
 
-(* generates a js version of an expression
+(* generates a js version of an annotated expression
    takes the name of the module and a module map along with the expression *)
-let rec js_of_expr (module_name: string) (map:'a NameMap.t) (expr: expr) =
-  match expr with
-  | NumLit(x) -> Printf.sprintf "%s" (string_of_float x)
-  | StrLit(s) -> Printf.sprintf "\"%s\"" s
-  | BoolLit(b) -> Printf.sprintf "%s" (string_of_bool b)
-  | UnitLit -> "null"
+let rec js_of_aexpr (module_name: string) (map:'a NameMap.t) (aexpr: aexpr) =
+  match aexpr with
+  | ANumLit(x, _) -> Printf.sprintf "%s" (string_of_float x)
+  | AStrLit(s, _) -> Printf.sprintf "\"%s\"" s
+  | ABoolLit(b, _) -> Printf.sprintf "%s" (string_of_bool b)
+  | AUnitLit(_) -> "null"
 
-  | Unop(o, e) ->
-    let s1 = string_of_op o and s2 = js_of_expr module_name map e in
+  | AUnop(o, e, _) ->
+    let s1 = string_of_op o and s2 = js_of_aexpr module_name map e in
     Printf.sprintf "%s%s" s1 s2
 
-  | Binop(e1, o, e2) ->
-    let s2 = js_of_expr module_name map e1
-    and s3 = js_of_expr module_name map e2 in
+  | ABinop(e1, o, e2, _) ->
+    let s2 = js_of_aexpr module_name map e1
+    and s3 = js_of_aexpr module_name map e2 in
     (match o with
       | Cons -> Printf.sprintf "(%s).insert(0, %s)" s3 s2
       | Caret -> Printf.sprintf "(%s + %s)" s2 s3
       | _ -> Printf.sprintf "(%s %s %s)" s2 (string_of_op o) s3)
 
-  | Throw(e) -> Printf.sprintf "(function() { throw %s })()" (js_of_expr module_name map e)
+  | AThrow(e, t) -> Printf.sprintf "(function() { throw %s })()" (js_of_aexpr module_name map e)
 
-  | TryCatch(e1, s, e2) ->
-    let s1 = js_of_expr module_name map e1 and s2 = js_of_expr module_name map e2 in
+  | ATryCatch(e1, s, e2, t) ->
+    let s1 = js_of_aexpr module_name map e1 and s2 = js_of_aexpr module_name map e2 in
     try_catch_template s1 s s2
 
-  | Val(s) ->
+  | AVal(s, _) ->
     if NameMap.mem s map
     then Printf.sprintf "%s.%s" module_name (remove_qmark s)
     else (remove_qmark s)
 
-  | Assign(id, _, e) ->
+  | AAssign(id, _, e, _) ->
     if NameMap.mem id map
-    then Printf.sprintf "%s.%s = %s" module_name (remove_qmark id) (js_of_expr module_name map e)
-    else Printf.sprintf "let %s = %s" (remove_qmark id) (js_of_expr module_name map e)
+    then Printf.sprintf "%s.%s = %s" module_name (remove_qmark id) (js_of_aexpr module_name map e)
+    else Printf.sprintf "let %s = %s" (remove_qmark id) (js_of_aexpr module_name map e)
 
-  | Block(es) ->
-    let es = List.rev (List.map (fun e -> js_of_expr module_name map e) es) in
+  | ABlock(es, _) ->
+    let es = List.rev (List.map (fun e -> js_of_aexpr module_name map e) es) in
     (match es with
     | [] -> "" (* will never be reached *)
     | x :: [] -> block_template x None
@@ -101,26 +101,26 @@ let rec js_of_expr (module_name: string) (map:'a NameMap.t) (expr: expr) =
       let es = String.concat "\n" (List.rev xs) in
       block_template x (Some es))
 
-  | If(p, e1, e2) ->
-    let pred_s = js_of_expr module_name map p
-    and s1 = js_of_expr module_name map e1
-    and s2 = js_of_expr module_name map e2 in
+  | AIf(p, e1, e2, _) ->
+    let pred_s = js_of_aexpr module_name map p
+    and s1 = js_of_aexpr module_name map e1
+    and s2 = js_of_aexpr module_name map e2 in
     if_template pred_s s1 s2
 
-  | FunLit(ids, body, t) ->
+  | AFunLit(ids, body, t, _) ->
     let string_forms = String.concat "," ids in
-    let string_body = js_of_expr module_name map body in
+    let string_body = js_of_aexpr module_name map body in
     let template = format_of_string "(function(%s) { return (%s) })" in
     Printf.sprintf template string_forms string_body
 
-  | Call(e, es) ->
+  | ACall(e, es, _) ->
     let id = match e with
-      | Val(s) -> if NameMap.mem s map
+      | AVal(s, _) -> if NameMap.mem s map
         then Printf.sprintf "%s.%s" module_name (remove_qmark s)
         else (remove_qmark s)
-      | FunLit(_) -> js_of_expr module_name map e
+      | AFunLit(_) -> js_of_aexpr module_name map e
       | _ -> raise (failwith "not a function call") in
-    let es = List.map (fun e -> js_of_expr module_name map e) es in
+    let es = List.map (fun e -> js_of_aexpr module_name map e) es in
     (match id with
      | "print_num" | "print_bool" | "print"
      | "print_string" -> Printf.sprintf "%s(%s)" id (String.concat "," es)
@@ -134,14 +134,14 @@ let rec js_of_expr (module_name: string) (map:'a NameMap.t) (expr: expr) =
      | "del" -> Printf.sprintf "(%s).remove((%s).toString())" (List.hd es) (List.nth es 1)
      | _ -> Printf.sprintf "%s(%s)" id (String.concat "," es))
 
-  | ListLit(es) -> let es = String.concat ", " (List.map (fun e -> js_of_expr module_name map e) es) in
+  | AListLit(es, _) -> let es = String.concat ", " (List.map (fun e -> js_of_aexpr module_name map e) es) in
     Printf.sprintf "Immutable.List.of(%s)" es
 
-  | ModuleLit(id, e) -> Printf.sprintf "%s.%s" id (js_of_expr module_name map e)
+  | AModuleLit(id, e, _) -> Printf.sprintf "%s.%s" id (js_of_aexpr module_name map e)
 
-  | MapLit(kvpairs) ->
+  | AMapLit(kvpairs, _) ->
     let pairs = List.map (fun (k, v) ->
-        Printf.sprintf "%s:%s" (js_of_expr module_name map k)
-          (js_of_expr module_name map v)) kvpairs in
+        Printf.sprintf "%s:%s" (js_of_aexpr module_name map k)
+          (js_of_aexpr module_name map v)) kvpairs in
     Printf.sprintf "Immutable.Map({ %s })" (String.concat "," pairs)
 ;;

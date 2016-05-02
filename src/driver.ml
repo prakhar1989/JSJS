@@ -9,14 +9,14 @@ type action = Compile | GenAST
 let generate_stdlib file_path module_name =
   let lexbuf = Lexing.from_channel (open_in file_path) in
   let program = Parser.program Scanner.token lexbuf in
-  let _ = try Typecheck.type_check program
+  let inferred_program = try Typecheck.type_check program
     with
     | Exceptions.TypeError(s) -> print_endline s; exit 1
     | e -> Printf.printf "%s" (Exn.to_string e); exit 1
   in
   let map = Lib.ModuleMap.find module_name Lib.modules in
-  let js_exprs = List.fold_left program
-      ~f:(fun acc expr -> (js_of_expr module_name map expr) :: acc)
+  let js_exprs = List.fold_left inferred_program
+      ~f:(fun acc aexpr -> (js_of_aexpr module_name map aexpr) :: acc)
       ~init: []
   in
   let string_of_stdlib = String.concat ~sep:"\n" (List.rev js_exprs) in
@@ -72,8 +72,8 @@ let driver filename axn =
 
   (* Compile *)
   let compile_to_js () =
-    let js_exprs = List.fold_left program
-        ~f:(fun acc expr -> (js_of_expr "" NameMap.empty expr) :: acc)
+    let js_exprs = List.fold_left inferred_program
+        ~f:(fun acc aexpr -> (js_of_aexpr "" NameMap.empty aexpr) :: acc)
         ~init: []
     in
     let s = String.concat ~sep:"\n" (List.rev js_exprs) in
