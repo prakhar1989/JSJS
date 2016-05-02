@@ -1,0 +1,1 @@
+val factorial = /\(n) => if n <= "a" then 1 else n * factorial(n-1);
