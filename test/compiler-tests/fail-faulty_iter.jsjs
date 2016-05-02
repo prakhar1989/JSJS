@@ -1,0 +1,5 @@
+val l = [1,2,3,4,5];
+
+val sq = /\(x) => x * x;
+
+List.iter(sq, l);

@@ -1,0 +1,7 @@
+val x = [];
+
+val _ = 4 :: x;
+
+val _ = "hello" :: x;
+
+print(empty?(x));
