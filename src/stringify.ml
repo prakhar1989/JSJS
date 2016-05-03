@@ -2,6 +2,10 @@
 
 open Ast
 
+module CharMap = Map.Make(String)
+
+type genericMap = int CharMap.t
+
 let string_of_op = function
   | Add       -> "+"
   | Mul       -> "*"
@@ -21,20 +25,41 @@ let string_of_op = function
   | Cons      -> "::"
 ;;
 
-let rec string_of_type = function
-  | TNum    -> "num"
-  | TString -> "string"
-  | TBool   -> "bool"
-  | TAny    -> "any"
-  | TExn    -> "exception"
-  | TUnit   -> "unit"
-  | T(c)    -> Printf.sprintf "%s" c
-  | TList(p) -> "list " ^ (string_of_type p)
-  | TFun(f) ->
-    let args, t = f in
-    String.concat  " -> " ((List.map string_of_type args) @ [string_of_type t])
-  | TMap(k, v) ->
-    "< " ^ string_of_type k ^ " : " ^ string_of_type v ^ " >"
+let string_of_type (t: Ast.primitiveType) =
+  let rec aux (t: primitiveType) (chr: int) (map: genericMap) =
+    match t with
+    | TNum    -> "num", chr, map
+    | TString -> "string", chr, map
+    | TBool   -> "bool", chr, map
+    | TAny    -> "any", chr, map
+    | TExn    -> "exn", chr, map
+    | TUnit   -> "unit", chr, map
+    | T(x)    ->
+      let gen_chr, new_chr, new_map = if CharMap.mem x map
+        then Char.escaped (Char.chr (CharMap.find x map)), chr, map
+        else
+          let c = Char.escaped (Char.chr chr) in
+          c, (chr + 1), CharMap.add x chr map
+      in
+      Printf.sprintf "%s" gen_chr, new_chr, new_map
+    | TList(t) ->
+      let st, c, m = aux t chr map in
+      (Printf.sprintf "list %s" st), c, m
+    | TMap(kt, vt) ->
+      let st1, c1, m1 = aux kt chr map in
+      let st2, c2, m2 = aux vt c1 m1 in
+      (Printf.sprintf "<%s:%s>" st1 st2), c2, m2
+    | TFun(args_type, ret_type) ->
+      let sargs, (c, m) = ListLabels.fold_left args_type ~init: ([], (chr, map))
+          ~f: (fun (ts, (c, m)) arg ->
+              let argt, c1, m1 = aux arg c m in
+              (argt :: ts, (c1, m1))
+            ) in
+      let rs, c, m = aux ret_type c m in
+      let sargs = String.concat ", " sargs in
+      Printf.sprintf "(%s) -> %s" sargs rs, c, m
+  in
+  let s, _, _ = aux t 65 CharMap.empty in s
 ;;
 
 (* returns a stringified version of an expression *)

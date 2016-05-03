@@ -1,1 +1,1 @@
-Type error: expected value of type 'AAE', got a value of type 'list AAE -> AAF' instead
+Type error: expected value of type 'A', got a value of type '(list A) -> B' instead
