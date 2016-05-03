@@ -50,8 +50,13 @@ var print = console.log;
   Out_channel.close outc
 ;;
 
+
 let driver filename axn =
-  let lexbuf = try Lexing.from_channel (open_in filename) with
+  let get_inchan = function
+    | None | Some "-" -> In_channel.stdin
+    | Some filename -> In_channel.create ~binary:true filename
+  in
+  let lexbuf = try Lexing.from_channel (get_inchan filename) with
     | Sys_error(s) -> Printf.printf "Error: %s\n" s; exit 1
   in
   let program = try Parser.program Scanner.token lexbuf with
@@ -92,7 +97,7 @@ let command =
     ~readme: (fun () -> "Learn more at http://github.com/prakhar1989/JSJS")
     Command.Spec.(
       empty
-      +> anon ("filename" %: file)
+      +> anon (maybe ("filename" %: file))
       +> flag "-s" no_arg ~doc:" JSJS -> AST -> JSJS"
     )
     (fun filename f1 () ->
