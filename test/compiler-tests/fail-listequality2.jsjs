@@ -1,0 +1,8 @@
+val xs = List.range(1, 10);
+val ys = List.range(1, 10);
+
+val _ =
+  if List.range(1, 10) == List.range(1, 10)
+  then print("same lists")
+  else print("diff lists");
+

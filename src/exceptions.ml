@@ -13,7 +13,7 @@ exception MismatchedTypes of primitiveType * primitiveType
 exception AlreadyDefined of string
 exception NonUniformTypeContainer of primitiveType * primitiveType
 exception MismatchedArgCount of int * int
-exception UndefinedProperty of string * string
+exception UndefinedProperty of string * expr
 exception ModuleNotFound of string
 exception InvalidReturnExpression of string
 exception InvalidKeyType of primitiveType
@@ -40,7 +40,8 @@ let handle_error (e: exn) =
     raise (TypeError (Printf.sprintf "Error: value '%s' was used before it was defined" s))
   | AlreadyDefined(s) ->
     raise (TypeError (Printf.sprintf "Error: '%s' cannot be redefined in the current scope" s))
-  | UndefinedProperty(module_name, prop) ->
+  | UndefinedProperty(module_name, e) ->
+    let prop = string_of_expr e in
     raise (TypeError (Printf.sprintf "Error: property '%s' is not defined in module '%s'" prop module_name))
   | CannotRedefineKeyword(keyword) ->
     raise (TypeError (Printf.sprintf "Error: Cannot define Javascript keyword '%s'" keyword))

@@ -74,6 +74,9 @@ let rec js_of_aexpr (module_name: string) (map:'a NameMap.t) (aexpr: aexpr) =
     (match o with
       | Cons -> Printf.sprintf "(%s).insert(0, %s)" s3 s2
       | Caret -> Printf.sprintf "(%s + %s)" s2 s3
+      | Equals -> (match (Typecheck.type_of e1) with
+          | TList(_) | TMap(_) -> Printf.sprintf "(Immutable.is(%s, %s))" s2 s3
+          | _ -> Printf.sprintf "(%s %s %s)" s2 (string_of_op o) s3)
       | _ -> Printf.sprintf "(%s %s %s)" s2 (string_of_op o) s3)
 
   | AThrow(e, t) -> Printf.sprintf "(function() { throw %s })()" (js_of_aexpr module_name map e)

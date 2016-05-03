@@ -190,18 +190,18 @@ let rec annotate_expr (e: expr) (env: environment) : (aexpr * environment) =
           | Val(prop) ->
             let prop_type = if NameMap.mem prop definitions
               then NameMap.find prop definitions
-              else raise (UndefinedProperty(id, prop)) in
+              else raise (UndefinedProperty(id, e)) in
             AVal(prop, prop_type)
           | Call(fn, args) -> let afn = (match fn with
               | Val(prop) ->
                 let prop_type = if NameMap.mem prop definitions
                   then NameMap.find prop definitions
-                  else raise (UndefinedProperty(id, prop)) in
+                  else raise (UndefinedProperty(id, e)) in
                 AVal(prop, prop_type)
               | _ -> raise (failwith "unreachable state reached")) in
             let aargs = List.map (fun arg -> fst (annotate_expr arg env)) args in
             ACall(afn, aargs, get_new_type ())
-          | _ -> raise (failwith "unreachable state reached")) in
+          | _ -> raise (UndefinedProperty(id, e))) in
       AModuleLit(id, ae, get_new_type ()), env
     else raise (ModuleNotFound(id))
 ;;
@@ -317,7 +317,7 @@ let rec collect_expr (ae: aexpr): constraints =
      | AVal(prop, ts) ->
        let prop_type = if NameMap.mem prop definitions
        then NameMap.find prop definitions
-       else raise (UndefinedProperty(id, prop)) in
+       else raise (UndefinedProperty(id, Val(prop))) in
        (collect_expr ae) @ [(t, prop_type)]
      | ACall(afn, aargs, call_t) ->
        let prop = (match afn with
@@ -325,7 +325,7 @@ let rec collect_expr (ae: aexpr): constraints =
            |  _ -> raise (failwith "unreachable state")) in
        let prop_type = if NameMap.mem prop definitions
        then NameMap.find prop definitions
-       else raise (UndefinedProperty(id, prop)) in
+       else raise (UndefinedProperty(id, Val(prop))) in
        (match prop_type with
         | TFun(arg_types, ret_type) ->
           let sign_conts =

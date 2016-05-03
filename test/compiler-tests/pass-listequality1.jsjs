@@ -1,0 +1,18 @@
+val xs = [1, 2, 3];
+val ys = [1, 2, 3];
+
+// same
+val _ = if xs == ys then print("same lists") else print("diff lists");
+val _ = if ((10 :: []) == (10 :: [])) then print("same lists") else print("diff lists");
+
+
+// diff
+val _ =
+  if (20 :: []) == (10 :: [])
+  then print("same lists")
+  else print("diff lists");
+
+val _ =
+  if [1, 2, 3] == [1, 4, 5]
+  then print("same lists")
+  else print("diff lists");
