@@ -1,0 +1,7 @@
+val areListsEqual? = /\(xs: list T, ys: list U) =>
+  if xs == ys then print("yes") else print("no");
+
+
+val _ = areListsEqual?([1, 2, 3, 4], [1, 2, 3, 4]);
+val _ = areListsEqual?(List.range(1, 20), List.range(1, 20));
+val _ = areListsEqual?(10 :: [], 20 :: []);
