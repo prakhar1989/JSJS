@@ -1,5 +1,4 @@
-JSJS
-====
+![img](logo.png)
 
 > A strongly typed language for the web.
 
