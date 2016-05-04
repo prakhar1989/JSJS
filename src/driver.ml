@@ -8,7 +8,9 @@ type action = Compile | GenAST
 
 let generate_stdlib file_path module_name =
   let lexbuf = Lexing.from_channel (open_in file_path) in
-  let program = Parser.program Scanner.token lexbuf in
+  let program = try Parser.program Scanner.token lexbuf with
+    | Parser.Error -> Printf.printf "Error: There was an error in your syntax."; exit 1
+  in
   let inferred_program = try Typecheck.type_check program
     with
     | Exceptions.TypeError(s) -> print_endline s; exit 1
@@ -61,6 +63,8 @@ let driver filename axn =
   in
   let program = try Parser.program Scanner.token lexbuf with
     | Sys_error(s) -> Printf.printf "Error: %s\n" s; exit 1
+    | Parser.Error -> Printf.printf "Error: There was a syntax error in your file."; exit 1
+    | _ -> Printf.printf "Error: Error in parsing file"; exit 1
   in
   (* TODO: Fix this error catching *)
   let inferred_program = try Typecheck.type_check program
