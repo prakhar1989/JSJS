@@ -35,10 +35,12 @@ let dump_javascript filename str =
 %s
 %s
 var num_to_string = function (x) { return x.toString(); };
-var print_string = console.log;
-var print_num = console.log;
-var print_bool = console.log;
-var print = console.log;
+var print_me = function(m) { console.log(m); };
+// printing utils
+var print_string = print_me;
+var print_num = print_me;
+var print_bool = print_me;
+var print = print_me;
 // generated code follows
 %s" in
   let stdlib = [("List", "lib/list.jsjs"); ("Map", "lib/map.jsjs")] in
