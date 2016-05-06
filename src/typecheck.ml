@@ -264,7 +264,7 @@ let rec collect_expr (ae: aexpr): constraints =
   | AListLit(aes, t) ->
     let list_type = match t with
       | TList(x) -> x
-      | _ -> raise (failwith "unreachable state reached")
+      | _ -> raise (failwith "unreachable state reached in listlit")
     in
     let elem_conts = List.map (fun ae -> (list_type, type_of ae)) aes in
     (List.flatten (List.map collect_expr aes)) @ elem_conts
@@ -274,7 +274,7 @@ let rec collect_expr (ae: aexpr): constraints =
   | AMapLit(kvpairs, t) ->
     let kt, vt = match t with
       | TMap(kt, vt) -> kt, vt
-      | _ -> raise (failwith "unreachable state reached")
+      | _ -> raise (failwith "unreachable state reached in maplit")
     in
     let klist = List.map fst kvpairs in
     let vlist = List.map snd kvpairs in
@@ -293,12 +293,12 @@ let rec collect_expr (ae: aexpr): constraints =
 
   | AFunLit(_, ae, _, t) -> (match t with
       | TFun(_, ret_type) -> (collect_expr ae) @ [(type_of ae, ret_type)]
-      | _ -> raise (failwith "unreachable state reached"))
+      | _ -> raise (failwith "unreachable state reached in funlit"))
 
   | ACall(afn , aargs, t) ->
     let typ_afn = (match afn with
         | AVal(_) | AFunLit(_) -> type_of afn
-        | _ -> raise (failwith "unreachable state reached")) in
+        | _ -> raise (failwith "unreachable state reached in call")) in
     let sign_conts = (match typ_afn with
         | TFun(arg_types, ret_type) -> begin
             let l1 = List.length aargs and l2 = List.length arg_types in
@@ -308,7 +308,7 @@ let rec collect_expr (ae: aexpr): constraints =
               arg_conts @ [(t, ret_type)]
           end
         | T(_) -> [(typ_afn, TFun(List.map type_of aargs, t))]
-        | _ -> raise (failwith "unreachable state reached")) in
+        | _ -> raise (MismatchedTypes(typ_afn, TFun(List.map type_of aargs, t)))) in
     (collect_expr afn) @ (List.flatten (List.map collect_expr aargs)) @ sign_conts
 
   | AModuleLit(id, ae, t) ->
