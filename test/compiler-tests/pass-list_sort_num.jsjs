@@ -1,0 +1,11 @@
+val l1 = [5,3,2,6,3,1];
+val l2 = [1,2,3,4,5,6];
+val l3 = [];
+
+// compare functions
+val lt = /\(x, y) => x < y;
+val gt = /\(x,y) => x > y;
+
+List.iter(print_num, List.sort(lt, l1));
+List.iter(print_num, List.sort(gt, l2));
+List.iter(print, List.sort(lt, l3));

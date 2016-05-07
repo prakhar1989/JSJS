@@ -1,0 +1,3 @@
+Map { "foo": "hello", "bar": "world" }
+Map { "foo": "programming", "baz": "fun" }
+Map { "manz": "playa", "foo": "world" }

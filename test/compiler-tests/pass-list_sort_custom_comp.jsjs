@@ -1,0 +1,20 @@
+val map1 = {
+    "foo" : "hello",
+    "bar" : "world"
+};
+
+val map2 = {
+    "foo" : "programming",
+    "baz" : "fun"
+};
+
+val map3 = {
+    "manz" : "playa",
+    "foo" : "world"
+};
+
+val maplist = [map1, map2, map3];
+
+val key_comp = /\(m1, m2) => get(m1, "foo") < get(m2, "foo");
+
+List.iter(print, List.sort(key_comp, maplist));
