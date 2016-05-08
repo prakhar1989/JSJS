@@ -1,0 +1,6 @@
+val unit_lit1 = (-);
+
+val unit_lit2 = print(5);
+
+// should return true
+print(unit_lit1 == unit_lit2);

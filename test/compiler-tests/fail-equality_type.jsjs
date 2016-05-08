@@ -1,0 +1,7 @@
+val print_length = /\(l: list num) => {
+  print(List.length(l));
+};
+
+val res = if (print_length([1,2,3,4]) == 4) then "nope!!" else "yup!!";
+
+print(res);

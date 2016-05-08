@@ -1,0 +1,19 @@
+val take = /\(pred, arr) => {
+  val aux = /\(acc, arr) => {
+    if (empty?(arr)) then List.rev(acc)
+    else {
+        val head = hd(arr);
+        if pred(head) then aux(head :: acc, tl(arr))
+        else List.rev(acc);
+    };
+  };
+  aux([], arr);
+};
+
+val pred = /\(n) => n % 2 == 0;
+
+print(take(pred, [2,6,8,1,2,3,4]));
+print(take(pred, []));
+print(take(pred, [1,2,3,4,5]));
+print(take(pred, [0,2,2,4,8,100]));
+print(take(pred, [-2, -4, -6, 2, 1 , -1]));

@@ -1,0 +1,5 @@
+// key can only be num, bool, or string
+val m = {
+  [1,2,3]: "small list",
+  [1,2,3,4,5,6,7,8,9,10]: "big list"
+};

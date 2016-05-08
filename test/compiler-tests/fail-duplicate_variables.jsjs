@@ -1,0 +1,5 @@
+val x = 25;
+print(x);
+
+val x = 20;
+print(x);

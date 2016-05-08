@@ -1,0 +1,6 @@
+val temp = /\(x) => {
+  val x = "inner";
+  x;
+};
+
+print(temp("yo"));
