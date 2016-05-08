@@ -5,5 +5,5 @@ val join = /\(sep: string, xs: list string): string => {
   else List.fold_left(concat, hd(xs), tl(xs));
 };
 
-val joined = join(",", ["foo", "bar", "baz"]);
+val joined = join("," , ["foo", "bar", "baz"]);
 print(joined);

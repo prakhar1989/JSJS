@@ -2,8 +2,7 @@ val slist1 = ["foo", "bar", "baz"];
 
 // compare functions
 val lt = /\(x, y) => x < y;
-val gt = /\(x,y) => x > y;
 
 List.iter(print, List.sort(lt, slist1));
+// anonymous comparator function
 List.iter(print, List.sort(/\(x, y) => x > y, slist1));
-

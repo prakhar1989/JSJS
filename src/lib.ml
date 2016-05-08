@@ -75,7 +75,7 @@ let list_definitions = [
   ("fold_left", TFun([TFun([T("X"); T("Y")], T("X")); T("X"); TList(T("Y"))], T("X")));
   ("insert", TFun([TList(T("Z")); T("Z"); TNum], TList(T("Z"))));
   ("remove", TFun([TList(T("AA")); TNum], TList(T("AA"))));
-  ("sort", TFun([TFun([T("AB"); T("AB")], TBool); TList(T("AB"))], TList(T("AB"))));
+  ("sort", TFun([TFun([T("AH"); T("AH")], TBool); TList(T("AH"))], TList(T("AH"))));
 ];;
 
 let map_definitions = [
