@@ -1,1 +1,1 @@
-Type Error: Map key cannot be of type 'list num'
+Type Error: Cannot have 'list num' as key type in a Map.

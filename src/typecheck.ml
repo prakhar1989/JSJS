@@ -280,7 +280,7 @@ let rec collect_expr (ae: aexpr): constraints =
     let vlist = List.map snd kvpairs in
     let k_conts = List.map (fun k -> (kt, type_of k)) klist in
     let v_conts = List.map (fun v -> (vt, type_of v)) vlist in
-    (List.flatten (List.map collect_expr klist)) @
+    [(t, TMap(kt, vt))] @ (List.flatten (List.map collect_expr klist)) @
     (List.flatten (List.map collect_expr vlist)) @ k_conts @ v_conts
 
   | ABlock(aes, t) ->
@@ -389,12 +389,16 @@ and unify_one (t1: primitiveType) (t2: primitiveType) : substitutions =
   match t1, t2 with
   | TNum, TNum | TBool, TBool | TString, TString | TUnit, TUnit -> []
   | TExn, _ | _, TExn -> []
-  | T(x), z | z, T(x) ->
-    if (t1 = t2 || resolve_type x z)
-    then [(x, z)]
-    else raise (MismatchedTypes(t1, t2))
+  | T(x), z | z, T(x) -> 
+      if (t1 = t2 || resolve_type x z)
+      then [(x, z)]
+      else raise (MismatchedTypes(t1, t2))
   | TList(t1), TList(t2) -> unify_one t1 t2
-  | TMap(kt1, vt1), TMap(kt2, vt2) -> unify [(kt1, kt2) ; (vt1, vt2)]
+  | TMap(kt1, vt1), TMap(kt2, vt2) -> 
+          let _ = (match kt1 with 
+            | TNum | TBool | TString | T(_) -> ()
+            | _ -> raise (InvalidKeyType(kt1))) in
+          unify [(kt1, kt2) ; (vt1, vt2)]
   (* This case is particularly useful when you are calling a function that returns a function *)
   | TFun(a, b), TFun(x, y) ->
       let l1 = List.length a and l2 = List.length x in
@@ -424,7 +428,6 @@ let rec apply_expr (subs: substitutions) (ae: aexpr): aexpr =
   | AThrow(ae, t)                 -> AThrow(apply_expr subs ae, apply subs t)
   | ATryCatch(atry, s, acatch, t) -> ATryCatch(apply_expr subs atry, s, apply_expr subs acatch, apply subs t)
 ;;
-
 
 let infer (expr: expr) (env: environment) : aexpr * environment =
   let aexpr, env = annotate_expr expr env in
@@ -470,9 +473,7 @@ let type_check (program: program) : (aexpr list) =
 
                     (* return the annotated expression *)
                     AFunLit(id, unified_ae, user_type, user_unified_t), subs
-
                   | _ -> ae, []) in
-
               (* since this is an assignment statement, we
                  update the environment with the type of ae *)
               let locals, globals = env and aet = type_of ae in
