@@ -1,0 +1,4 @@
+val hazardous_fn = /\() => {
+    print("eden hazard");
+    val ok = "hmm...";
+};

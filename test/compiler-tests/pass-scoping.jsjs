@@ -1,0 +1,10 @@
+val x = "outer";
+
+val res = /\() => {
+  print(x);
+  val x = "inner";
+  print(x);
+  5;
+};
+
+print(res());
