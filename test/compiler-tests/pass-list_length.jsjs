@@ -1,0 +1,11 @@
+val a = [];
+print((List.length(a)) == 0);
+
+val b = [1, 2, 3, 4];
+print((List.length(b)) == 4);
+
+val c = ["one", "two"];
+print((List.length(c)) == 2);
+
+val d = [false, true, false];
+print((List.length(d)) == 3);
