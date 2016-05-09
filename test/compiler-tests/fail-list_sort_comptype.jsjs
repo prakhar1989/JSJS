@@ -1,0 +1,4 @@
+val comp: (num, num) -> bool = /\(x, y) => x < y;
+val slist = ["foo", "bar", "baz"];
+
+List.iter(print, List.sort(comp, slist));

@@ -322,20 +322,13 @@ let rec collect_expr (ae: aexpr): constraints =
     (collect_expr afn) @ (List.flatten (List.map collect_expr aargs)) @ sign_conts
 
   | AModuleLit(id, ae, t) ->
-    let definitions = ModuleMap.find id modules in
     (match ae with
      | AVal(prop, ts) ->
-       let prop_type = if NameMap.mem prop definitions
-       then NameMap.find prop definitions
-       else raise (UndefinedProperty(id, Val(prop))) in
-       (collect_expr ae) @ [(t, prop_type)]
+       (collect_expr ae) @ [(t, ts)]
      | ACall(afn, aargs, call_t) ->
-       let prop = (match afn with
-           | AVal(s, _) -> s
-           |  _ -> raise (failwith "unreachable state")) in
-       let prop_type = if NameMap.mem prop definitions
-       then NameMap.find prop definitions
-       else raise (UndefinedProperty(id, Val(prop))) in
+       let prop, prop_type = (match afn with
+           | AVal(s, t) -> s, t
+           |  _ -> raise (failwith "unreachable state 1")) in
        (match prop_type with
         | TFun(arg_types, ret_type) ->
           let sign_conts =
@@ -346,9 +339,9 @@ let rec collect_expr (ae: aexpr): constraints =
                   (fun ft at -> (ft, type_of at)) arg_types aargs in
               arg_conts
           in
-          sign_conts @ [(t, call_t); (t, ret_type)]
-       | _ -> raise(failwith "unreachable state"))
-     | _ -> raise (failwith "unreachable state"))
+          (List.flatten (List.map (collect_expr) aargs)) @  sign_conts @ [(t, call_t); (t, ret_type)]
+       | _ -> raise(failwith "unreachable state 2"))
+     | _ -> raise (failwith "unreachable state 3"))
 
   | AThrow(ae, t) -> collect_expr ae @ [(t, TExn)]
 

@@ -1,5 +1,4 @@
 val comp = /\(x , y) => x - y;
 val l = [1,2,3,4];
 
-// should give a type error within sort, but doesn't
 List.iter(print_num, List.sort(comp, l));
