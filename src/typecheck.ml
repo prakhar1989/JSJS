@@ -117,7 +117,17 @@ let rec annotate_expr (e: expr) (env: environment) : (aexpr * environment) =
                 else NameMap.add it at map) in
 
         (* prepare AFunLit *)
-        let ae, _ = annotate_expr e (new_locals, globals) in
+        let new_env = (new_locals, globals) in
+        let ae, _ = (match e with
+            (* if function expr is a block, env is already merged for its
+             * annotation, need not be merged again in Block *)
+            | Block(es) -> begin
+                let aes, _ = ListLabels.fold_left ~init: ([], new_env) es
+                    ~f: (fun (aes, env) e -> let ae, env = annotate_expr e env in (ae :: aes, env))
+                in ABlock(List.rev aes, get_new_type()), new_env
+            end
+            | _ -> annotate_expr e new_env) in
+
         let ret_type = if ret_type = TAny then get_new_type () else ret_type in
         let arg_types = List.map snd annotated_args in
         let fun_type = TFun(arg_types, ret_type) in

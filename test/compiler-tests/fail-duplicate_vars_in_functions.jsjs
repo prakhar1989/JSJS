@@ -1,6 +1,5 @@
 val temp = /\(x) => {
-  val x = "inner";
+  val x: string = "Inner";
   x;
 };
 
-print(temp("yo"));
