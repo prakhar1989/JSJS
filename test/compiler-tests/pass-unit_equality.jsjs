@@ -2,5 +2,9 @@ val unit_lit1 = (-);
 
 val unit_lit2 = print(5);
 
+print(unit_lit1);
+
+print(unit_lit2);
+
 // should return true
 print(unit_lit1 == unit_lit2);

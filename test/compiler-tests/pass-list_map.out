@@ -1,10 +1,2 @@
-1
-4
-9
-16
-25
-ODD
-EVEN
-ODD
-EVEN
-ODD
+List [ 1, 4, 9, 16, 25 ]
+List [ "ODD", "EVEN", "ODD", "EVEN", "ODD" ]

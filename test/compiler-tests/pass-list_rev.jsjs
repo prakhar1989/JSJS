@@ -1,11 +1,11 @@
 val a = [1, 2, 3, 4, 5];
 
-List.print_list(List.rev(a));
+print(List.rev(a));
 
 val b = ["one", "two", "three", "four", "five"];
 
-List.print_list(List.rev(b));
+print(List.rev(b));
 
 val c = [true, false, false, true, false];
 
-List.print_list(List.rev(c));
+print(List.rev(c));

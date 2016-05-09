@@ -1,15 +1,3 @@
-5
-4
-3
-2
-1
-five
-four
-three
-two
-one
-false
-true
-false
-false
-true
+List [ 5, 4, 3, 2, 1 ]
+List [ "five", "four", "three", "two", "one" ]
+List [ false, true, false, false, true ]
