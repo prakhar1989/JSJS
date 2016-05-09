@@ -1,0 +1,7 @@
+val a = [1, 2, 3, 4, 5];
+
+val b = List.filter(/\(a) => { if a==4 then true else false ; }, a);
+
+print(b == []);
+
+print(b == [4]);

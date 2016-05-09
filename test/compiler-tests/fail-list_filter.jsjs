@@ -1,0 +1,5 @@
+val a = [1, 2, 3, 4, 5];
+
+val b = List.filter(/\(a) => { if a then a else 0; }, a);
+
+print(b);
