@@ -62,7 +62,7 @@ let rec js_of_aexpr (module_name: string) (map:'a NameMap.t) (aexpr: aexpr) =
   | ANumLit(x, _) -> Printf.sprintf "%s" (string_of_float x)
   | AStrLit(s, _) -> Printf.sprintf "\"%s\"" s
   | ABoolLit(b, _) -> Printf.sprintf "%s" (string_of_bool b)
-  | AUnitLit(_) -> "null"
+  | AUnitLit(_) -> "(undefined)"
 
   | AUnop(o, e, _) ->
     let s1 = string_of_op o and s2 = js_of_aexpr module_name map e in
