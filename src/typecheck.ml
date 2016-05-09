@@ -242,6 +242,7 @@ let rec collect_expr (ae: aexpr): constraints =
   match ae with
   | AUnitLit(_) | ANumLit(_) | ABoolLit(_) | AStrLit(_) -> []
   | AVal(_) -> []
+
   | ABinop(ae1, op, ae2, t) ->
     let et1 = type_of ae1 and et2 = type_of ae2 in
 
@@ -392,13 +393,13 @@ and unify_one (t1: primitiveType) (t2: primitiveType) : substitutions =
   match t1, t2 with
   | TNum, TNum | TBool, TBool | TString, TString | TUnit, TUnit -> []
   | TExn, _ | _, TExn -> []
-  | T(x), z | z, T(x) -> 
+  | T(x), z | z, T(x) ->
       if (t1 = t2 || resolve_type x z)
       then [(x, z)]
       else raise (MismatchedTypes(t1, t2))
   | TList(t1), TList(t2) -> unify_one t1 t2
-  | TMap(kt1, vt1), TMap(kt2, vt2) -> 
-          let _ = (match kt1 with 
+  | TMap(kt1, vt1), TMap(kt2, vt2) ->
+          let _ = (match kt1 with
             | TNum | TBool | TString | T(_) -> ()
             | _ -> raise (InvalidKeyType(kt1))) in
           unify [(kt1, kt2) ; (vt1, vt2)]

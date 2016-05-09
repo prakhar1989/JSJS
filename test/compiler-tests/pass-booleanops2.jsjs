@@ -1,0 +1,8 @@
+val x = 5 < 10;
+val y = "a" < "b";
+val z = true < false;
+
+
+print(x);
+print(y);
+print(z);
