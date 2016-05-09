@@ -1,0 +1,5 @@
+val hw = (/\(s1, s2) => s1 ^ " " ^  s2;)("hello", "world");
+print(hw);
+
+val sum = (/\(x, y, z) => x + y + z;)(5, 10, 15);
+print_num(sum);

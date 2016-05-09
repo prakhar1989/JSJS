@@ -1,0 +1,14 @@
+val m1 = {
+    "a" : 1,
+    "b" : 2,
+    "c" : 3
+};
+
+val m2 = {
+    "d" : 4,
+    "a" : 5,
+    "e" : 6
+};
+
+val merged = Map.merge(m1, m2);
+print(merged);
