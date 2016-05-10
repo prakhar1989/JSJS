@@ -1,0 +1,2 @@
+val a = { "foo" : "bar" };
+print(set(a, 1, ""));

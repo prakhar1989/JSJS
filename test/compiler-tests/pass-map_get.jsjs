@@ -1,0 +1,12 @@
+val a = { "foo" : "bar"};
+print(get(a, "foo"));
+
+val b = { 1 : [1, 2, 3] };
+print(get(b, 1));
+
+val c = { true : 2, 
+          false : 3 };
+print(get(c, true));
+
+val d = { 1 : { "foo" : 2}};
+print(get(d, 1));

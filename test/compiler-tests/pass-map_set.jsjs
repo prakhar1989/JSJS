@@ -1,0 +1,12 @@
+val a = { "foo" : "bar"};
+print(set(a, "foo1", "bar1"));
+
+val b = { 1 : [1, 2, 3] };
+print(set(b, 2, [1, 4, 9]));
+
+val c = { true : 2, 
+          false : 3 };
+print(set(c, true, 4));
+
+val d = { 1 : { "foo" : 2 }};
+print(set(d, 2, {"bar": 4}));

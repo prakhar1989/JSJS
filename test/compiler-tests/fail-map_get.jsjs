@@ -1,0 +1,4 @@
+val a = { "foo" : "bar" };
+print(get(a, "foo"));
+print(get(a, ""));
+print(get(a, 1));
