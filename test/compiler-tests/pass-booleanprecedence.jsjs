@@ -1,0 +1,9 @@
+val f = true && false || true && false;
+print_bool(f);
+
+print_bool((false || true) && false && true);
+
+val t = true && false || true && true;
+print(t);
+val t2 = true && (false || true) && true;
+print(t2);

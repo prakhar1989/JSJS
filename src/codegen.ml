@@ -130,7 +130,6 @@ let rec js_of_aexpr (module_name: string) (map:'a NameMap.t) (env: environment) 
         let name = remove_qmark id in
         let alias = name ^ string_of_int(Random.int 1000000) in
         let new_locals = NameMap.add name alias locals in
-        print_endline ("added " ^ id ^ " in locals");
         let new_env = new_locals, globals in
         (Printf.sprintf "let %s = %s" alias (fst (js_of_aexpr module_name map new_env e))), new_env
     end
@@ -194,7 +193,7 @@ let rec js_of_aexpr (module_name: string) (map:'a NameMap.t) (env: environment) 
       | AFunLit(_) -> fst (js_of_aexpr module_name map env e)
       | _ -> raise (failwith "not a function call") in
     let es = List.map (fun e -> fst (js_of_aexpr module_name map env e)) es in
-    (match id with
+    let fn_call = (match id with
      | "print_num" | "print_bool" | "print"
      | "print_string" -> Printf.sprintf "%s(%s)" id (String.concat "," es)
      | "hd" -> Printf.sprintf "(%s).get(0)" (List.hd es)
@@ -205,21 +204,22 @@ let rec js_of_aexpr (module_name: string) (map:'a NameMap.t) (env: environment) 
      | "has__" -> Printf.sprintf "(%s).has((%s).toString())" (List.hd es) (List.nth es 1)
      | "keys" -> Printf.sprintf "Immutable.fromJS(Array.from((%s).keys()))" (List.hd es)
      | "del" -> Printf.sprintf "(%s).remove((%s).toString())" (List.hd es) (List.nth es 1)
-     | _ -> Printf.sprintf "%s(%s)" id (String.concat "," es)), env
+     | _ -> Printf.sprintf "%s(%s)" id (String.concat "," es)) in
+    fn_call, env
 
   | AListLit(es, _) -> let es = String.concat ", " (List.map (fun e ->
           fst (js_of_aexpr module_name map env e)) es) in
     (Printf.sprintf "Immutable.List.of(%s)" es), env
 
-  | AModuleLit(id, e, _) -> 
+  | AModuleLit(id, e, _) ->
     let js_e = (match e with
          | AVal(prop, _) -> prop
-         | ACall(prop, aargs, _) -> let js_args = List.map 
+         | ACall(prop, aargs, _) -> let js_args = List.map
            (fun aarg -> fst (js_of_aexpr module_name map env aarg)) aargs in
            let js_args = String.concat "," js_args in
            let prop = (match prop with
            | AVal(id, _) -> id
-           | _ -> raise (failwith "mod call can't be funlit")) in
+           | _ -> raise (failwith "mod call can't be funlit or anything else")) in
            Printf.sprintf "%s(%s)" prop js_args
          | _ -> raise (failwith "unreachable state in module codegen")) in
     (Printf.sprintf "%s.%s" id js_e), env

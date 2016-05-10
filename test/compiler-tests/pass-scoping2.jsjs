@@ -1,0 +1,11 @@
+val x = "top level";
+
+val f = /\(y) => {
+    print("function_arg " ^ y);
+    val x = "inner decl";
+    print(x);
+    (/\(x) => print("In anonymous function " ^ x);)("lambda");
+    print("should be inner decl " ^ x);
+};
+f("funarg");
+print("Back in top level scope " ^ x);

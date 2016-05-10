@@ -30,7 +30,9 @@ open Ast
 %nonassoc DOT
 %right ASSIGN
 %right CONS
-%left CARET AND OR
+%left CARET 
+%left OR
+%left AND
 %left NOT
 %left LTE GTE LT GT EQUALS NEQ
 %left PLUS MINUS

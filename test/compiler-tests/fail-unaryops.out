@@ -1,1 +1,1 @@
-Type error: expected value of type 'bool', got a value of type '(B, A) -> C' instead
+Type error: expected value of type '(B, A) -> C', got a value of type 'bool' instead

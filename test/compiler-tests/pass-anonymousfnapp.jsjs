@@ -3,3 +3,5 @@ print(hw);
 
 val sum = (/\(x, y, z) => x + y + z;)(5, 10, 15);
 print_num(sum);
+
+print_bool((/\(x) => x >= 0;)(2));

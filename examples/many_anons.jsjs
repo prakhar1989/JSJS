@@ -1,0 +1,10 @@
+val fn = /\() => {
+//    print("function f called");
+//    (/\() => print("lambda 0 - no arg");)();
+//    print("after lambda 0");
+    (/\(x) => print(x);)("lambda 1 - 1 arg");
+    (/\(x, y) => print(("lambda 2 - 2 args: " ^ x ^ " " ^ y));)("foo", "bar");
+    print("after 2 lambdas");
+};
+
+fn();
