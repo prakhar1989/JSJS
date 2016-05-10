@@ -45,17 +45,14 @@ var print_bool = print_me;
 var print = print_me;
 // generated code follows
 %s" in
-(*
   let stdlib = [("List", "lib/list.jsjs"); ("Map", "lib/map.jsjs")] in
   let module_names = String.concat ~sep:"" (List.map
       ~f: (fun (x, _) -> Printf.sprintf "let %s = {};" x) stdlib)
   in
   let js_of_stdlib = List.fold_left ~init: "" stdlib
       ~f: (fun acc (name, path) -> acc ^ (generate_stdlib path name)) in
-*)
   let outc = Out_channel.create filename in
-  Printf.fprintf outc template "" "" "" str;
-  (* Printf.fprintf outc template Lib.immutable module_names js_of_stdlib str;*)
+  Printf.fprintf outc template Lib.immutable module_names js_of_stdlib str;
   Out_channel.close outc
 ;;
 

@@ -96,23 +96,29 @@ let rec js_of_aexpr (module_name: string) (map:'a NameMap.t) (env: environment) 
   | AThrow(e, t) -> (Printf.sprintf "(function() { throw %s })()" (fst (js_of_aexpr module_name map env e))), env
 
   | ATryCatch(e1, s, e2, t) ->
-    let s1, _ = js_of_aexpr module_name map env e1 and s2, _ = js_of_aexpr module_name map env e2 in
+    let s1, _ = js_of_aexpr module_name map env e1 in
+    let locals, globals = merge_env env in
+    let new_locals = NameMap.add s s locals in
+    let s2, _ = js_of_aexpr module_name map (new_locals, globals) e2 in
     (try_catch_template s1 s s2), env
 
   | AVal(s, _) ->
-  (* add map here *)
-    if NameMap.mem s map
-    then (Printf.sprintf "%s.%s" module_name (remove_qmark s)), env
-    else begin
-        let s = remove_qmark s in
-        let locals, globals = env in
-        if NameMap.mem s locals
-        then (NameMap.find s locals), env
-        else if NameMap.mem s globals
-            then (NameMap.find s globals), env
-            else raise (failwith ("not found in globals " ^ s))
-
-    end
+      (* top level check if vals are global definitions *)
+      (match s with
+        | "print_num" | "print_bool" | "print"
+        | "print_string" | "hd" | "tl" | "empty__"
+        | "get" | "set" | "has__" | "keys" | "del" -> s, env 
+        | _ -> if NameMap.mem s map
+                then (Printf.sprintf "%s.%s" module_name (remove_qmark s)), env
+                else begin
+                    let s = remove_qmark s in
+                    let locals, globals = env in
+                    if NameMap.mem s locals
+                    then (NameMap.find s locals), env
+                    else if NameMap.mem s globals
+                        then (NameMap.find s globals), env
+                        else raise (failwith ("not found in globals " ^ s))
+                end)
 
   | AAssign(id, _, e, _) ->
   (* add map here *)
@@ -205,7 +211,18 @@ let rec js_of_aexpr (module_name: string) (map:'a NameMap.t) (env: environment) 
           fst (js_of_aexpr module_name map env e)) es) in
     (Printf.sprintf "Immutable.List.of(%s)" es), env
 
-  | AModuleLit(id, e, _) -> (Printf.sprintf "%s.%s" id (fst (js_of_aexpr module_name map env e))), env
+  | AModuleLit(id, e, _) -> 
+    let js_e = (match e with
+         | AVal(prop, _) -> prop
+         | ACall(prop, aargs, _) -> let js_args = List.map 
+           (fun aarg -> fst (js_of_aexpr module_name map env aarg)) aargs in
+           let js_args = String.concat "," js_args in
+           let prop = (match prop with
+           | AVal(id, _) -> id
+           | _ -> raise (failwith "mod call can't be funlit")) in
+           Printf.sprintf "%s(%s)" prop js_args
+         | _ -> raise (failwith "unreachable state in module codegen")) in
+    (Printf.sprintf "%s.%s" id js_e), env
 
   | AMapLit(kvpairs, _) ->
     let pairs = List.map (fun (k, v) ->

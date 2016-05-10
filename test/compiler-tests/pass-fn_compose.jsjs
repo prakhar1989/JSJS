@@ -6,5 +6,5 @@ val not = /\(x: bool): bool => !x;
 // composing two functions
 val odd? = compose(not, even?);
 
-//val results = List.filter(odd?, List.range(1, 10));
-//List.iter(/\(x) => print_num(x), results);
+val results = List.filter(odd?, List.range(1, 10));
+List.iter(/\(x) => print_num(x), results);
