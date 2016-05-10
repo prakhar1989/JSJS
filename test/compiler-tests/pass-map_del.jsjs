@@ -1,0 +1,15 @@
+val a = { "foo" : "bar"};
+print(del(a, "foo"));
+print(del(a, "bar"));
+
+val b = { 1 : [1, 2, 3] };
+print(del(b, 1));
+print(del(b, 2));
+
+val c = { true : 2,
+          false : 3 };
+print(del(c, true));
+
+val d = { 1 : { "foo" : 2}};
+print(del(d, 1));
+print(del(d, 2));

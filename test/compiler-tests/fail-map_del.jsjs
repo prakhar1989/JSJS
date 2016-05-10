@@ -1,0 +1,2 @@
+val a = { "foo" : "bar" };
+print(del(a, 1));

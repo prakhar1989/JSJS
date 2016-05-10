@@ -1,0 +1,7 @@
+Map {}
+Map { "foo": "bar" }
+Map {}
+Map { "1": List [ 1, 2, 3 ] }
+Map { "false": 3 }
+Map {}
+Map { "1": Map { "foo": 2 } }
