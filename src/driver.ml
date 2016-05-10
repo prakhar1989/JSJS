@@ -17,9 +17,11 @@ let generate_stdlib file_path module_name =
     | e -> Printf.printf "%s" (Exn.to_string e); exit 1
   in
   let map = Lib.ModuleMap.find module_name Lib.modules in
-  let js_exprs = List.fold_left inferred_program
-      ~f:(fun acc aexpr -> (js_of_aexpr module_name map aexpr) :: acc)
-      ~init: []
+  let js_exprs, _  = List.fold_left inferred_program
+      ~f:(fun (acc, env) aexpr ->
+          let js_expr, new_env = js_of_aexpr module_name map env aexpr in
+          (js_expr :: acc, new_env))
+      ~init: ([], (NameMap.empty, NameMap.empty))
   in
   let string_of_stdlib = String.concat ~sep:"\n" (List.rev js_exprs) in
   let template = format_of_string "
@@ -43,14 +45,17 @@ var print_bool = print_me;
 var print = print_me;
 // generated code follows
 %s" in
+(*
   let stdlib = [("List", "lib/list.jsjs"); ("Map", "lib/map.jsjs")] in
   let module_names = String.concat ~sep:"" (List.map
       ~f: (fun (x, _) -> Printf.sprintf "let %s = {};" x) stdlib)
   in
   let js_of_stdlib = List.fold_left ~init: "" stdlib
       ~f: (fun acc (name, path) -> acc ^ (generate_stdlib path name)) in
+*)
   let outc = Out_channel.create filename in
-  Printf.fprintf outc template Lib.immutable module_names js_of_stdlib str;
+  Printf.fprintf outc template "" "" "" str;
+  (* Printf.fprintf outc template Lib.immutable module_names js_of_stdlib str;*)
   Out_channel.close outc
 ;;
 
@@ -83,9 +88,11 @@ let driver filename axn =
 
   (* Compile *)
   let compile_to_js () =
-    let js_exprs = List.fold_left inferred_program
-        ~f:(fun acc aexpr -> (js_of_aexpr "" NameMap.empty aexpr) :: acc)
-        ~init: []
+    let js_exprs, _ = List.fold_left inferred_program
+        ~f:(fun (acc, env) aexpr ->
+            let js_expr, new_env = js_of_aexpr "" NameMap.empty env aexpr in
+            (js_expr :: acc, new_env))
+        ~init: ([], (NameMap.empty, NameMap.empty))
     in
     let s = String.concat ~sep:"\n" (List.rev js_exprs) in
     dump_javascript "out.js" s;

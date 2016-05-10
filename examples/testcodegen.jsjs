@@ -1,0 +1,4 @@
+val x = 5;
+val y = 10;
+print(x + y);
+print("hello");
