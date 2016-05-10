@@ -1,0 +1,4 @@
+val z = ! (/\(x, y) => {
+  val zero = 0;
+  zero + 5;
+});

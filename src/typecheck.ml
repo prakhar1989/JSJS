@@ -28,12 +28,8 @@ let keywords = ["break"; "case"; "class"; "catch"; "const"; "continue";
                 "switch"; "this"; "throw"; "try"; "typeof"; "var"; "void";
                 "while"; "with"; "yield"; "val"; ];;
 
-let jsjs_toplevel = ["print"; "print_num"; "print_string"; "print_bool";
-"num_to_string"; "hd"; "empty?"; "tl"; "get"; "set"; "has?"; "del"; "keys"]  
-
-let keywords_set = List.fold_left (fun acc x -> KeywordsSet.add x acc)
-    KeywordsSet.empty (jsjs_toplevel @  keywords);;
-
+let js_keywords_set = List.fold_left (fun acc x -> KeywordsSet.add x acc)
+    KeywordsSet.empty keywords;;
 
 let get_new_type () =
   let rec aux (cs: char list): char list =
@@ -87,7 +83,7 @@ let rec annotate_expr (e: expr) (env: environment) : (aexpr * environment) =
   | FunLit(ids, e, t) -> begin
 
       (* check if JS keywords are passed as arguments *)
-      List.iter (fun i -> if KeywordsSet.mem i keywords_set
+      List.iter (fun i -> if KeywordsSet.mem i js_keywords_set
                   then raise (CannotRedefineKeyword(i)) else ()) ids;
 
       match t with
@@ -151,7 +147,7 @@ let rec annotate_expr (e: expr) (env: environment) : (aexpr * environment) =
       (* do not allow reassignment *)
       if NameMap.mem id locals
       then raise (AlreadyDefined(id))
-      else if KeywordsSet.mem id keywords_set
+      else if KeywordsSet.mem id js_keywords_set
       then raise (CannotRedefineKeyword(id))
       (* annotate t with user-provided type or new placeholder *)
       else let t = if t = TAny then get_new_type () else t in

@@ -1,0 +1,7 @@
+val y = /\(x) => {
+  - (if (x > 0) 
+  then x * x
+  else x + x);
+};
+
+print(y(5));
