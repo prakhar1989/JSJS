@@ -44,7 +44,7 @@ let handle_error (e: exn) =
     let prop = string_of_expr e in
     raise (TypeError (Printf.sprintf "Error: property '%s' is not defined in module '%s'" prop module_name))
   | CannotRedefineKeyword(keyword) ->
-    raise (TypeError (Printf.sprintf "Error: Cannot define Javascript keyword '%s'" keyword))
+    raise (TypeError (Printf.sprintf "Error: Cannot redefine keyword '%s'" keyword))
   | MismatchedArgCount(l1, l2) ->
     raise (TypeError (Printf.sprintf "Error: Expected number of argument(s): %d, got %d instead." l1 l2))
   | InvalidKeyType(t) ->
