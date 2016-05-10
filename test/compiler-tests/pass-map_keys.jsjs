@@ -1,0 +1,15 @@
+val a = { "foo" : "bar",
+          "foo1" : "bar1" };
+print(keys(a));
+
+val b = { 1 : [1, 2, 3],
+          2 : [1, 4, 9]};
+print(keys(b));
+
+val c = { true : 2,
+          false : 3 };
+print(keys(c));
+
+val d = { 1 : { "foo" : 2 },
+          2 : { "bar" : 3 }};
+print(keys(d));

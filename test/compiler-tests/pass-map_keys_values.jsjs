@@ -1,0 +1,9 @@
+val a = { "a" : 1,
+          "b" : 2,
+          "c" : 3,
+          "d" : 4 };
+
+val ks = keys(a);
+val v = /\(l, key) => { get(a, key) :: l; };
+val vs = List.rev(List.fold_left(v, [], ks));
+print(vs == Map.values(a));
