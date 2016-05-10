@@ -1,0 +1,8 @@
+val a = if 1 == 1 
+        then {
+            print(7);
+            7;
+        }else{
+            "this should fail";
+        };
+
