@@ -2968,3 +2968,103 @@ print_num(gcd42828(12.,8.))
 ### Testing Roles
 
 Prakhar wrote the testing infrastructure for both unit and integration tests including test reporting, file structure, automation and Travis CI setup. Gaurang and Bahul worked on writing out test cases for the type-checker and lastly, Ayush worked on testing plan and testing out the standard library.
+
+
+## Roles and Responsibilities
+There were no specific roles assigned among us. We set up a room in one of our rooms where we used to meet once or sometimes twice a week and code on person's laptop. We didnt work individually on any part of the project. It was a collaborative effort.
+
+## Github Usernames
+
+- Ayush Jain - ayushjain7
+
+- Bahul Jain - bahuljain
+
+- Gaurang Sadekar - gaurangsadekar
+
+- Prakhar Srivastav - prakhar1989
+
+## Software Development Environment
+
+For the duration of the project we used the following development environment:
+
+- Operating System - We used both Ubuntu 14.04 and Mac OS systems for the development of our project.
+
+- OCaml - We used the OPAM to install OCaml and the associated packages including utop, core, batteries and menhir.
+
+- Slack - We used slack for communication and planning for our meetings and offline discussions and follow-ups.
+
+- Github - Github was used for version control throughout our project. Since, all of us our familiar with github it made collaboration easy. We maintained separate branches to maintain our own versions of code.
+
+- Vim/Merlin - We used vim with merlin extension for OCaml as our text editor. Merlin is really helpful. It helps with suggestions, auto-completion and any syntactic or semantic errors in the code.
+
+- Latex/Pandoc/Markdown - We used these softwares for documentation so that quality is maintained.
+
+## Project Timeline
+| Date | Projected Milestone |
+|------|---------------------|
+| February 5 | Project Proposal & LRM |
+| February 15 | Scanner |
+| February 31 | Parser |
+| March 15 | Semantic Analysis |
+| March 31 | Codegen & Hello World |
+| April 15 | Test Suite |
+| April 22 | Bug fixes |
+| May 5 | Lists, Maps and supported library |
+| May 11 | Final Report |
+
+## Architectural Design
+
+The JSJS compiler runs an input program through the following major components one after the other.
+
+- **Scanner**
+- **Parser**
+- **Type Inference and Semantic Checking**
+- **Code Generation**
+
+All these components are implemented purely in OCaml. The entry point to the JSJS compiler is `driver.ml`, which reads input from a file and invokes the above components in order.  
+The scanner (`scanner.mll`) tokenizes the input, and the parser (`parser.mly`) checks for it syntax errors. If there are no syntax errors, the parser emits an Abstract Syntax Tree (AST) structure, using types defined in `ast.mli`. The AST is then type inferred and semantically checked in `typecheck.ml`. If there are no semantic errors in the program, the inferred AST is passed to code generation (`codegen.ml`), which converts it to Javascript code expression by expression.  
+
+### Scanner:
+The scanner takes the raw program file as input, and outputs the tokens present in the program. These include variable identifiers, keywords operators, literals and important symbols. It also removes any additional white spaces and ignores user comments. The scanner gives an error if any unrecognized symbols or incorrect patterns are used in the program.
+
+### Parser:
+The parser takes the tokenized program from the scanner and matches it token by token against the grammar defined. If there is any mismatch, the parser raises a syntax error and causes the compiler to exit. If there are no syntax errors, the parser emits an Abstract Syntax Tree for the program. In JSJS, a program is a list of expressions. The types that compose the Abstract Syntax Tree are all defined in `ast.mli`. This AST structure is then passed ahead for semantic analysis.
+
+### Type Inference and Semantic Checking:
+The semantic analyzer is the most sophisticated component of the JSJS compiler. The code is implemented in `typecheck.ml`. It takes an AST and executes the following semantic checks on it:
+- checks if values are not redefined in the current scope.
+- checks if Javascript or JSJS keywords are redefined in the code.
+- checks if correct module names and member expressions are referenced in code.
+- runs Hindley - Milner Type Inference (Algorithm W) on the AST, to concretely infer types and enforce semantic constraints.
+
+### Hindley - Milner Type Inference
+Hindley - Milner Type Inference or Algorithm W is an algorithm which has the ability to deduce the type of a given program AST without the need of any annotations or information provided by the programmer about the types involved.  
+The type inference algorithm we have implemented in JSJS infers all types in the AST of an expression with the following 4 steps:
+- **Annotate**  
+In this step, we either annotate each expression and sub-expression in the AST with any type annotations that the programmer provides, or with a new placeholder type to be unified or resolved later.
+
+- **Collect**  
+In this step, we enforce all the semantic constraints associated with each type. Each sub-expression within an expression also has to be collected recursively. We impose constraints on the enclosing type first as at any point, it gives the most information about what type its subexpression could possibly have. An example of collect is if we get the AST for the expression `x + y`, we need to enforce that the result of the this operation is of type `num` and the operands `x` and `y` are of type `num`. Constraints are always applied from outwards in.  
+If we have 3 placeholder types `C`, `B` and `A` associated with `x + y`, `x` and `y` respectively, then we get constraints in collect of the form `[(A, num), (B, num), (C, num)]`. We do this because the substitution and unification algorithm work from right to left.
+
+Once we have the constraints ready, we pass these list of constraints to the Type Unification Algorithm, which comprises of 2 steps, substitute and unify.
+
+- **Substitute**  
+In this step we take a substitution rule that tells us to replace all occurrences of type placeholder x with u, in a primitive type t. We are required to apply this substitution to t recursively, so if t is a composite type that contains multiple occurrences of x then at every occurrence of x, a u is to be substituted. We apply the substitutions to the list of constraints, folding from right to left.
+
+- **Unification**  
+Type unification is done using 2 mutually recursive methods, `unify` and `unify_one`.
+    - Unify: The unify function takes a bunch of constraints it obtained from the collect method and turns them into substitutions. Since constraints on the right have more precedence we start from the rightmost constraint and unify it by calling the unify_one function. unify_one transforms the constraint to a substitution.
+    - Unify One: In this method, a constraint is converted to a substitution using type unification rules.  
+
+Using these 2 steps, we infer all the types when we unify all the constraints in the list passed from the Collect step.
+
+If the unification passes for all constraints, the program is semantically correct. We then pass the AST with all inferred types to code generation. Inferring all types correctly using HMTI is a mechanism to type check the program correctly, as type information is not useful in code generation to Javascript.
+
+### Codegen: 
+Using this component of the compiler, we generate Javascript code from the AST of the program. Since Javascript is an **untyped** language we don't need any of the inferred type information for code generation.  
+Translating JSJS to JS requires some tricks in code generation because we implemented have JSJS as a completely expression oriented language.  
+
+In JS, `if-else` is a statement, but in JSJS `if-then-else` is an expression. The same applies with blocks as well. To deal with this, we wrap all our `if-then-else` and blocks within anonymous function calls, so that they always return a result. 
+
+Another issue we noticed with doing a naive Javascript translation was Javascript's inconsistent scoping rules. In Javascript, 2 types of declarations are allowed, `let` and `var`. `let` binds to the nearest enclosing block (essentially a local definition) and 
