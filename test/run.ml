@@ -119,7 +119,7 @@ let run_testcase fname =
 
 let run testcases () : test_kind =
   let total = List.length testcases in
-  let t_start = Sys.time() in
+  let t_start = Unix.gettimeofday() in
   let passing = List.fold_left
       (fun acc t ->
          acc + (match run_testcase t with Pass -> 1 | Fail -> 0))
@@ -137,7 +137,7 @@ let run testcases () : test_kind =
       \n" in
   let failures = total - passing in
   Printf.printf template total passing failures
-    (Sys.time() -. t_start);
+    (Unix.gettimeofday() -. t_start);
   if failures = 0 then Pass else Fail
 ;;
 

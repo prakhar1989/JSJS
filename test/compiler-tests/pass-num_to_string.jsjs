@@ -1,0 +1,4 @@
+val x = 5;
+val y = 10;
+
+print_string(num_to_string(x + y) ^ " as a string");

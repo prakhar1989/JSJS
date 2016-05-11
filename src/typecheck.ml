@@ -14,7 +14,6 @@ type environment = typesTable * typesTable
 type substitutions = (id * primitiveType) list
 type constraints = (primitiveType * primitiveType) list
 
-
 (* mutable state *)
 let type_variable = (ref ['A'; 'A'; 'A']);;
 
@@ -29,10 +28,13 @@ let keywords = ["break"; "case"; "class"; "catch"; "const"; "continue";
                 "while"; "with"; "yield"; "val"; ];;
 
 let jsjs_toplevel = ["print"; "print_num"; "print_string"; "print_bool";
-"num_to_string"; "hd"; "empty?"; "tl"; "get"; "set"; "has?"; "del"; "keys"]  
+"num_to_string"; "hd"; "empty?"; "tl"; "get"; "set"; "has?"; "del"; "keys"]
 
 let keywords_set = List.fold_left (fun acc x -> KeywordsSet.add x acc)
     KeywordsSet.empty (jsjs_toplevel @  keywords);;
+
+let jsjs_set = List.fold_left (fun acc x -> KeywordsSet.add x acc)
+    KeywordsSet.empty jsjs_toplevel;;
 
 let get_new_type () =
   let rec aux (cs: char list): char list =

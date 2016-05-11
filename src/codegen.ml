@@ -184,18 +184,16 @@ let rec js_of_aexpr (module_name: string) (map:'a NameMap.t) (env: environment) 
 
   | ACall(e, es, _) ->
     let id = match e with
-      | AVal(s, _) -> let name = (remove_qmark s) in
-      (match name with
-        | "print_num" | "print_bool" | "print"
-        | "print_string" | "hd" | "tl" | "empty__"
-        | "get" | "set" | "has__" | "keys" | "del" -> name
-        | _ -> fst (js_of_aexpr module_name map env e))
+      | AVal(s, _) -> if Typecheck.KeywordsSet.mem s Typecheck.jsjs_set
+          then (remove_qmark s)
+          else fst (js_of_aexpr module_name map env e)
+
       | AFunLit(_) -> fst (js_of_aexpr module_name map env e)
       | _ -> raise (failwith "not a function call") in
     let es = List.map (fun e -> fst (js_of_aexpr module_name map env e)) es in
     let fn_call = (match id with
      | "print_num" | "print_bool" | "print"
-     | "print_string" -> Printf.sprintf "%s(%s)" id (String.concat "," es)
+     | "print_string" | "num_to_string" -> Printf.sprintf "%s(%s)" id (String.concat "," es) 
      | "hd" -> Printf.sprintf "(%s).get(0)" (List.hd es)
      | "tl" -> Printf.sprintf "(%s).delete(0)" (List.hd es)
      | "empty__" -> Printf.sprintf "(%s).isEmpty()" (List.hd es)
