@@ -3083,3 +3083,19 @@ Try to work with people who are accustomed to working with. Start early and try 
 Working on such a big project over the semester made me realize how important it is to be consistent in your work. We met up at least once a week to work and once with our TA to make sure that we were on track. We always knew what we were going to work on and when we left we decided what we were to study before meeting the next time so that everybody had context. This helped save precious time.
 
 It is also very important to choose a good team. People you can work with. Having a good team can go a long way in achieving the goal of your project. You will really enjoy the class and the project if you choose the team well. Also, I really liked the language. The stuff you can do with OCaml and it's type inference and pattern matching is really cool. I can totally imagine how bloated the project would be if were to do this in C++ or JAVA. So learn the language as early into the semester as you can.
+
+## Gaurang
+
+ Working on JSJS was an extremely enlightening experience. Having never done functional programming before, implementing functional features in our language allowed me to learn these concepts in real depth. Particularly, when we implemented Hindley - Milner Type Inference, we realized how reliant we were on OCaml's type system. Throughout the project, I developed a deeper appreciation for programming languages in general, and the complexities involved in providing many of the features in them that we take for granted. Definitely the best project I've worked on at Columbia, in large part due to my team. We were all passionate about JSJS from day 1. I think its really important to have a team that pushes you to work harder and who are all motivated to work on the project regularly. Also, its best to work with people you have teamed up with in the past and people who have similar schedules as you, so that there aren't logistic problems. Besides that, start early and work together on the project at least once a week.
+ 
+ ## Bahul
+ 
+ Learning and using OCaml for the course and project was the perhaps one of the most enlightening experience in I have had in Columbia. Besides that I really enjoyed working on a different type of software development project. Having a concrete vision for the project right from the beginning really helped us a lot. Collective intelligence goes a long way in not just making decisions but also in writing code. Our way of working on the project was quite different but it worked out really well. Sitting together in front of a big monitor while coding every week helped us tackle a lot of the problems with ease. A comprehensive test suite is a blessing in disguise. Ok Bye!
+
+# Appendix
+
+## Project Logs
+
+```
+jhjhkjhkjh
+```
