@@ -3024,6 +3024,8 @@ The JSJS compiler runs an input program through the following major components o
 All these components are implemented purely in OCaml. The entry point to the JSJS compiler is `driver.ml`, which reads input from a file and invokes the above components in order.  
 The scanner (`scanner.mll`) tokenizes the input, and the parser (`parser.mly`) checks for it syntax errors. If there are no syntax errors, the parser emits an Abstract Syntax Tree (AST) structure, using types defined in `ast.mli`. The AST is then type inferred and semantically checked in `typecheck.ml`. If there are no semantic errors in the program, the inferred AST is passed to code generation (`codegen.ml`), which converts it to Javascript code expression by expression.  
 
+Once the Javascript code is generated in `out.js`, it can be run in the terminal using `node out.js` or in the browser as well.
+
 ### Scanner:
 The scanner takes the raw program file as input, and outputs the tokens present in the program. These include variable identifiers, keywords operators, literals and important symbols. It also removes any additional white spaces and ignores user comments. The scanner gives an error if any unrecognized symbols or incorrect patterns are used in the program.
 
@@ -3067,4 +3069,17 @@ Translating JSJS to JS requires some tricks in code generation because we implem
 
 In JS, `if-else` is a statement, but in JSJS `if-then-else` is an expression. The same applies with blocks as well. To deal with this, we wrap all our `if-then-else` and blocks within anonymous function calls, so that they always return a result. 
 
-Another issue we noticed with doing a naive Javascript translation was Javascript's inconsistent scoping rules. In Javascript, 2 types of declarations are allowed, `let` and `var`. `let` binds to the nearest enclosing block (essentially a local definition) and 
+Another issue we noticed with doing a naive Javascript translation was Javascript's inconsistent scoping rules. In Javascript, 2 types of declarations are allowed, `let` and `var`. `let` binds a variable to the nearest enclosing block (essentially a local definition) and `var` binds to the nearest function block. Which means it is accessible everywhere in the function in which it is defined, rather than being accessible *after* its declaration. Since we want proper global and local scoping behavior, we need to do name mangling with some enviroment information. The environment for codegen is simply a map of variable names and their aliases, to replace the names with aliases where they are referenced while generating JS.  
+This allowed us to replicate typical scoping behavior present in statically scoped languages.
+
+# Lessons Learnt
+
+## Prakhar
+
+Try to work with people who are accustomed to working with. Start early and try to grok MicroC's implementation as early in the course as you can. Have a strong test suite, invest in your Makefile and use Github issues for planning. Oh, and never submit a pull-request without attaching a cat gif.
+
+## Ayush
+
+Working on such a big project over the semester made me realize how important it is to be consistent in your work. We met up at least once a week to work and once with our TA to make sure that we were on track. We always knew what we were going to work on and when we left we decided what we were to study before meeting the next time so that everybody had context. This helped save precious time.
+
+It is also very important to choose a good team. People you can work with. Having a good team can go a long way in achieving the goal of your project. You will really enjoy the class and the project if you choose the team well. Also, I really liked the language. The stuff you can do with OCaml and it's type inference and pattern matching is really cool. I can totally imagine how bloated the project would be if were to do this in C++ or JAVA. So learn the language as early into the semester as you can.
