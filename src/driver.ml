@@ -91,7 +91,7 @@ let driver filename axn =
             (js_expr :: acc, new_env))
         ~init: ([], (NameMap.empty, NameMap.empty))
     in
-    let s = String.concat ~sep:"\n" (List.rev js_exprs) in
+    let s = String.concat ~sep:";\n" (List.rev js_exprs) in
     dump_javascript "out.js" s;
     print_endline "JS file ready - out.js";
   in

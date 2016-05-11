@@ -27,7 +27,7 @@ let block_template (return_expr: string) (body: string option) : string =
     let template = format_of_string "
     (function() {
         %s
-        return %s
+        return %s;
     })()"
     in Printf.sprintf template exprs return_expr
 ;;
@@ -145,8 +145,8 @@ let rec js_of_aexpr (module_name: string) (map:'a NameMap.t) (env: environment) 
     | [] -> "" (* will never be reached *)
     | x :: [] -> block_template x None
     | x :: xs ->
-      let es = String.concat "\n" (List.rev xs) in
-      block_template x (Some es)), env
+        let es = String.concat ";\n" (List.rev xs) in
+        block_template x (Some es)), env
 
   | AIf(p, e1, e2, _) ->
     let pred_s, _ = js_of_aexpr module_name map env p
@@ -175,7 +175,7 @@ let rec js_of_aexpr (module_name: string) (map:'a NameMap.t) (env: environment) 
             | [] -> "" (* will never be reached *)
             | x :: [] -> block_template x None
             | x :: xs ->
-              let es = String.concat "\n" (List.rev xs) in
+              let es = String.concat ";\n" (List.rev xs) in
               block_template x (Some es)), new_env 
         end
         | _ -> js_of_aexpr module_name map new_env body) in 

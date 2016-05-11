@@ -1,0 +1,26 @@
+val x = 2;
+// all these fail
+// -> a hanging if else in global scope. Should be evaluated and thrown away in JS
+if x == 2 then print("dos") else print("nos");
+// -> named function call #75
+print("hello");
+(/\(x) => print(x);)("chillin like a lambda");
+
+// anonymous function call followed by anonymous function call #76
+val ftest = /\() => {
+val x = 5;
+print("hello");
+(/\(x) => print(x);)("hi!");
+(/\(x) => print(x);)("chillin like a lambda");
+};
+
+ftest();
+
+// a hanging try catch block, not associated with any function
+try {
+    val y = x + 10;
+    throw "ffs";
+} catch (e) {
+    print(e);
+};
+
