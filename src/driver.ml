@@ -85,12 +85,14 @@ let driver filename axn =
 
   (* Compile *)
   let compile_to_js () =
-    let js_exprs, _ = List.fold_left inferred_program
+    let js_exprs, _ =
+      try List.fold_left inferred_program
         ~f:(fun (acc, env) aexpr ->
-            let js_expr, new_env = js_of_aexpr "" NameMap.empty env aexpr in
+            let js_expr, new_env = Codegen.js_of_aexpr "" NameMap.empty env aexpr in
             (js_expr :: acc, new_env))
         ~init: ([], (NameMap.empty, NameMap.empty))
-    in
+      with
+    | e -> Printf.printf "Error: %s\n" (Exn.to_string e); exit 1 in
     let s = String.concat ~sep:";\n" (List.rev js_exprs) in
     dump_javascript "out.js" s;
     print_endline "JS file ready - out.js";
