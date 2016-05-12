@@ -29,6 +29,11 @@ val chess_squares = pow(8, 2);
 print_string("Total number of squares on a chessboard: ");
 print_num(chess_squares);
 ```
+#### Install
+1. Install ocaml
+  - For mac, using homebrew: `brew install ocaml ocamlbuild opam` 
+2. Configure opam enviroment: `opam init`
+3. Install dependencies: `opam install ocamlfind core menhir`
 
 #### Build
 ```shell
