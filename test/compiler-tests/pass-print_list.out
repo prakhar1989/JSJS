@@ -1,0 +1,5 @@
+List [ 1, 2, 3, 4 ]
+List []
+List [ "a", "b", "c" ]
+List [ true, false, false, false ]
+List [ List [ 1, 2 ], List [ 2, 3 ], List [ 3, 4 ] ]

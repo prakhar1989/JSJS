@@ -28,7 +28,8 @@ let keywords = ["break"; "case"; "class"; "catch"; "const"; "continue";
                 "while"; "with"; "yield"; "val"; ];;
 
 let jsjs_toplevel = ["print"; "print_num"; "print_string"; "print_bool";
-"num_to_string"; "hd"; "empty?"; "tl"; "get"; "set"; "has?"; "del"; "keys"]
+                     "print_list"; "print_map"; "num_to_string"; "hd"; "empty?";
+                     "tl"; "get"; "set"; "has?"; "del"; "keys"]
 
 let keywords_set = List.fold_left (fun acc x -> KeywordsSet.add x acc)
     KeywordsSet.empty (jsjs_toplevel @  keywords);;

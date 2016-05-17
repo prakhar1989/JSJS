@@ -1,0 +1,9 @@
+print_list([1,2,3,4]);
+
+print_list([]);
+
+print_list(["a", "b", "c"]);
+
+print_list([true, false, false, false]);
+
+print_list([[1,2], [2,3], [3,4]]);

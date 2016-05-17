@@ -42,6 +42,8 @@ var print_me = function(m) { console.log(m); };
 var print_string = print_me;
 var print_num = print_me;
 var print_bool = print_me;
+var print_list = print_me;
+var print_map = print_me;
 var print = print_me;
 // generated code follows
 %s" in

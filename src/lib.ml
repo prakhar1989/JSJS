@@ -47,6 +47,8 @@ let top_level_definitions = [
   ("print_string", TFun([TString], TUnit));
   ("print_num", TFun([TNum], TUnit));
   ("print_bool", TFun([TBool], TUnit));
+  ("print_list", TFun([TList(T("AI"))], TUnit));
+  ("print_map", TFun([TMap(T("AJ"), T("AK"))], TUnit));
   ("num_to_string", TFun([TNum], TString));
   ("hd", TFun([TList(T("B"))], T("B")));
   ("empty?", TFun([TList(T("C"))], TBool));

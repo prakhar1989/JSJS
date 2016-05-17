@@ -5,7 +5,7 @@ module NameMap = Map.Make(String);;
 
 (* name environment for program *)
 type aliasTable = string NameMap.t
-type environment = aliasTable * aliasTable 
+type environment = aliasTable * aliasTable
 
 let merge_env (env: environment) : environment =
   let locals, globals = env in
@@ -106,8 +106,8 @@ let rec js_of_aexpr (module_name: string) (map:'a NameMap.t) (env: environment) 
       (* top level check if vals are global definitions *)
       (match s with
         | "print_num" | "print_bool" | "print"
-        | "print_string" | "hd" | "tl" | "empty__"
-        | "get" | "set" | "has__" | "keys" | "del" -> s, env 
+        | "print_string" | "print_list" | "print_map" | "hd" | "tl" | "empty__"
+        | "get" | "set" | "has__" | "keys" | "del" -> s, env
         | _ -> if NameMap.mem s map
                 then (Printf.sprintf "%s.%s" module_name (remove_qmark s)), env
                 else begin
@@ -156,18 +156,18 @@ let rec js_of_aexpr (module_name: string) (map:'a NameMap.t) (env: environment) 
 
   | AFunLit(ids, body, t, _) ->
     let locals, globals = merge_env env in
-    let aliases = List.map 
+    let aliases = List.map
     (fun id -> (remove_qmark id) ^ string_of_int(Random.int 1000000)) ids in
     let new_locals = ListLabels.fold_left2 ~init: locals ids aliases
     ~f: (fun locals id alias -> NameMap.add id alias locals) in
     let string_forms = String.concat "," aliases in
-    
+
     let new_env = new_locals, globals in
     let string_body, _ = (match body with
         (* codegen for function blocks *)
         | ABlock(aes, _) -> begin
             let es, _ = ListLabels.fold_left ~init: ([], new_env) aes
-            ~f: (fun (acc, env) e -> 
+            ~f: (fun (acc, env) e ->
                 let js_expr, new_env = (js_of_aexpr module_name map env e) in
                 (js_expr :: acc), new_env)
             in
@@ -176,9 +176,9 @@ let rec js_of_aexpr (module_name: string) (map:'a NameMap.t) (env: environment) 
             | x :: [] -> block_template x None
             | x :: xs ->
               let es = String.concat ";\n" (List.rev xs) in
-              block_template x (Some es)), new_env 
+              block_template x (Some es)), new_env
         end
-        | _ -> js_of_aexpr module_name map new_env body) in 
+        | _ -> js_of_aexpr module_name map new_env body) in
     let template = format_of_string "(function(%s) { return (%s) })" in
     (Printf.sprintf template string_forms string_body), env
 
@@ -193,7 +193,8 @@ let rec js_of_aexpr (module_name: string) (map:'a NameMap.t) (env: environment) 
     let es = List.map (fun e -> fst (js_of_aexpr module_name map env e)) es in
     let fn_call = (match id with
      | "print_num" | "print_bool" | "print"
-     | "print_string" | "num_to_string" -> Printf.sprintf "%s(%s)" id (String.concat "," es) 
+     | "print_string" | "num_to_string"
+     | "print_list" | "print_map" -> Printf.sprintf "%s(%s)" id (String.concat "," es)
      | "hd" -> Printf.sprintf "(%s).get(0)" (List.hd es)
      | "tl" -> Printf.sprintf "(%s).delete(0)" (List.hd es)
      | "empty__" -> Printf.sprintf "(%s).isEmpty()" (List.hd es)
